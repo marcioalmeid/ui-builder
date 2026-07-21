@@ -1,8 +1,10 @@
 import { Component, signal } from '@angular/core';
+import { DragDropEditorComponent } from './drag-drop-editor/drag-drop-editor';
 
 @Component({
   selector: 'app-root',
-  imports: [],
+  standalone: true,
+  imports: [DragDropEditorComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
