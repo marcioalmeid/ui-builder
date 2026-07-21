@@ -25,8 +25,6 @@ export class FormEditorComponent {
        };
        this.formService.addField(newField, rowId, event.currentIndex);
       return;
-    } else {
-      console.log('Item moved from another container');
-    }
+    }  
   }
 }
