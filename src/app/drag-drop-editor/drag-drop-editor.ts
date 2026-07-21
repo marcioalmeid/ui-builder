@@ -17,8 +17,8 @@ interface DraggableItem {
       <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">Drag & Drop Editor</h1>
 
       <!-- Teste -->
-      <div class="mb-6 bg-blue-100 p-4 rounded">
-        Isso é um teste
+      <div class="mb-6 bg-blue-100 p-4 rounded text-gray-800">
+        teste drag and drop
       </div>
 
       <!-- Toolbar -->
