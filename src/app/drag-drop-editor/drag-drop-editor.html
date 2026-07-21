@@ -2,11 +2,13 @@
 <div class="flex flex-col h-screen bg-gray-100 px-4">
     <div class="flex flex-col justify-center items-center  py-10">
         <h1 class="text-2xl tracking-wide font-medium ">Drag & Drop Editor Design2</h1>
-     </div>
-     <div class="flex gap-4 ">
-    <app-form-elements-menu class="w-64"/>
-    <app-main-canvas class="flex-1" />
-    <app-field-settings class="w-64"/>
+    </div>
+    <div class="flex gap-4 "
+        cdkDropListGroup
+    >
+        <app-form-elements-menu class="w-64" />
+        <app-main-canvas class="flex-1" />
+        <app-field-settings class="w-64" />
     </div>
 
 </div>

@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
+import { FormEditorComponent } from './form-editor.component/form-editor.component';
 
 @Component({
   selector: 'app-main-canvas',
-  imports: [],
+  imports: [FormEditorComponent],
   templateUrl: './main-canvas.html',
   styleUrl: './main-canvas.css',
 })

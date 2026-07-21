@@ -5,3 +5,8 @@ body {
   margin: 0;
   padding: 0;
 }
+
+.cdk-drop-list-dragging:not(.elements-menu)  {
+  border: 2px solid lightgray !important;
+  background-color: lightgray !important; 
+}
