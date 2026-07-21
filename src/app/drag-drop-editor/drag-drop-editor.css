@@ -1,0 +1,143 @@
+/* Drag and drop editor styles */
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.h-screen {
+  height: 100vh;
+}
+
+.bg-gray-100 {
+  background-color: #f5f5f5;
+}
+
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.py-4 {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.flex {
+  display: flex;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.text-2xl {
+  font-size: 1.5rem;
+  line-height: 1.4;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.tracking-wide {
+  letter-spacing: 0.025em;
+}
+
+.bg-white {
+  background-color: #fff;
+}
+
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+
+.shadow {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+}
+
+.p-4 {
+  padding: 1rem;
+}
+
+.min-h-\[300px\] {
+  min-height: 300px;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.p-2 {
+  padding: 0.5rem;
+}
+
+.border {
+  border-width: 1px;
+}
+
+.rounded {
+  border-radius: 0.25rem;
+}
+
+.float-right {
+  float: right;
+}
+
+.text-red-500 {
+  color: #ef4444;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-gray-500 {
+  color: #6b7280;
+}
+
+.py-8 {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+.bg-red-500 {
+  background-color: #ef4444;
+}
+
+.text-white {
+  color: #fff;
+}
+
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.py-2 {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.rounded {
+  border-radius: 0.25rem;
+}
+
+.form-element-preview {
+  margin-bottom: 0.5rem;
+}
+
+.form-element-preview label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+.form-element-preview input,
+.form-element-preview textarea,
+.form-element-preview select {
+  margin-bottom: 0.5rem;
+}

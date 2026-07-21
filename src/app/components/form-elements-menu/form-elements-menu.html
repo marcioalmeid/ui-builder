@@ -1,0 +1,9 @@
+<div class="p-4 bg-white rounded-lg h-[calc(100vh-4rem)] overflow-y-auto border border-gray-200 shadow-sm">
+    @for (type of fieldTypes; track type.type) {
+        <app-field-button
+            [field]="type"
+           
+        ></app-field-button>
+    }
+ 
+</div> 

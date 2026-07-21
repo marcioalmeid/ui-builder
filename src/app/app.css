@@ -1,0 +1,9 @@
+/* Add some basic styling for the app */
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.min-h-screen {
+  min-height: 100vh;
+}
