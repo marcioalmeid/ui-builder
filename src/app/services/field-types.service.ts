@@ -1,10 +1,15 @@
 import { Injectable } from '@angular/core';
-import { FieldTypeDefinition } from '../models/field-types-definition.services';
+import { FieldTypeDefinition } from '../models/field';
 const TEXT_FIELD_TYPE  = {
   id: 'text',
   type: 'text',
   label: 'Text field',
   icon: 'text_fields',
+  defaultConfig: {
+    label: 'Text field',
+    placeholder: 'Enter text',
+    required: false,
+  }
 };
 
 const CHECKBOX_FIELD_TYPE  = {
@@ -12,13 +17,21 @@ const CHECKBOX_FIELD_TYPE  = {
   type: 'checkbox',
   label: 'Checkbox field',
   icon: 'check_box',
-};
+    defaultConfig: {
+    label: 'Checkbox field',
+    required: false,
+  }
+};  
 
 const RADIO_FIELD_TYPE  = {
   id: 'radio',
   type: 'radio',
   label: 'Radio field',
   icon: 'radio_button_checked',
+    defaultConfig: {
+    label: 'Radio field',
+    required: false,
+  }
 };
 
 
