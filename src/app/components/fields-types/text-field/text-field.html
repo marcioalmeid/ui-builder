@@ -1,4 +1,4 @@
 <mat-form-field>
   <mat-label>{{ field().label }}</mat-label>
-  <input matInput [type]="field().inputType || 'text'" [required]="field().required" />
+  <input matInput [type]="field().inputType || 'text'" [required]="field().required" [placeholder]="field().placeHolder || ''" />
 </mat-form-field>

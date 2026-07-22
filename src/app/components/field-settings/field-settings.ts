@@ -31,7 +31,10 @@ export class FieldSettings {
     return field as any;
   });
 
-  updateField(selectedFieldId: string, key: string, value: any): void {
+  updateField(fieldId: string, key: string, value: any): void {
+
+    this.formService.updateField(fieldId,{  [key]: value});
+
   }
 
 }

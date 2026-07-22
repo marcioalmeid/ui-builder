@@ -101,6 +101,14 @@ rows.forEach((row, rowIndex) => {
   
 }
 
+  updateField(fieldId: string, data: Partial<FormField>) {
+    const rows = this._rows();
+    const newRows = rows.map(row => ({
+      ...row,
+      fields: row.fields.map((field => field.id === fieldId ? { ...field, ...data } : field))}));
+      this._rows.set(newRows);
+  }
+
   setSelectedField(fieldId: string) {
     this._selectedFieldId.set(  fieldId); 
   }

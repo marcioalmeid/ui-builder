@@ -19,6 +19,7 @@ export interface FormField {
   id: string;
   type: string;
   label: string;
+  placeHolder?: string;
   icon: string;
   required: boolean;
   inputType?: string;
