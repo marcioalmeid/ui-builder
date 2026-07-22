@@ -33,9 +33,14 @@ const RADIO_FIELD_TYPE  = {
   type: 'radio',
   label: 'Radio field',
   icon: 'radio_button_checked',
-    defaultConfig: {
+  defaultConfig: {
     label: 'Radio field',
     required: false,
+    options: [
+      { label: 'Option 1', value: 'option-1' },
+      { label: 'Option 2', value: 'option-2' },
+      { label: 'Option 3', value: 'option-3' },
+    ],
   },
   component: RadioField,
 };

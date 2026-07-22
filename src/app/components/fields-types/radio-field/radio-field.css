@@ -1,0 +1,18 @@
+.radio-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.radio-field__label {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgb(55 65 81);
+}
+
+.radio-field__group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}

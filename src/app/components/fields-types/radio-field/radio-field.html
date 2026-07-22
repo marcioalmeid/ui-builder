@@ -1,1 +1,14 @@
-<p class="text-gray-800">{{ field().label }}</p>
+<div class="radio-field">
+  <p class="radio-field__label">{{ field().label }}</p>
+  <mat-radio-group
+    class="radio-field__group"
+    [required]="field().required"
+    [attr.aria-label]="field().label"
+  >
+    @for (option of field().options ?? []; track option.value) {
+      <mat-radio-button [value]="option.value">
+        {{ option.label }}
+      </mat-radio-button>
+    }
+  </mat-radio-group>
+</div>

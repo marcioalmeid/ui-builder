@@ -9,6 +9,11 @@ export interface FieldTypeDefinition {
 }
 
 
+export interface RadioOption {
+  label: string;
+  value: string;
+}
+
 export interface FormField {
   id: string;
   type: string;
@@ -16,4 +21,5 @@ export interface FormField {
   icon: string;
   required: boolean;
   inputType?: string;
+  options?: RadioOption[];
 }
