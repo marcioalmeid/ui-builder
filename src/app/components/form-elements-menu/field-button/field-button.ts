@@ -1,4 +1,4 @@
-import { Component,input } from '@angular/core';
+import { Component,input, signal } from '@angular/core';
 import { FieldTypeDefinition } from '../../../models/field';
 import { MatIconModule } from '@angular/material/icon';
 import { DragDropModule } from '@angular/cdk/drag-drop';
@@ -11,4 +11,5 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 })
 export class FieldButton {
   field = input.required<FieldTypeDefinition>( );
+  whileDragging = signal( false );
 }

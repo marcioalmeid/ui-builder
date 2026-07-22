@@ -4,7 +4,9 @@
     cdkDropList
     id="field-selector-list"
     cdkDropListSortingDisabled="true" 
-    [cdkDropListData]="'field-selector'">
+    [cdkDropListData]="'field-selector'"
+    [cdkDropListEnterPredicate]="noDropAllowed" 
+    >
         @for (type of fieldTypes; track type.type) {
         <app-field-button [field]="type"></app-field-button>
         }
