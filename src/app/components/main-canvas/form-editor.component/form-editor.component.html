@@ -4,12 +4,15 @@
         cdkDropList
         [cdkDropListData]="row.id"
         (cdkDropListDropped)="onDropInRow($event, row.id)"
+        [cdkDropListOrientation]="'mixed'"
         >
+        <div>Row</div>
+        <div class="flex gap-4 flex-wrap">
         @for (field of row.fields; track field.id) {
-            <div  >
-              {{ field.label }} 
-            </div>
+             <app-form-field 
+               [field]="field"      /> 
         }
+        </div>
         </div>
     }
  

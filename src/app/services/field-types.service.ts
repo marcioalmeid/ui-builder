@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
 import { FieldTypeDefinition } from '../models/field';
+import { TextField } from '../components/fields-types/text-field/text-field';
+import { CheckboxField } from '../components/fields-types/checkbox-field/checkbox-field';
+import { RadioField } from '../components/fields-types/radio-field/radio-field';
 const TEXT_FIELD_TYPE  = {
   id: 'text',
   type: 'text',
@@ -9,7 +12,8 @@ const TEXT_FIELD_TYPE  = {
     label: 'Text field',
     placeholder: 'Enter text',
     required: false,
-  }
+  },
+ component: TextField, 
 };
 
 const CHECKBOX_FIELD_TYPE  = {
@@ -20,7 +24,8 @@ const CHECKBOX_FIELD_TYPE  = {
     defaultConfig: {
     label: 'Checkbox field',
     required: false,
-  }
+  },
+  component: CheckboxField,
 };  
 
 const RADIO_FIELD_TYPE  = {
@@ -31,7 +36,8 @@ const RADIO_FIELD_TYPE  = {
     defaultConfig: {
     label: 'Radio field',
     required: false,
-  }
+  },
+  component: RadioField,
 };
 
 
@@ -50,8 +56,12 @@ export class FieldTypesService {
   ]);
   
 
-  getFieldTypes(): FieldTypeDefinition[] | undefined {
-    return Array.from(this.fieldTypes.values());
+  getFieldTypeById(id: string): FieldTypeDefinition | undefined {
+    return this.fieldTypes.get(id);
+  }
+
+  getFieldType(type: string): FieldTypeDefinition | undefined {
+    return  this.fieldTypes.get(type) ;
   }
 
   

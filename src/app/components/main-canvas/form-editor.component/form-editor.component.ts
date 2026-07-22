@@ -2,9 +2,10 @@ import { Component, inject } from '@angular/core';
 import { DragDropModule, CdkDragDrop } from '@angular/cdk/drag-drop';
 import { FormService } from '../../../services/form.services';
 import { FieldTypeDefinition } from '../../../models/field';
+import { FormFieldComponent } from '../form-field/form-field.component/form-field.component';
 @Component({
   selector: 'app-form-editor',
-  imports: [DragDropModule],
+  imports: [DragDropModule, FormFieldComponent],
   templateUrl: './form-editor.component.html',
   styleUrl: './form-editor.component.css',
 })
