@@ -7,13 +7,14 @@
         @for (setting of fieldSettings(); track setting.key) {
         @switch (setting.type) {
         @case ('text'){
+            
         <input  class="border border-grey-300 rounded-md px-4 py-2 "  matInput [ngModel]="fieldValues()[setting.key]"
             (ngModelChange)="updateField(selectedField.id, setting.key, $event)" />
         }
 
         @case ('checkbox'){
             <div class="flex items-center">
-        <mat-checkbox matInput [ngModel]="fieldValues()[setting.key]"
+        <mat-checkbox  [ngModel]="fieldValues()[setting.key]"
             (ngModelChange)="updateField(selectedField.id, setting.key, $event)">
             {{ setting.label }}
         </mat-checkbox>

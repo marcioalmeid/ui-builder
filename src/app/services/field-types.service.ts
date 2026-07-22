@@ -35,10 +35,10 @@ const TEXT_FIELD_TYPE: FieldTypeDefinition  = {
 const CHECKBOX_FIELD_TYPE: FieldTypeDefinition  =  {
   id: 'checkbox',
   type: 'checkbox',
-  label: 'Checkbox field',
+  label: 'Checkbox',
   icon: 'check_box',
     defaultConfig: {
-    label: 'Checkbox field',
+    label: 'Checkbox',
     required: false,
   },
   settingsConfig: [
@@ -62,7 +62,22 @@ const RADIO_FIELD_TYPE: FieldTypeDefinition  =  {
       { label: 'Option 3', value: 'option-3' },
     ],
   },
-  settingsConfig:[],
+   settingsConfig: [
+    { type: 'text',  key: 'label', label: 'Label' },
+    { type: 'text',  key: 'placeholder', label: 'Placeholder' },
+    { type: 'checkbox',  key: 'required', label: 'Required' },
+    { type: 'select', key: 'inputType', label: 'Input Type', 
+      options: [
+        { value: 'text', label: 'Text' },
+        { value: 'number', label: 'Number' },
+        { value: 'email', label: 'Email' },
+        { value: 'tel', label: 'Phone' },
+
+
+      ] },
+
+
+  ],
   component: RadioField,
 };
 
