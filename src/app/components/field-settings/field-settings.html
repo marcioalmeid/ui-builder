@@ -8,11 +8,15 @@
         @switch (setting.type) {
         @case ('text'){
 
-        <input  class="border border-grey-300 rounded-md px-4 py-2 "  
-        matInput [ngModel]="fieldValues()[setting.key]"
-     (ngModelChange)="updateField(selectedField.id, setting.key, $event)" 
-          [placeholder]="setting.label"  
-     />
+       <mat-form-field appearance="outline" class="w-full">
+  <mat-label>{{ setting.label }}</mat-label>
+  <input  
+    matInput 
+    [ngModel]="fieldValues()[setting.key]"
+    (ngModelChange)="updateField(selectedField.id, setting.key, $event)"  
+  />
+</mat-form-field>
+
         }
 
         @case ('checkbox'){
