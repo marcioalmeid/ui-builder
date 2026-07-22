@@ -1,10 +1,13 @@
+    <div class="p-4">
     @for (row of formService.rows(); track row.id) {
-        <div class="p-5 bg-white rounded-lg border-dashed border-2 border-gray-200 min-h-32"
+        <div 
         cdkDropList
         [id]="'row-' + row.id"
         [cdkDropListConnectedTo]="['field-selector-list']"
         [cdkDropListData]="row.id"
         (cdkDropListDropped)="onDropInRow($event, row.id)"
+        [cdkDropListOrientation]="'mixed'"
+        class="p-5 pt-w mb-4 bg-white rounded-lg border-dashed border-2 border-gray-200 min-h-32"
         >
         <div class="text-sm text-gray-400 mb-3">Row</div>
         <div class="flex gap-4 flex-wrap">
@@ -19,4 +22,4 @@
         </div>
         </div>
     }
- 
+ </div>

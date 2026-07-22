@@ -7,6 +7,15 @@
             <mat-button-toggle value="editor">Editor</mat-button-toggle>
             <mat-button-toggle value="preview">Preview</mat-button-toggle>
         </mat-button-toggle-group>
+        @if((activeTab() === 'editor')) {
+            <div class="flex-1"></div>
+        <button mat-flat-button
+        (click)="formService.addRow()"
+        >Add Row
+            <mat-icon>add_circle</mat-icon>
+        </button>
+        }
+
     </div>
     <div class="mt-4">
         @if (activeTab()=== 'editor') {
