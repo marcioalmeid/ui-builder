@@ -9,7 +9,11 @@
         [cdkDropListOrientation]="'mixed'"
         class="p-5 pt-w mb-4 bg-white rounded-lg border-dashed border-2 border-gray-200 min-h-32"
         >
-        <div class="text-sm text-gray-400 mb-3">Row</div>
+        <div class="flex justify-between items-center ">
+          <span>Row</span>
+          <button mat-icon-button (click)="formService.deleteRow(row.id)"><mat-icon>close</mat-icon></button>
+        </div>
+
         <div class="flex gap-4 flex-wrap">
         @for (field of row.fields; track field.id) {
              <app-form-field

@@ -3,10 +3,12 @@ import { CdkDrag, CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
 import { FormService } from '../../../services/form.services';
 import { FieldTypeDefinition, FormField } from '../../../models/field';
 import { FormFieldComponent } from '../form-field/form-field.component/form-field.component';
+import { MatIcon } from "@angular/material/icon";
+import { MatButtonModule } from "@angular/material/button";
 
 @Component({
   selector: 'app-form-editor',
-  imports: [DragDropModule, FormFieldComponent],
+  imports: [DragDropModule, FormFieldComponent, MatIcon, MatButtonModule],
   templateUrl: './form-editor.component.html',
   styleUrl: './form-editor.component.css',
 })

@@ -50,6 +50,15 @@ export class FormService {
        this._rows.set([...rows, newRow]);
 
     }
+
+    deleteRow(rowId: string){
+      if(this._rows().length ===1){
+        return;
+      }
+      
+      const rows = this._rows();
+      this._rows.set(rows.filter((row) => row.id !== rowId));
+    }
        
   constructor() {
     this._rows.set([
