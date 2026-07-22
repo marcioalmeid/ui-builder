@@ -10,12 +10,12 @@ const TEXT_FIELD_TYPE: FieldTypeDefinition  = {
   icon: 'text_fields',
   defaultConfig: {
     label: 'Text field',
-    placeholder: 'Enter text',
+    placeHolder: 'Enter text',
     required: false,
   },
   settingsConfig: [
     { type: 'text',  key: 'label', label: 'Label' },
-    { type: 'text',  key: 'placeholder', label: 'Placeholder' },
+    { type: 'text',  key: 'placeHolder', label: 'Placeholder' },
     { type: 'checkbox',  key: 'required', label: 'Required' },
     { type: 'select', key: 'inputType', label: 'Input Type', 
       options: [
@@ -64,7 +64,7 @@ const RADIO_FIELD_TYPE: FieldTypeDefinition  =  {
   },
    settingsConfig: [
     { type: 'text',  key: 'label', label: 'Label' },
-    { type: 'text',  key: 'placeholder', label: 'Placeholder' },
+    { type: 'text',  key: 'placeHolder', label: 'Placeholder' },
     { type: 'checkbox',  key: 'required', label: 'Required' },
     { type: 'select', key: 'inputType', label: 'Input Type', 
       options: [
