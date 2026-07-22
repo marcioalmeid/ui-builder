@@ -3,7 +3,7 @@ import { FieldTypeDefinition } from '../models/field';
 import { TextField } from '../components/fields-types/text-field/text-field';
 import { CheckboxField } from '../components/fields-types/checkbox-field/checkbox-field';
 import { RadioField } from '../components/fields-types/radio-field/radio-field';
-const TEXT_FIELD_TYPE  = {
+const TEXT_FIELD_TYPE: FieldTypeDefinition  = {
   id: 'text',
   type: 'text',
   label: 'Text field',
@@ -13,10 +13,26 @@ const TEXT_FIELD_TYPE  = {
     placeholder: 'Enter text',
     required: false,
   },
+  settingsConfig: [
+    { type: 'text',  key: 'label', label: 'Label' },
+    { type: 'text',  key: 'placeholder', label: 'Placeholder' },
+    { type: 'checkbox',  key: 'required', label: 'Required' },
+    { type: 'select', key: 'inputType', label: 'Input Type', 
+      options: [
+        { value: 'text', label: 'Text' },
+        { value: 'number', label: 'Number' },
+        { value: 'email', label: 'Email' },
+        { value: 'tel', label: 'Phone' },
+
+
+      ] },
+
+
+  ],
  component: TextField, 
 };
 
-const CHECKBOX_FIELD_TYPE  = {
+const CHECKBOX_FIELD_TYPE: FieldTypeDefinition  =  {
   id: 'checkbox',
   type: 'checkbox',
   label: 'Checkbox field',
@@ -25,10 +41,14 @@ const CHECKBOX_FIELD_TYPE  = {
     label: 'Checkbox field',
     required: false,
   },
+  settingsConfig: [
+      { type: 'text',  key: 'label', label: 'Label' },
+    { type: 'checkbox',  key: 'required', label: 'Required' },
+  ],
   component: CheckboxField,
 };  
 
-const RADIO_FIELD_TYPE  = {
+const RADIO_FIELD_TYPE: FieldTypeDefinition  =  {
   id: 'radio',
   type: 'radio',
   label: 'Radio field',
@@ -42,6 +62,7 @@ const RADIO_FIELD_TYPE  = {
       { label: 'Option 3', value: 'option-3' },
     ],
   },
+  settingsConfig:[],
   component: RadioField,
 };
 

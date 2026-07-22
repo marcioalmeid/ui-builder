@@ -1,4 +1,4 @@
-import { Injectable, signal } from "@angular/core";
+import { Injectable, signal,computed } from "@angular/core";
 import { FormRow } from "../models/form";
 import { FormField } from "../models/field";
 
@@ -7,6 +7,14 @@ import { FormField } from "../models/field";
 })
 export class FormService {
   private _rows = signal<FormRow[]>([]);
+  private _selectedFieldId = signal<string | null>(null);
+  public readonly selectedField = computed(()=>  
+    this._rows()
+  .flatMap((row)=> row.fields)
+  .find(
+      (field) => field.id === this._selectedFieldId()),
+    );
+
   public readonly rows = this._rows.asReadonly();
 
   addField(field: FormField, rowId: string, index?: number) {
@@ -92,6 +100,11 @@ rows.forEach((row, rowIndex) => {
 
   
 }
+
+  setSelectedField(fieldId: string) {
+    this._selectedFieldId.set(  fieldId); 
+  }
+
 
   constructor() {
     this._rows.set([

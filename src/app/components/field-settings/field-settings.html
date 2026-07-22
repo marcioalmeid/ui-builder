@@ -1,5 +1,40 @@
 <div class="p-4 bg-white rounded-lg h-[calc(100vh-4rem)] overflow-y-auto border border-gray-200 shadow-sm">
     <div class="flex items-center justify-between py-4">
-        <h1 class="text-2xl tracking-wide font-medium ">Field Settings</h1>
+        <h1 class="text-2xl tracking-wide font-medium ">Field Properties </h1>
     </div>
-   </div> 
+    @if(formService.selectedField(); as selectedField) {
+    <div class="flex flex-col gap-6">
+        @for (setting of fieldSettings(); track setting.key) {
+        @switch (setting.type) {
+        @case ('text'){
+        <input  class="border border-grey-300 rounded-md px-4 py-2 "  matInput [ngModel]="fieldValues()[setting.key]"
+            (ngModelChange)="updateField(selectedField.id, setting.key, $event)" />
+        }
+
+        @case ('checkbox'){
+            <div class="flex items-center">
+        <mat-checkbox matInput [ngModel]="fieldValues()[setting.key]"
+            (ngModelChange)="updateField(selectedField.id, setting.key, $event)">
+            {{ setting.label }}
+        </mat-checkbox>
+        </div>
+        }
+
+        @case ('select'){
+        <mat-form-field appearance="outline" class="w-full">
+            <mat-label>{{ setting.label }}</mat-label>
+            <mat-select [(ngModel)]="fieldValues()[setting.key]"
+                (ngModelChange)="updateField(selectedField.id, setting.key, $event)">
+                @for (option of setting.options|| []; track option.value) {
+                <mat-option [value]="option.value">{{ option.label }}</mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+        }
+        }
+        }
+    </div>
+    }
+</div>
+
+ 
