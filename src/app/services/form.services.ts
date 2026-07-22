@@ -25,6 +25,21 @@ export class FormService {
          });
          this._rows.set(newRows);
     }
+
+    deleteField(fieldId: string, rowId: string) {
+        const newRows = this._rows().map((row) => {
+            if (row.id !== rowId) {
+                return row;
+            }
+
+            return {
+                ...row,
+                fields: row.fields.filter((field) => field.id !== fieldId),
+            };
+        });
+
+        this._rows.set(newRows);
+    }
        
   constructor() {
     this._rows.set([

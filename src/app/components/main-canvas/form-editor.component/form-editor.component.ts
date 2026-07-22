@@ -38,6 +38,10 @@ export class FormEditorComponent {
     this.formService.addField(newField, targetRowId ?? rowId, event.currentIndex);
   }
 
+  onDeleteField(fieldId: string, rowId: string) {
+    this.formService.deleteField(fieldId, rowId);
+  }
+
   private getDropListData(container: CdkDragDrop<string>['previousContainer']): string {
     return typeof container === 'string' ? container : container.data;
   }

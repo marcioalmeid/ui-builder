@@ -59,4 +59,24 @@ describe('FormEditorComponent', () => {
     expect(formService.rows()[0].fields).toHaveLength(1);
     expect(formService.rows()[0].fields[0].type).toBe('text');
   });
+
+  it('should delete a field from a row', () => {
+    const rowId = formService.rows()[0].id;
+    const fieldId = crypto.randomUUID();
+
+    formService.addField(
+      {
+        id: fieldId,
+        type: 'text',
+        label: 'Text field',
+        icon: 'text_fields',
+        required: false,
+      },
+      rowId,
+    );
+
+    component.onDeleteField(fieldId, rowId);
+
+    expect(formService.rows()[0].fields).toHaveLength(0);
+  });
 });
