@@ -53,7 +53,7 @@ const RADIO_FIELD_TYPE  = {
 
 
 
-export class FieldTypesService {
+export class FieldTypeService {
   fieldTypes= new Map<string, FieldTypeDefinition>([
     ['text', TEXT_FIELD_TYPE],
     ['checkbox', CHECKBOX_FIELD_TYPE],

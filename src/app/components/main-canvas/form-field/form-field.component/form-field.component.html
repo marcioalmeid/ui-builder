@@ -1,5 +1,4 @@
 <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:border-black cursor-pointer">
-    @if (previewComponent(); as component) {
 
     <div class="flex items-center justify-between mb-1">
         <span class="text-sm">{{field().type | titlecase }}</span>
@@ -7,6 +6,5 @@
             <mat-icon>delete</mat-icon>
         </button>
     </div>
-    <ng-container [ngComponentOutlet]="component" [ngComponentOutletInputs]="{ field: field() }" />
-    }
+    <app-field-preview [field]="field()" ></app-field-preview>
 </div>

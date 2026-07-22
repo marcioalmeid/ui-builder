@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { FieldTypesService } from '../../services/field-types.service';
+import { FieldTypeService } from '../../services/field-types.service';
 import { FieldButton } from './field-button/field-button';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 
@@ -11,6 +11,6 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
   styleUrl: './form-elements-menu.css',
 })
 export class FormElementsMenu {
-    fieldTypeService = inject(FieldTypesService);
+    fieldTypeService = inject(FieldTypeService);
     fieldTypes = this.fieldTypeService.getFieldTypes() || [];
 }
