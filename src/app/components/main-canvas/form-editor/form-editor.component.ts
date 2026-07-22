@@ -16,29 +16,33 @@ export class FormEditorComponent {
   formService = inject(FormService);
 
   onDropInRow(event: CdkDragDrop<string>, rowId: string) {
-    const previousContainerData = this.getDropListData(event.previousContainer);
-    const targetRowId = this.getDropListData(event.container);
 
-    if (previousContainerData !== 'field-selector') {
+    if (event.previousContainer.data === 'field-selector') {
+      const fieldType = event.item.data as FieldTypeDefinition;
+      if (!fieldType?.type) {
+        return;
+      }
+
+      const newField: FormField = {
+        id: crypto.randomUUID(),
+        type: fieldType.type,
+        label: fieldType.label,
+        icon: fieldType.icon,
+        ...fieldType.defaultConfig,
+      };
+
+      this.formService.addField(newField, rowId, event.currentIndex);
       return;
     }
 
-    const fieldType = (event.item as CdkDrag<FieldTypeDefinition>).data;
-    if (!fieldType?.type) {
-      return;
-    }
+       const dragData = event?.item.data as FormField;
+       const previousRowId = event.previousContainer.data as string;
+       
+       this.formService.moveField(dragData.id, previousRowId, rowId, event.currentIndex);
+     
+     
+  } 
 
-    const newField: FormField = {
-      id: crypto.randomUUID(),
-      type: fieldType.type,
-      label: fieldType.label,
-      icon: fieldType.icon,
-      required: fieldType.defaultConfig?.required ?? false,
-      ...fieldType.defaultConfig,
-    };
-
-    this.formService.addField(newField, targetRowId ?? rowId, event.currentIndex);
-  }
 
   onDeleteField(fieldId: string, rowId: string) {
     this.formService.deleteField(fieldId, rowId);

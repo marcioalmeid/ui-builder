@@ -17,6 +17,7 @@
         <div class="flex gap-4 flex-wrap">
         @for (field of row.fields; track field.id) {
              <app-form-field
+               cdkDrag [cdkDragData]="field"
                [field]="field"
                (fieldDelete)="onDeleteField($event, row.id)"
              />
