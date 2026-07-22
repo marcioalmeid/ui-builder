@@ -11,10 +11,6 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
   styleUrl: './form-elements-menu.css',
 })
 export class FormElementsMenu {
-[x: string]: any;
-
-
     fieldTypeService = inject(FieldTypesService);
     fieldTypes = this.fieldTypeService.getFieldTypes() || [];
-
 }

@@ -64,5 +64,7 @@ export class FieldTypesService {
     return  this.fieldTypes.get(type) ;
   }
 
-  
+  getFieldTypes(): FieldTypeDefinition[] {
+    return Array.from(this.fieldTypes.values());
+  }
 }

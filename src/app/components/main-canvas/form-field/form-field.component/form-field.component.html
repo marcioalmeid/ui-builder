@@ -1,4 +1,8 @@
 <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:border-black cursor-pointer">
-
-    <ng-container [ngComponentOutlet]="previewComponent()" [ngComponentOutletInputs]="{field:field()}" ></ng-container>
+    @if (previewComponent(); as component) {
+      <ng-container
+        [ngComponentOutlet]="component"
+        [ngComponentOutletInputs]="{ field: field() }"
+      />
+    }
 </div>

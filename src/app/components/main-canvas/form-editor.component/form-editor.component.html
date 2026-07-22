@@ -1,16 +1,18 @@
- 
     @for (row of formService.rows(); track row.id) {
-        <div class="p-5 bg-white rounded-lg border-dashed border-2 border-gray-200  "
+        <div class="p-5 bg-white rounded-lg border-dashed border-2 border-gray-200 min-h-32"
         cdkDropList
+        [id]="'row-' + row.id"
+        [cdkDropListConnectedTo]="['field-selector-list']"
         [cdkDropListData]="row.id"
         (cdkDropListDropped)="onDropInRow($event, row.id)"
-        [cdkDropListOrientation]="'mixed'"
         >
-        <div>Row</div>
+        <div class="text-sm text-gray-400 mb-3">Row</div>
         <div class="flex gap-4 flex-wrap">
         @for (field of row.fields; track field.id) {
              <app-form-field 
                [field]="field"      /> 
+        } @empty {
+          <p class="text-gray-400 text-sm">Drop fields here</p>
         }
         </div>
         </div>
