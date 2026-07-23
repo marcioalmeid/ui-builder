@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @source "./**/*.{html,ts}";
 
+@use "@angular/material" as mat;
+@import './app/themes/greentheme.css';
+
 body {
   margin: 0;
   padding: 0;

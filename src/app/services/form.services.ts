@@ -134,14 +134,30 @@ export class FormService {
   /**
    * Gera o código completo de um componente Angular baseado no formId fornecido.
    */
-  generateForm(formId: string) {
-    const rows = this._rows().filter((row) => row.formId === formId);
-    const template = this.generateTemplate(rows);
 
+    exportForm(){
+    const code = this.generateForm();
+    const blob = new Blob([code], { type: 'text/plain' }); // Ajuste o MIME type conforme necessário (ex: application/json)
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    
+    link.href = url;
+    link.download = `form-${new Date().getTime()}.txt`; // Nome do arquivo
+    link.click();
+    
+    window.URL.revokeObjectURL(url);
+  }
+  generateForm() {
+    const allRows = this._rows();
+    const rows = allRows;
+    if (rows.length === 0) {
+      console.warn(`AVISO: Nenhum formulário encontrado com o ID`);
+    }
+    const template = this.generateTemplate(rows);
     let code = this.generateImports();
     code += this.generateComponentDecorator(template);
     code += this.generateFormBody(rows);
-    console.log(code);
+
     return code;
   }
 
@@ -185,38 +201,43 @@ export class FormService {
   }
 
   private generateTemplate(rows: FormRow[]): string {
-    let template = '';
+    let template = `<div class="p-6">\n`;
+    template += `  <div class="py-6 flex flex-col gap-4 shadow-md rounded-lg border bg-gray-0">\n`;
+
     for (const row of rows) {
-      template += `<div class="form-row">\n`;
+      template += `    <div class="flex gap-4 flex-wrap">\n`;
       for (const field of row.fields) {
-        template += `  <div class="field-container">\n`;
-        template += `    <label for="${field.id}">${field.label}</label>\n`;
+        template += `      <div class="flex-1">\n`;
+        template += `        <label class="block text-sm font-medium mb-1" for="${field.id}">${field.label}</label>\n`;
 
         if (field.type === 'text') {
-          template += `    <input type="text" id="${field.id}" formControlName="${field.id}" placeholder="${field.placeholder || ''}">\n`;
+          template += `        <input type="text" id="${field.id}" formControlName="${field.id}" placeholder="${field.placeholder || ''}" class="w-full p-2 border rounded shadow-sm">\n`;
         } else if (field.type === 'radio') {
-          template += `    <div class="radio-group">\n`;
+          template += `        <div class="flex flex-col gap-2">\n`;
           for (const option of field.options || []) {
-            template += `      <label>\n`;
-            template += `        <input type="radio" name="${field.id}" [value]="'${option.value}'" formControlName="${field.id}"> ${option.label}\n`;
-            template += `      </label>\n`;
+            template += `          <label class="flex items-center gap-2">\n`;
+            template += `            <input type="radio" name="${field.id}" [value]="'${option.value}'" formControlName="${field.id}"> ${option.label}\n`;
+            template += `            </label>\n`;
           }
-          template += `    </div>\n`;
+          template += `        </div>\n`;
         } else if (field.type === 'checkbox') {
-          template += `    <input type="checkbox" id="${field.id}" formControlName="${field.id}">\n`;
+          template += `        <input type="checkbox" id="${field.id}" formControlName="${field.id}" class="h-5 w-5">\n`;
         } else if (field.type === 'select') {
-          template += `    <select id="${field.id}" formControlName="${field.id}">\n`;
+          template += `        <select id="${field.id}" formControlName="${field.id}" class="w-full p-2 border rounded shadow-sm">\n`;
           for (const option of field.options || []) {
-            template += `      <option [value]="'${option.value}'">${option.label}</option>\n`;
+            template += `          <option [value]="'${option.value}'">${option.label}</option>\n`;
           }
-          template += `    </select>\n`;
+          template += `        </select>\n`;
         } else {
-          template += `    <input type="text" id="${field.id}" formControlName="${field.id}" placeholder="${field.placeholder || ''}">\n`;
+          template += `        <input type="text" id="${field.id}" formControlName="${field.id}" placeholder="${field.placeholder || ''}" class="w-full p-2 border rounded shadow-sm">\n`;
         }
-        template += `  </div>\n`;
+        template += `      </div>\n`; // end of flex-1 div
       }
-      template += `</div>\n`;
+      template += `    </div>\n`; // end of row div
     }
+
+    template += `  </div>\n`; // end of inner container div
+    template += `</div>\n`; // end of outer container div
     return template;
   }
 
