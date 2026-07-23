@@ -37,6 +37,16 @@
           }
         }
       }
+    },
+     {
+      "label": "Claude: Gerar Mensagem de Commit",
+      "type": "shell",
+      // O comando agora lê o diff do git e passa para o claude como texto puro
+      "command": "git diff --cached | claude \"generate a single line commit message for these changes. Output ONLY the raw text, no markdown, no explanation, no quotes.\" | pbcopy",
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared"
+      }
     }
   ]
 }

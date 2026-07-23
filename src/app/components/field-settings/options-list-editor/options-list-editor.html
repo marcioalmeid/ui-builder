@@ -1,0 +1,18 @@
+<div class="flex flex-col gap-2">
+  @for (option of options(); track $index) {
+    <div class="flex gap-2 items-center">
+      <mat-form-field appearance="outline" class="flex-1">
+        <mat-label>Label</mat-label>
+        <input matInput [(ngModel)]="option.label" (ngModelChange)="updateOption($index, 'label', option.label)" />
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="flex-1">
+        <mat-label>Value</mat-label>
+        <input matInput [(ngModel)]="option.value" (ngModelChange)="updateOption($index, 'value', option.value)" />
+      </mat-form-field>
+      <button mat-icon-button color="warn" (click)="remove($index)">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+  }
+  <button mat-flat-button color="primary" (click)="add()">+ Add Option</button>
+</div>

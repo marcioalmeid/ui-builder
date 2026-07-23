@@ -39,10 +39,14 @@
             </mat-select>
         </mat-form-field>
         }
+
+        @case ('options-list') {
+          <app-options-list-editor 
+            [options]="fieldValues()[setting.key]" 
+            (optionsChange)="updateField(selectedField.id, setting.key, $event)" />
+        }
         }
         }
     </div>
     }
 </div>
-
- 

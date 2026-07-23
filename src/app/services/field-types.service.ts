@@ -10,13 +10,14 @@ const TEXT_FIELD_TYPE: FieldTypeDefinition  = {
   icon: 'text_fields',
   defaultConfig: {
     label: 'Text field',
-    placeHolder: 'Enter text',
+    placeholder: 'Enter text',
     required: false,
   },
   settingsConfig: [
     { type: 'text',  key: 'label', label: 'Label' },
-    { type: 'text',  key: 'placeHolder', label: 'Placeholder' },
+    { type: 'text',  key: 'placeholder', label: 'Placeholder' },
     { type: 'checkbox',  key: 'required', label: 'Required' },
+    { type: 'options-list', key: 'options', label: 'Options' },
     { type: 'select', key: 'inputType', label: 'Input Type', 
       options: [
         { value: 'text', label: 'Text' },
@@ -44,6 +45,7 @@ const CHECKBOX_FIELD_TYPE: FieldTypeDefinition  =  {
   settingsConfig: [
       { type: 'text',  key: 'label', label: 'Label' },
     { type: 'checkbox',  key: 'required', label: 'Required' },
+    { type: 'options-list', key: 'options', label: 'Options' },
   ],
   component: CheckboxField,
 };  
@@ -64,8 +66,9 @@ const RADIO_FIELD_TYPE: FieldTypeDefinition  =  {
   },
    settingsConfig: [
     { type: 'text',  key: 'label', label: 'Label' },
-    { type: 'text',  key: 'placeHolder', label: 'Placeholder' },
+    { type: 'text',  key: 'placeholder', label: 'Placeholder' },
     { type: 'checkbox',  key: 'required', label: 'Required' },
+    { type: 'options-list', key: 'options', label: 'Options' },
     { type: 'select', key: 'inputType', label: 'Input Type', 
       options: [
         { value: 'text', label: 'Text' },

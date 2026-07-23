@@ -19,7 +19,7 @@ export interface FormField {
   id: string;
   type: string;
   label: string;
-  placeHolder?: string;
+  placeholder?: string;
   icon: string;
   required: boolean;
   inputType?: string;
@@ -27,7 +27,7 @@ export interface FormField {
 }
 
 export interface FieldSettingsDefinition {
-  type: 'text'|'checkbox'|'radio'|'select';
+  type: 'text'|'checkbox'|'radio'|'select'|'options-list';
   label: string;
   icon?: string;
   key: string;

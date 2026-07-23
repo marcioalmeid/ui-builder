@@ -6,10 +6,11 @@ import { FormsModule } from '@angular/forms';
 import { MatInput } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import {  MatCheckboxModule } from '@angular/material/checkbox';
+import { OptionsListEditor } from './options-list-editor/options-list-editor';
 
 @Component({
   selector: 'app-field-settings',
-  imports: [MatFormFieldModule, MatInput, FormsModule, MatSelectModule, MatCheckboxModule],
+  imports: [MatFormFieldModule, MatInput, FormsModule, MatSelectModule, MatCheckboxModule, OptionsListEditor],
   templateUrl: './field-settings.html',
   styleUrl: './field-settings.css',
 })
