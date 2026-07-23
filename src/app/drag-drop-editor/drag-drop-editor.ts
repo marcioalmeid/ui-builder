@@ -1,4 +1,4 @@
-import { Component,   } from '@angular/core';
+import { Component, inject  } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormElementsMenu } from '../components/form-elements-menu/form-elements-menu';
 import { MainCanvas } from "../components/main-canvas/main-canvas";
@@ -6,6 +6,7 @@ import { FieldSettings } from "../components/field-settings/field-settings";
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MatAnchor } from "@angular/material/button";
 import { MatIcon } from "@angular/material/icon";
+import { FormService } from '../services/form.services';
 
  
 
@@ -17,5 +18,5 @@ import { MatIcon } from "@angular/material/icon";
   styleUrls: ['./drag-drop-editor.css'],
 })
 export class DragDropEditorComponent {
-   
+   formService = inject(FormService);
 }

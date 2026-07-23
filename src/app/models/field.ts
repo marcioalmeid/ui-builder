@@ -7,6 +7,7 @@ export interface FieldTypeDefinition {
    defaultConfig: any;
    settingsConfig: FieldSettingsDefinition[];
    component: Type<unknown>;
+     
 }
 
 

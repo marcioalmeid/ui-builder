@@ -7,7 +7,9 @@
         <app-main-canvas class="flex-1" />
         <app-field-settings class="w-64" />
     </div>
-   <button mat-flat-button class="!absolute top-30 right-[20px] bg-blue-500 font-bold py-2 px-4 rounded-full shadow-md">
+   <button mat-flat-button class="!absolute top-30 right-[20px] bg-blue-500 font-bold py-2 px-4 rounded-full shadow-md"
+    (click)="formService.generateForm('test')"
+   >
     Export Form 
     <mat-icon name="download">download</mat-icon>
 </button>
