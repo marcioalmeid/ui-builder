@@ -17,8 +17,7 @@ const TEXT_FIELD_TYPE: FieldTypeDefinition  = {
     { type: 'text',  key: 'label', label: 'Label' },
     { type: 'text',  key: 'placeholder', label: 'Placeholder' },
     { type: 'checkbox',  key: 'required', label: 'Required' },
-    { type: 'options-list', key: 'options', label: 'Options' },
-    { type: 'select', key: 'inputType', label: 'Input Type', 
+    { type: 'select', key: 'inputType', label: 'Input Type',
       options: [
         { value: 'text', label: 'Text' },
         { value: 'number', label: 'Number' },
@@ -27,6 +26,7 @@ const TEXT_FIELD_TYPE: FieldTypeDefinition  = {
 
 
       ] },
+    { type: 'options-list', key: 'options', label: 'Options' },
 
 
   ],
@@ -68,8 +68,7 @@ const RADIO_FIELD_TYPE: FieldTypeDefinition  =  {
     { type: 'text',  key: 'label', label: 'Label' },
     { type: 'text',  key: 'placeholder', label: 'Placeholder' },
     { type: 'checkbox',  key: 'required', label: 'Required' },
-    { type: 'options-list', key: 'options', label: 'Options' },
-    { type: 'select', key: 'inputType', label: 'Input Type', 
+    { type: 'select', key: 'inputType', label: 'Input Type',
       options: [
         { value: 'text', label: 'Text' },
         { value: 'number', label: 'Number' },
@@ -78,6 +77,7 @@ const RADIO_FIELD_TYPE: FieldTypeDefinition  =  {
 
 
       ] },
+    { type: 'options-list', key: 'options', label: 'Options' },
 
 
   ],

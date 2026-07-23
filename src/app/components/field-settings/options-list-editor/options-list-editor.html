@@ -14,5 +14,7 @@
       </button>
     </div>
   }
-  <button mat-flat-button color="primary" (click)="add()">+ Add Option</button>
+  @if (options().length > 0) {
+    <button mat-flat-button color="primary" (click)="add()">+ Add Option</button>
+  }
 </div>
