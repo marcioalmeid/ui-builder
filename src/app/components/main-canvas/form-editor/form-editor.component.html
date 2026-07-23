@@ -1,30 +1,30 @@
-    <div class="p-4">
-    @for (row of formService.rows(); track row.id) {
-        <div 
-        cdkDropList
-        [id]="'row-' + row.id"
-        [cdkDropListConnectedTo]="['field-selector-list']"
-        [cdkDropListData]="row.id"
-        (cdkDropListDropped)="onDropInRow($event, row.id)"
-        [cdkDropListOrientation]="'mixed'"
-        class="p-5 pt-w mb-4 bg-white rounded-lg border-dashed border-2 border-gray-200 min-h-32"
-        >
-        <div class="flex justify-between items-center ">
-          <span>Row</span>
-          <button mat-icon-button (click)="formService.deleteRow(row.id)"><mat-icon>close</mat-icon></button>
-        </div>
+<div class="p-4">
+  @for (row of formService.rows(); track row.id) {
+  <div cdkDropList [id]="'row-' + row.id" [cdkDropListConnectedTo]="['field-selector-list']" [cdkDropListData]="row.id"
+    (cdkDropListDropped)="onDropInRow($event, row.id)" [cdkDropListOrientation]="'mixed'"
+    class="relative p-5 pt-2 ps-10 mb-4 bg-white rounded-lg border-dashed border-2 border-gray-200 min-h-32">
+    <div class="flex justify-between items-center ">
+      <span>Row</span>
+      <button mat-icon-button (click)="formService.deleteRow(row.id)"><mat-icon>close</mat-icon></button>
+    </div>
 
-        <div class="flex gap-4 flex-wrap">
-        @for (field of row.fields; track field.id) {
-             <app-form-field
-               cdkDrag [cdkDragData]="field"
-               [field]="field"
-               (fieldDelete)="onDeleteField($event, row.id)"
-             />
-        } @empty {
-          <p class="text-gray-400 text-sm">Drop fields here</p>
-        }
+    <div class="flex gap-4 flex-wrap">
+      @for (field of row.fields; track field.id) {
+      <app-form-field cdkDrag [cdkDragData]="field" [field]="field" (fieldDelete)="onDeleteField($event, row.id)"
+        class="flex-1" />
+      } @empty {
+      <p class="text-gray-400 text-sm">Drop fields here</p>
+      }
+    </div>
+    <div class="absolute left-0 flex gap-0 flex-col top-1/2 -translate-y-1/2">
+          <button mat-icon-button [disabled]="$first" (click)="formService.moveRowUp(row.id)">
+            <mat-icon >keyboard_arrow_up</mat-icon>
+          </button>
+          <button mat-icon-button [disabled]="$last" (click)="formService.moveRowDown(row.id)">
+            <mat-icon >keyboard_arrow_down</mat-icon>
+          </button>
         </div>
-        </div>
-    }
- </div>
+  </div>
+
+  }
+</div>

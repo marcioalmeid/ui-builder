@@ -4,13 +4,15 @@ import { FormElementsMenu } from '../components/form-elements-menu/form-elements
 import { MainCanvas } from "../components/main-canvas/main-canvas";
 import { FieldSettings } from "../components/field-settings/field-settings";
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { MatAnchor } from "@angular/material/button";
+import { MatIcon } from "@angular/material/icon";
 
  
 
 @Component({
   selector: 'app-drag-drop-editor',
   // standalone: true,
-  imports: [CommonModule, FormElementsMenu, MainCanvas, FieldSettings, DragDropModule],
+  imports: [CommonModule, FormElementsMenu, MainCanvas, FieldSettings, DragDropModule, MatAnchor, MatIcon],
   templateUrl: './drag-drop-editor.html',
   styleUrls: ['./drag-drop-editor.css'],
 })

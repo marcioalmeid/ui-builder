@@ -114,6 +114,28 @@ rows.forEach((row, rowIndex) => {
   }
 
 
+   moveRowUp(rowId: string) {
+    const rows = [...this._rows()]; // Cria uma cópia do array
+    const index = rows.findIndex(row => row.id === rowId);
+    if (index > 0) {
+      // Troca o elemento atual com o anterior
+      [rows[index], rows[index - 1]] = [rows[index - 1], rows[index]];
+      this._rows.set(rows);
+    }
+  }
+
+  moveRowDown(rowId: string) {
+    const rows = this._rows();
+    const index = rows.findIndex(row => row.id === rowId);
+    if (index < rows.length - 1)
+      {
+        const movedRow = rows.splice(index, 1)[0];
+        const newRow = { ...movedRow };
+        newRow.id = crypto.randomUUID();
+        this._rows.set([...rows, newRow]);
+        }
+    }
+
   constructor() {
     this._rows.set([
       {

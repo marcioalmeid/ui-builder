@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { CdkDrag, CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
 import { FormService } from '../../../services/form.services';
 import { FieldTypeDefinition, FormField } from '../../../models/field';
 import { FormFieldComponent } from '../form-field/form-field.component/form-field.component';
@@ -47,6 +47,8 @@ export class FormEditorComponent {
   onDeleteField(fieldId: string, rowId: string) {
     this.formService.deleteField(fieldId, rowId);
   }
+
+  
 
   private getDropListData(container: CdkDragDrop<string>['previousContainer']): string {
     return typeof container === 'string' ? container : container.data;
