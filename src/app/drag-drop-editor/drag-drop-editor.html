@@ -1,13 +1,13 @@
-<div class="flex flex-col h-screen bg-gray-100 px-4">
+<div class="flex flex-col h-screen  px-4 ">
     <div class="flex flex-col justify-center items-center  py-10">
-        <h1 class="text-2xl tracking-wide font-medium ">Editor Design</h1>
+        <h1 class="text-2xl text-primary tracking-wide font-medium ">Editor Design</h1>
     </div>
     <div class="flex gap-4 relative" cdkDropListGroup>
         <app-form-elements-menu class="w-64" />
         <app-main-canvas class="flex-1" />
         <app-field-settings class="w-64" />
     </div>
-   <button mat-flat-button class="!absolute top-30 right-[20px] bg-blue-500 font-bold py-2 px-4 rounded-full shadow-md"
+   <button mat-flat-button class="!absolute top-30 right-[20px] bg-blue-500 font-bold py-2 px-4 rounded-full shadow-md compact-button"
     (click)="formService.exportForm()"
    >
     Export Form 

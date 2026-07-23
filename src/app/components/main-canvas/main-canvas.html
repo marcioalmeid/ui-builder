@@ -1,6 +1,6 @@
 <div class="p-4 bg-white rounded-lg h-[calc(100vh-150px)] overflow-y-auto border-gray-200 shadow-sm">
     <div class="pb-4 border-b border-gray-200 flex gap-2 items-center">
-        <h3 class="text-xl   font-medium ">Form Canvas</h3>
+        <h3 class="text-xl   font-medium text-primary">Form Canvas</h3>
         <mat-button-toggle-group [(value)]="activeTab"
          hideSingleSelectionIndicator="true"
         >
@@ -9,7 +9,7 @@
         </mat-button-toggle-group>
         @if((activeTab() === 'editor')) {
             <div class="flex-1"></div>
-        <button mat-flat-button
+        <button mat-flat-button class="compact-button"
         (click)="formService.addRow()"
         >Add Row
             <mat-icon>add_circle</mat-icon>

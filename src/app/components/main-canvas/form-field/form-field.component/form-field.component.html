@@ -1,5 +1,5 @@
-<div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:border-black cursor-pointer"
-[class]="formService.selectedField()?.id === field().id ? '!border-black' : '' "
+<div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:border-primary cursor-pointer"
+[class]="formService.selectedField()?.id === field().id ? '!border-primary !bg-background' : '' "
 (click)="formService.setSelectedField(field().id)"
 onkeyup=""
  

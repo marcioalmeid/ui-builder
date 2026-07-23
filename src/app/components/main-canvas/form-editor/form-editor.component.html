@@ -4,7 +4,7 @@
     (cdkDropListDropped)="onDropInRow($event, row.id)" [cdkDropListOrientation]="'mixed'"
     class="relative p-5 pt-2 ps-10 mb-4 bg-white rounded-lg border-dashed border-2 border-gray-200 min-h-32">
     <div class="flex justify-between items-center ">
-      <span>Row</span>
+      <span class="text-primary">Row</span>
       <button mat-icon-button (click)="formService.deleteRow(row.id)"><mat-icon>close</mat-icon></button>
     </div>
 
@@ -13,7 +13,7 @@
       <app-form-field cdkDrag [cdkDragData]="field" [field]="field" (fieldDelete)="onDeleteField($event, row.id)"
         class="flex-1" />
       } @empty {
-      <p class="text-gray-400 text-sm">Drop fields here</p>
+      <p class="w-full bg-background p-4 border-dashed border-primary-container rounded text-gray-400 text-center">Drag and Drop form elements here</p>
       }
     </div>
     <div class="absolute left-0 flex gap-0 flex-col top-1/2 -translate-y-1/2">
