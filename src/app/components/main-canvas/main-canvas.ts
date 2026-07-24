@@ -10,7 +10,7 @@ import { FormService } from '../../services/form.services';
   selector: 'app-main-canvas',
   imports: [FormEditorComponent, MatButtonToggleModule, FormPreview, MatAnchor, MatIcon],
   templateUrl: './main-canvas.html',
-  styleUrl: './main-canvas.css',
+  styleUrl: './main-canvas.scss',
 })
 export class MainCanvas {
 

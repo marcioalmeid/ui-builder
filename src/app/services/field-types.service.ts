@@ -83,7 +83,35 @@ const RADIO_FIELD_TYPE: FieldTypeDefinition  =  {
   ],
   component: RadioField,
 };
+const DATE_PICKER_FIELD_TYPE: FieldTypeDefinition  = {
+  id: 'text',
+  type: 'text',
+  label: 'Date Picker',
+  icon: 'calendar_month',
+  defaultConfig: {
+    label: 'Date Picker',
+    placeholder: 'Enter date',
+    required: false,
+  },
+  settingsConfig: [
+    { type: 'text',  key: 'label', label: 'Label' },
+    { type: 'text',  key: 'placeholder', label: 'Placeholder' },
+    { type: 'checkbox',  key: 'required', label: 'Required' },
+    { type: 'select', key: 'inputType', label: 'Input Type',
+      options: [
+        { value: 'text', label: 'Text' },
+        { value: 'number', label: 'Number' },
+        { value: 'email', label: 'Email' },
+        { value: 'tel', label: 'Phone' },
 
+
+      ] },
+    { type: 'options-list', key: 'options', label: 'Options' },
+
+
+  ],
+ component: TextField, 
+};
 
 
 @Injectable({
@@ -97,7 +125,12 @@ export class FieldTypeService {
     ['text', TEXT_FIELD_TYPE],
     ['checkbox', CHECKBOX_FIELD_TYPE],
     ['radio', RADIO_FIELD_TYPE],
-  ]);
+    ['datepicker', DATE_PICKER_FIELD_TYPE],
+    // ['select', SELECT_FIELD_TYPE],
+    // ['textarea', TEXTAREA_FIELD_TYPE],
+    // ['number', NUMBER_FIELD_TYPE],
+    // ['email', EMAIL_FIELD]
+]);
   
 
   getFieldTypeById(id: string): FieldTypeDefinition | undefined {
