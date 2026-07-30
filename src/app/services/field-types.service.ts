@@ -5,6 +5,7 @@ import { CheckboxField } from '../components/fields-types/checkbox-field/checkbo
 import { RadioField } from '../components/fields-types/radio-field/radio-field';
 import { TextAreaComponent } from '../components/fields-types/text-area/text-area.component';
 import { DropdownList } from '../components/fields-types/dropdown-list/dropdown-list';
+import { DatePicker } from '../components/fields-types/date-picker/date-picker';
 
 const TEXT_FIELD_TYPE: FieldTypeDefinition  = {
   id: 'text',
@@ -120,7 +121,7 @@ const DATE_PICKER_FIELD_TYPE: FieldTypeDefinition  = {
       ] },
     { type: 'options-list', key: 'options', label: 'Options' },
   ],
- component: TextField,
+ component: DatePicker,
 };
 
 const DROPDOWN_LIST_FIELD_TYPE: FieldTypeDefinition = {
