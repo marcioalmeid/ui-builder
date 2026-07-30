@@ -3,6 +3,8 @@ import { FieldTypeDefinition } from '../models/field';
 import { TextField } from '../components/fields-types/text-field/text-field';
 import { CheckboxField } from '../components/fields-types/checkbox-field/checkbox-field';
 import { RadioField } from '../components/fields-types/radio-field/radio-field';
+import { TextAreaComponent } from '../components/fields-types/text-area/text-area.component';
+
 const TEXT_FIELD_TYPE: FieldTypeDefinition  = {
   id: 'text',
   type: 'text',
@@ -23,12 +25,8 @@ const TEXT_FIELD_TYPE: FieldTypeDefinition  = {
         { value: 'number', label: 'Number' },
         { value: 'email', label: 'Email' },
         { value: 'tel', label: 'Phone' },
-
-
       ] },
     { type: 'options-list', key: 'options', label: 'Options' },
-
-
   ],
  component: TextField, 
 };
@@ -74,18 +72,33 @@ const RADIO_FIELD_TYPE: FieldTypeDefinition  =  {
         { value: 'number', label: 'Number' },
         { value: 'email', label: 'Email' },
         { value: 'tel', label: 'Phone' },
-
-
       ] },
     { type: 'options-list', key: 'options', label: 'Options' },
-
-
   ],
   component: RadioField,
 };
+
+const TEXTAREA_FIELD_TYPE: FieldTypeDefinition = {
+  id: 'textarea',
+  type: 'textarea',
+  label: 'Text area',
+  icon: 'format_textdirection_l_to_r',
+  defaultConfig: {
+    label: 'Text area',
+    placeholder: 'Enter text',
+    required: false,
+  },
+  settingsConfig: [
+    { type: 'text', key: 'label', label: 'Label' },
+    { type: 'text', key: 'placeholder', label: 'Placeholder' },
+    { type: 'checkbox', key: 'required', label: 'Required' },
+  ],
+  component: TextAreaComponent,
+};
+
 const DATE_PICKER_FIELD_TYPE: FieldTypeDefinition  = {
-  id: 'text',
-  type: 'text',
+  id: 'datepicker',
+  type: 'datepicker',
   label: 'Date Picker',
   icon: 'calendar_month',
   defaultConfig: {
@@ -103,31 +116,24 @@ const DATE_PICKER_FIELD_TYPE: FieldTypeDefinition  = {
         { value: 'number', label: 'Number' },
         { value: 'email', label: 'Email' },
         { value: 'tel', label: 'Phone' },
-
-
       ] },
     { type: 'options-list', key: 'options', label: 'Options' },
-
-
   ],
  component: TextField, 
 };
 
-
 @Injectable({
   providedIn: 'root',
 })
-
-
 
 export class FieldTypeService {
   fieldTypes= new Map<string, FieldTypeDefinition>([
     ['text', TEXT_FIELD_TYPE],
     ['checkbox', CHECKBOX_FIELD_TYPE],
     ['radio', RADIO_FIELD_TYPE],
+    ['textarea', TEXTAREA_FIELD_TYPE],
     ['datepicker', DATE_PICKER_FIELD_TYPE],
     // ['select', SELECT_FIELD_TYPE],
-    // ['textarea', TEXTAREA_FIELD_TYPE],
     // ['number', NUMBER_FIELD_TYPE],
     // ['email', EMAIL_FIELD]
 ]);

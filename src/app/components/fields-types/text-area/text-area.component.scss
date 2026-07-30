@@ -1,0 +1,31 @@
+.text-area-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  
+  label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--mat-sys-on-surface-variant);
+  }
+  
+  textarea {
+    background: var(--mat-sys-neutral10) !important;
+    border: 1px solid var(--mat-sys-outline-variant) !important;
+    border-radius: 8px !important;
+    color: var(--mat-sys-on-surface-variant) !important;
+    font-size: 13px;
+    padding: 8px 12px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    
+    &:hover {
+      border-color: var(--mat-sys-primary) !important;
+    }
+    
+    &:focus {
+      outline: none;
+      border-color: var(--mat-sys-primary) !important;
+      box-shadow: 0 0 0 3px rgba(255, 92, 71, 0.25) !important;
+    }
+  }
+}
