@@ -1,5 +1,4 @@
-
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { FormField } from '../../../models/field';
 
 @Component({
@@ -7,15 +6,13 @@ import { FormField } from '../../../models/field';
   templateUrl: './text-area.component.html',
   styleUrls: ['./text-area.component.scss']
 })
-export class TextAreaComponent {
-
-
-
-
-
-
+export class TextAreaComponent  {
   field = input.required<FormField>();
   valueChange = output<string>();
+
+  @ViewChild('textarea', { static: true }) textarea!: ElementRef;
+
+  
 
   onInputChange(event: Event): void {
     const value = (event.target as HTMLTextAreaElement).value;
