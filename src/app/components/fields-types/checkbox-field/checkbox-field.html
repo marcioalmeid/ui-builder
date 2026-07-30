@@ -1,1 +1,3 @@
-<mat-checkbox [required]="field().required" class="w-full">{{ field().label }}</mat-checkbox> 
+<div [style.border]="getBorderStyle()" class="p-2">
+  <mat-checkbox [required]="field().required" class="w-full">{{ field().label }}</mat-checkbox>
+</div> 

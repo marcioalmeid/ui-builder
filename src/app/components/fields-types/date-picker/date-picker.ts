@@ -13,4 +13,13 @@ import { MatNativeDateModule } from '@angular/material/core';
 })
 export class DatePicker {
   field = input.required<FormField>();
+
+  getBorderStyle(): string {
+    const border = this.field().border;
+    if (!border || border.style === 'none') {
+      return 'none';
+    }
+
+    return `${border.width} ${border.style} ${border.color}`;
+  }
 }

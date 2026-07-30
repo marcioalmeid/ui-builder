@@ -12,4 +12,12 @@ import { FormField } from '../../../models/field';
 export class CheckboxField {
     field = input.required<FormField>();
 
+    getBorderStyle(): string {
+      const border = this.field().border;
+      if (!border || border.style === 'none') {
+        return 'none';
+      }
+
+      return `${border.width} ${border.style} ${border.color}`;
+    }
 }

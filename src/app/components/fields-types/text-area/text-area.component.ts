@@ -31,4 +31,13 @@ export class TextAreaComponent implements AfterViewInit {
 
     this.valueChange.emit(value);
   }
+
+  getBorderStyle(): string {
+    const border = this.field().border;
+    if (!border || border.style === 'none') {
+      return 'none';
+    }
+
+    return `${border.width} ${border.style} ${border.color}`;
+  }
 }

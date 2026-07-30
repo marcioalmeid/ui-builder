@@ -1,0 +1,17 @@
+/* Estilos específicos para o componente de textarea */
+textarea {
+  font-family: var(--mat-sys-plain-font-family);
+  font-size: var(--mat-sys-body-large-size);
+  line-height: var(--mat-sys-body-large-line-height);
+  padding: 12px 16px;
+}
+
+/* Ajuste para o estilo fill do Material Design */
+.mat-form-field-appearance-fill .mat-form-field-flex {
+  padding: 0;
+}
+
+/* Ajuste para o espaçamento interno */
+.mat-form-field-underline {
+  margin-top: 8px;
+}
