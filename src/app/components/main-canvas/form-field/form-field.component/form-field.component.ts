@@ -17,9 +17,11 @@ export class FormFieldComponent {
   fieldDelete = output<string>();
   fieldTypeService = inject(FieldTypeService);
   formService = inject(FormService);
-   
+
   onDeleteClick(event: Event) {
     event.stopPropagation();
     this.fieldDelete.emit(this.field().id);
+    // Save after deletion
+    this.formService.saveFormState();
   }
 }

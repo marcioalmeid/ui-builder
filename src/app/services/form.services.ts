@@ -31,6 +31,8 @@ export class FormService {
       return row;
     });
     this._rows.set(newRows);
+    // Save form state after adding a field
+    this.saveFormState();
   }
 
   deleteField(fieldId: string, rowId: string) {
@@ -46,6 +48,8 @@ export class FormService {
     });
 
     this._rows.set(newRows);
+    // Save form state after deleting a field
+    this.saveFormState();
   }
 
   addRow() {
@@ -56,6 +60,8 @@ export class FormService {
     };
     const rows = this._rows();
     this._rows.set([...rows, newRow]);
+    // Save form state after adding a row
+    this.saveFormState();
   }
 
   deleteRow(rowId: string) {
@@ -65,6 +71,8 @@ export class FormService {
 
     const rows = this._rows();
     this._rows.set(rows.filter((row) => row.id !== rowId));
+    // Save form state after deleting a row
+    this.saveFormState();
   }
 
   moveField(fieldId: string, sourceRowId: string, targetRowId: string, targetIndex: number = -1) {
@@ -105,6 +113,8 @@ export class FormService {
       ),
     }));
     this._rows.set(newRows);
+    // Save form state after updating a field
+    this.saveFormState();
   }
 
   setSelectedField(fieldId: string) {
@@ -132,6 +142,52 @@ export class FormService {
   }
 
   /**
+   * Save form state to localStorage
+   */
+  saveFormState() {
+    try {
+      const formState = {
+        rows: this._rows(),
+        timestamp: Date.now()
+      };
+      localStorage.setItem('form-builder-state', JSON.stringify(formState));
+    } catch (error) {
+      console.error('Failed to save form state:', error);
+    }
+  }
+
+  /**
+   * Load form state from localStorage
+   */
+  loadFormState() {
+    try {
+      const savedState = localStorage.getItem('form-builder-state');
+      if (savedState) {
+        const formState = JSON.parse(savedState);
+        // Check if the saved state is recent (less than 24 hours old)
+        const now = Date.now();
+        if (now - formState.timestamp < 24 * 60 * 60 * 1000) { // 24 hours
+          this._rows.set(formState.rows);
+        } else {
+          // Clear old state
+          localStorage.removeItem('form-builder-state');
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load form state:', error);
+      // Clear corrupted data
+      localStorage.removeItem('form-builder-state');
+    }
+  }
+
+  /**
+   * Clear saved form state
+   */
+  clearFormState() {
+    localStorage.removeItem('form-builder-state');
+  }
+
+  /**
    * Gera o código completo de um componente Angular baseado no formId fornecido.
    */
 
@@ -140,11 +196,11 @@ export class FormService {
     const blob = new Blob([code], { type: 'text/plain' }); // Ajuste o MIME type conforme necessário (ex: application/json)
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
-    
+
     link.href = url;
     link.download = `form-${new Date().getTime()}.txt`; // Nome do arquivo
     link.click();
-    
+
     window.URL.revokeObjectURL(url);
   }
   generateForm() {
@@ -249,5 +305,7 @@ export class FormService {
         fields: [],
       },
     ]);
+    // Load saved state on initialization
+    this.loadFormState();
   }
 }

@@ -1,6 +1,7 @@
 <mat-form-field class="w-full" appearance="fill">
   <mat-label>{{ field().label }}</mat-label>
   <textarea
+    #textareaElement
     [id]="'textarea-' + field().id"
     [placeholder]="field().placeholder || ''"
     (input)="onInputChange($event)"
