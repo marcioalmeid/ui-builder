@@ -4,6 +4,7 @@ import { TextField } from '../components/fields-types/text-field/text-field';
 import { CheckboxField } from '../components/fields-types/checkbox-field/checkbox-field';
 import { RadioField } from '../components/fields-types/radio-field/radio-field';
 import { TextAreaComponent } from '../components/fields-types/text-area/text-area.component';
+import { DropdownList } from '../components/fields-types/dropdown-list/dropdown-list';
 
 const TEXT_FIELD_TYPE: FieldTypeDefinition  = {
   id: 'text',
@@ -119,7 +120,31 @@ const DATE_PICKER_FIELD_TYPE: FieldTypeDefinition  = {
       ] },
     { type: 'options-list', key: 'options', label: 'Options' },
   ],
- component: TextField, 
+ component: TextField,
+};
+
+const DROPDOWN_LIST_FIELD_TYPE: FieldTypeDefinition = {
+  id: 'dropdown',
+  type: 'dropdown',
+  label: 'Dropdown List',
+  icon: 'arrow_drop_down_circle',
+  defaultConfig: {
+    label: 'Dropdown List',
+    placeholder: 'Select an option',
+    required: false,
+    options: [
+      { label: 'Option 1', value: 'option-1' },
+      { label: 'Option 2', value: 'option-2' },
+      { label: 'Option 3', value: 'option-3' },
+    ],
+  },
+  settingsConfig: [
+    { type: 'text', key: 'label', label: 'Label' },
+    { type: 'text', key: 'placeholder', label: 'Placeholder' },
+    { type: 'checkbox', key: 'required', label: 'Required' },
+    { type: 'options-list', key: 'options', label: 'Options' },
+  ],
+  component: DropdownList,
 };
 
 @Injectable({
@@ -133,6 +158,7 @@ export class FieldTypeService {
     ['radio', RADIO_FIELD_TYPE],
     ['textarea', TEXTAREA_FIELD_TYPE],
     ['datepicker', DATE_PICKER_FIELD_TYPE],
+    ['dropdown', DROPDOWN_LIST_FIELD_TYPE],
     // ['select', SELECT_FIELD_TYPE],
     // ['number', NUMBER_FIELD_TYPE],
     // ['email', EMAIL_FIELD]
