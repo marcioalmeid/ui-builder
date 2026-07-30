@@ -7,10 +7,11 @@ import { MatInput } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import {  MatCheckboxModule } from '@angular/material/checkbox';
 import { OptionsListEditor } from './options-list-editor/options-list-editor';
+import { BorderConfigComponent } from './border-config/border-config';
 
 @Component({
   selector: 'app-field-settings',
-  imports: [MatFormFieldModule, MatInput, FormsModule, MatSelectModule, MatCheckboxModule, OptionsListEditor],
+  imports: [MatFormFieldModule, MatInput, FormsModule, MatSelectModule, MatCheckboxModule, OptionsListEditor, BorderConfigComponent],
   templateUrl: './field-settings.html',
   styleUrl: './field-settings.css',
 })
@@ -29,7 +30,13 @@ export class FieldSettings {
   fieldValues = computed(() => {
     const field = this.formService.selectedField();
     if(!field) return {};
-    return field as any;
+
+    // Ensure border configuration is properly initialized
+    const fieldCopy = { ...field };
+    if (!fieldCopy.border) {
+      fieldCopy.border = { style: 'none', width: '', color: '#000000' };
+    }
+    return fieldCopy as any;
   });
 
   updateField(fieldId: string, key: string, value: any): void {

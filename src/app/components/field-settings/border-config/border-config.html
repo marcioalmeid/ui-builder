@@ -1,0 +1,32 @@
+<div class="border-config">
+  <div class="flex flex-col gap-4">
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Border Style</mat-label>
+      <mat-select
+        [value]="border()?.style || 'none'"
+        (selectionChange)="updateStyle($event.value)">
+        @for (style of borderStyles; track style.value) {
+          <mat-option [value]="style.value">{{ style.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Border Width</mat-label>
+      <input
+        matInput
+        type="text"
+        [value]="border()?.width || ''"
+        (input)="updateWidth($event.target.value)" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Border Color</mat-label>
+      <input
+        matInput
+        type="color"
+        [value]="border()?.color || '#000000'"
+        (input)="updateColor($event.target.value)" />
+    </mat-form-field>
+  </div>
+</div>

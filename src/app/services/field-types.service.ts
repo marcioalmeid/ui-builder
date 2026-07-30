@@ -16,6 +16,11 @@ const TEXT_FIELD_TYPE: FieldTypeDefinition  = {
     label: 'Text field',
     placeholder: 'Enter text',
     required: false,
+    border: {
+      style: 'none',
+      width: '1px',
+      color: '#ccc'
+    }
   },
   settingsConfig: [
     { type: 'text',  key: 'label', label: 'Label' },
@@ -29,8 +34,9 @@ const TEXT_FIELD_TYPE: FieldTypeDefinition  = {
         { value: 'tel', label: 'Phone' },
       ] },
     { type: 'options-list', key: 'options', label: 'Options' },
+    { type: 'border', key: 'border', label: 'Border' },
   ],
- component: TextField, 
+ component: TextField,
 };
 
 const CHECKBOX_FIELD_TYPE: FieldTypeDefinition  =  {
@@ -41,11 +47,17 @@ const CHECKBOX_FIELD_TYPE: FieldTypeDefinition  =  {
     defaultConfig: {
     label: 'Checkbox',
     required: false,
+    border: {
+      style: 'none',
+      width: '1px',
+      color: '#ccc'
+    }
   },
   settingsConfig: [
       { type: 'text',  key: 'label', label: 'Label' },
     { type: 'checkbox',  key: 'required', label: 'Required' },
     { type: 'options-list', key: 'options', label: 'Options' },
+    { type: 'border', key: 'border', label: 'Border' },
   ],
   component: CheckboxField,
 };  
@@ -63,6 +75,11 @@ const RADIO_FIELD_TYPE: FieldTypeDefinition  =  {
       { label: 'Option 2', value: 'option-2' },
       { label: 'Option 3', value: 'option-3' },
     ],
+    border: {
+      style: 'none',
+      width: '1px',
+      color: '#ccc'
+    }
   },
    settingsConfig: [
     { type: 'text',  key: 'label', label: 'Label' },
@@ -76,6 +93,7 @@ const RADIO_FIELD_TYPE: FieldTypeDefinition  =  {
         { value: 'tel', label: 'Phone' },
       ] },
     { type: 'options-list', key: 'options', label: 'Options' },
+    { type: 'border', key: 'border', label: 'Border' },
   ],
   component: RadioField,
 };
@@ -89,11 +107,17 @@ const TEXTAREA_FIELD_TYPE: FieldTypeDefinition = {
     label: 'Text area',
     placeholder: 'Enter text',
     required: false,
+    border: {
+      style: 'none',
+      width: '1px',
+      color: '#ccc'
+    }
   },
   settingsConfig: [
     { type: 'text', key: 'label', label: 'Label' },
     { type: 'text', key: 'placeholder', label: 'Placeholder' },
     { type: 'checkbox', key: 'required', label: 'Required' },
+    { type: 'border', key: 'border', label: 'Border' },
   ],
   component: TextAreaComponent,
 };
@@ -107,6 +131,11 @@ const DATE_PICKER_FIELD_TYPE: FieldTypeDefinition  = {
     label: 'Date Picker',
     placeholder: 'Enter date',
     required: false,
+    border: {
+      style: 'none',
+      width: '1px',
+      color: '#ccc'
+    }
   },
   settingsConfig: [
     { type: 'text',  key: 'label', label: 'Label' },
@@ -120,6 +149,7 @@ const DATE_PICKER_FIELD_TYPE: FieldTypeDefinition  = {
         { value: 'tel', label: 'Phone' },
       ] },
     { type: 'options-list', key: 'options', label: 'Options' },
+    { type: 'border', key: 'border', label: 'Border' },
   ],
  component: DatePicker,
 };
@@ -138,12 +168,18 @@ const DROPDOWN_LIST_FIELD_TYPE: FieldTypeDefinition = {
       { label: 'Option 2', value: 'option-2' },
       { label: 'Option 3', value: 'option-3' },
     ],
+    border: {
+      style: 'none',
+      width: '1px',
+      color: '#ccc'
+    }
   },
   settingsConfig: [
     { type: 'text', key: 'label', label: 'Label' },
     { type: 'text', key: 'placeholder', label: 'Placeholder' },
     { type: 'checkbox', key: 'required', label: 'Required' },
     { type: 'options-list', key: 'options', label: 'Options' },
+    { type: 'border', key: 'border', label: 'Border' },
   ],
   component: DropdownList,
 };

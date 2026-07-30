@@ -45,6 +45,12 @@
             [options]="fieldValues()[setting.key] || []"
             (optionsChange)="updateField(selectedField.id, setting.key, $event)" />
         }
+
+        @case ('border') {
+          <app-border-config
+            [border]="fieldValues()[setting.key]"
+            (borderChange)="updateField(selectedField.id, setting.key, $event)" />
+        }
         }
         }
     </div>

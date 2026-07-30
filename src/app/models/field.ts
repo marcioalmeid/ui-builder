@@ -25,14 +25,21 @@ export interface FormField {
   required: boolean;
   inputType?: string;
   options?: RadioOption[];
+  border?: BorderConfig;
 }
 
 export interface FieldSettingsDefinition {
-  type: 'text'|'checkbox'|'radio'|'select'|'options-list';
+  type: 'text'|'checkbox'|'radio'|'select'|'options-list'|'border';
   label: string;
   icon?: string;
   key: string;
   options?: OptionItem[];
+}
+
+export interface BorderConfig {
+  style: 'none' | 'solid' | 'dashed' | 'dotted' | 'double' | 'groove' | 'ridge' | 'inset' | 'outset';
+  width: string;
+  color: string;
 }
 
 export interface OptionItem {
