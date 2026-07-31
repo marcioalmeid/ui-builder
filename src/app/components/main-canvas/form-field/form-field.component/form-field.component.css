@@ -1,3 +1,30 @@
 :host {
   display: block;
 }
+
+.cdk-drag-placeholder {
+  opacity: 0.4;
+  border: 2px dashed #3b82f6;
+  border-radius: 0.5rem;
+  min-height: 80px;
+  background: transparent;
+}
+
+.cdk-drag-preview {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.field-connection-icon {
+  width: 1rem !important;
+  height: 1rem !important;
+  font-size: 1rem !important;
+  flex-shrink: 0;
+}
+
+.field-connection-icon--complete {
+  color: #16a34a;
+}
+
+.field-connection-icon--incomplete {
+  color: #d97706;
+}

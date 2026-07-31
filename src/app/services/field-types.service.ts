@@ -6,8 +6,22 @@ import { RadioField } from '../components/fields-types/radio-field/radio-field';
 import { TextAreaComponent } from '../components/fields-types/text-area/text-area.component';
 import { DropdownList } from '../components/fields-types/dropdown-list/dropdown-list';
 import { DatePicker } from '../components/fields-types/date-picker/date-picker';
+import { SectionHeader } from '../components/fields-types/section-header/section-header';
+import { CostBreakdown } from '../components/fields-types/cost-breakdown/cost-breakdown';
 
-const TEXT_FIELD_TYPE: FieldTypeDefinition  = {
+const HINT_SETTING = { type: 'text' as const, key: 'hint', label: 'Help text' };
+const ENTITY_MAP_SETTING = {
+  type: 'entity-map' as const,
+  key: 'entityMapping',
+  label: 'Entity mapping',
+};
+const VISIBILITY_SETTING = {
+  type: 'visibility-rule' as const,
+  key: 'visibilityRule',
+  label: 'Visibility',
+};
+
+const TEXT_FIELD_TYPE: FieldTypeDefinition = {
   id: 'text',
   type: 'text',
   label: 'Text field',
@@ -16,53 +30,54 @@ const TEXT_FIELD_TYPE: FieldTypeDefinition  = {
     label: 'Text field',
     placeholder: 'Enter text',
     required: false,
-    border: {
-      style: 'none',
-      width: '1px',
-      color: '#ccc'
-    }
+    border: { style: 'none', width: '1px', color: '#ccc' },
   },
   settingsConfig: [
-    { type: 'text',  key: 'label', label: 'Label' },
-    { type: 'text',  key: 'placeholder', label: 'Placeholder' },
-    { type: 'checkbox',  key: 'required', label: 'Required' },
-    { type: 'select', key: 'inputType', label: 'Input Type',
+    { type: 'text', key: 'label', label: 'Label' },
+    { type: 'text', key: 'placeholder', label: 'Placeholder' },
+    HINT_SETTING,
+    { type: 'checkbox', key: 'required', label: 'Required' },
+    {
+      type: 'select',
+      key: 'inputType',
+      label: 'Input Type',
       options: [
         { value: 'text', label: 'Text' },
         { value: 'number', label: 'Number' },
+        { value: 'currency', label: 'Currency ($)' },
         { value: 'email', label: 'Email' },
         { value: 'tel', label: 'Phone' },
-      ] },
-    { type: 'options-list', key: 'options', label: 'Options' },
+      ],
+    },
+    ENTITY_MAP_SETTING,
+    VISIBILITY_SETTING,
     { type: 'border', key: 'border', label: 'Border' },
   ],
- component: TextField,
+  component: TextField,
 };
 
-const CHECKBOX_FIELD_TYPE: FieldTypeDefinition  =  {
+const CHECKBOX_FIELD_TYPE: FieldTypeDefinition = {
   id: 'checkbox',
   type: 'checkbox',
   label: 'Checkbox',
   icon: 'check_box',
-    defaultConfig: {
+  defaultConfig: {
     label: 'Checkbox',
     required: false,
-    border: {
-      style: 'none',
-      width: '1px',
-      color: '#ccc'
-    }
+    border: { style: 'none', width: '1px', color: '#ccc' },
   },
   settingsConfig: [
-      { type: 'text',  key: 'label', label: 'Label' },
-    { type: 'checkbox',  key: 'required', label: 'Required' },
-    { type: 'options-list', key: 'options', label: 'Options' },
+    { type: 'text', key: 'label', label: 'Label' },
+    HINT_SETTING,
+    { type: 'checkbox', key: 'required', label: 'Required' },
+    ENTITY_MAP_SETTING,
+    VISIBILITY_SETTING,
     { type: 'border', key: 'border', label: 'Border' },
   ],
   component: CheckboxField,
-};  
+};
 
-const RADIO_FIELD_TYPE: FieldTypeDefinition  =  {
+const RADIO_FIELD_TYPE: FieldTypeDefinition = {
   id: 'radio',
   type: 'radio',
   label: 'Radio field',
@@ -70,29 +85,19 @@ const RADIO_FIELD_TYPE: FieldTypeDefinition  =  {
   defaultConfig: {
     label: 'Radio field',
     required: false,
+    optionsSource: 'static',
     options: [
       { label: 'Option 1', value: 'option-1' },
       { label: 'Option 2', value: 'option-2' },
-      { label: 'Option 3', value: 'option-3' },
     ],
-    border: {
-      style: 'none',
-      width: '1px',
-      color: '#ccc'
-    }
+    border: { style: 'none', width: '1px', color: '#ccc' },
   },
-   settingsConfig: [
-    { type: 'text',  key: 'label', label: 'Label' },
-    { type: 'text',  key: 'placeholder', label: 'Placeholder' },
-    { type: 'checkbox',  key: 'required', label: 'Required' },
-    { type: 'select', key: 'inputType', label: 'Input Type',
-      options: [
-        { value: 'text', label: 'Text' },
-        { value: 'number', label: 'Number' },
-        { value: 'email', label: 'Email' },
-        { value: 'tel', label: 'Phone' },
-      ] },
-    { type: 'options-list', key: 'options', label: 'Options' },
+  settingsConfig: [
+    { type: 'text', key: 'label', label: 'Label' },
+    HINT_SETTING,
+    { type: 'checkbox', key: 'required', label: 'Required' },
+    { type: 'data-source', key: 'options', label: 'Options' },
+    VISIBILITY_SETTING,
     { type: 'border', key: 'border', label: 'Border' },
   ],
   component: RadioField,
@@ -102,112 +107,146 @@ const TEXTAREA_FIELD_TYPE: FieldTypeDefinition = {
   id: 'textarea',
   type: 'textarea',
   label: 'Text area',
-  icon: 'format_textdirection_l_to_r',
+  icon: 'notes',
   defaultConfig: {
     label: 'Text area',
     placeholder: 'Enter text',
     required: false,
-    border: {
-      style: 'none',
-      width: '1px',
-      color: '#ccc'
-    }
+    border: { style: 'none', width: '1px', color: '#ccc' },
   },
   settingsConfig: [
     { type: 'text', key: 'label', label: 'Label' },
     { type: 'text', key: 'placeholder', label: 'Placeholder' },
+    HINT_SETTING,
     { type: 'checkbox', key: 'required', label: 'Required' },
+    ENTITY_MAP_SETTING,
+    VISIBILITY_SETTING,
     { type: 'border', key: 'border', label: 'Border' },
   ],
   component: TextAreaComponent,
 };
 
-const DATE_PICKER_FIELD_TYPE: FieldTypeDefinition  = {
+const DATE_PICKER_FIELD_TYPE: FieldTypeDefinition = {
   id: 'datepicker',
   type: 'datepicker',
-  label: 'Date Picker',
+  label: 'Date picker',
   icon: 'calendar_month',
   defaultConfig: {
-    label: 'Date Picker',
-    placeholder: 'Enter date',
+    label: 'Date picker',
+    placeholder: 'mm/dd/yyyy',
     required: false,
-    border: {
-      style: 'none',
-      width: '1px',
-      color: '#ccc'
-    }
+    border: { style: 'none', width: '1px', color: '#ccc' },
   },
   settingsConfig: [
-    { type: 'text',  key: 'label', label: 'Label' },
-    { type: 'text',  key: 'placeholder', label: 'Placeholder' },
-    { type: 'checkbox',  key: 'required', label: 'Required' },
-    { type: 'select', key: 'inputType', label: 'Input Type',
-      options: [
-        { value: 'text', label: 'Text' },
-        { value: 'number', label: 'Number' },
-        { value: 'email', label: 'Email' },
-        { value: 'tel', label: 'Phone' },
-      ] },
-    { type: 'options-list', key: 'options', label: 'Options' },
+    { type: 'text', key: 'label', label: 'Label' },
+    { type: 'text', key: 'placeholder', label: 'Placeholder' },
+    HINT_SETTING,
+    { type: 'checkbox', key: 'required', label: 'Required' },
+    ENTITY_MAP_SETTING,
+    VISIBILITY_SETTING,
     { type: 'border', key: 'border', label: 'Border' },
   ],
- component: DatePicker,
+  component: DatePicker,
 };
 
 const DROPDOWN_LIST_FIELD_TYPE: FieldTypeDefinition = {
   id: 'dropdown',
   type: 'dropdown',
-  label: 'Dropdown List',
+  label: 'Dropdown',
   icon: 'arrow_drop_down_circle',
   defaultConfig: {
-    label: 'Dropdown List',
+    label: 'Dropdown',
     placeholder: 'Select an option',
     required: false,
+    optionsSource: 'static',
     options: [
       { label: 'Option 1', value: 'option-1' },
       { label: 'Option 2', value: 'option-2' },
-      { label: 'Option 3', value: 'option-3' },
     ],
-    border: {
-      style: 'none',
-      width: '1px',
-      color: '#ccc'
-    }
+    border: { style: 'none', width: '1px', color: '#ccc' },
   },
   settingsConfig: [
     { type: 'text', key: 'label', label: 'Label' },
     { type: 'text', key: 'placeholder', label: 'Placeholder' },
+    HINT_SETTING,
     { type: 'checkbox', key: 'required', label: 'Required' },
-    { type: 'options-list', key: 'options', label: 'Options' },
+    { type: 'data-source', key: 'options', label: 'Options' },
+    VISIBILITY_SETTING,
     { type: 'border', key: 'border', label: 'Border' },
   ],
   component: DropdownList,
 };
 
+const DATA_SOURCE_SETTING = {
+  type: 'data-source' as const,
+  key: 'dataSource',
+  label: 'Data source',
+};
+
+const SECTION_HEADER_FIELD_TYPE: FieldTypeDefinition = {
+  id: 'section-header',
+  type: 'section-header',
+  label: 'Section header',
+  icon: 'view_agenda',
+  defaultConfig: {
+    label: 'Section title',
+    hint: '',
+    required: false,
+    optionsSource: 'static',
+  },
+  settingsConfig: [
+    { type: 'text', key: 'label', label: 'Section title' },
+    { type: 'text', key: 'hint', label: 'Subtitle (optional)' },
+    DATA_SOURCE_SETTING,
+    VISIBILITY_SETTING,
+  ],
+  component: SectionHeader,
+};
+
+const COST_BREAKDOWN_FIELD_TYPE: FieldTypeDefinition = {
+  id: 'cost-breakdown',
+  type: 'cost-breakdown',
+  label: 'Cost breakdown',
+  icon: 'calculate',
+  defaultConfig: {
+    label: 'Cost breakdown',
+    hint: 'Calculated net ad spend from gross budget and fees',
+    required: false,
+    optionsSource: 'static',
+    managementFeePercent: 15,
+  },
+  settingsConfig: [
+    { type: 'text', key: 'label', label: 'Block title' },
+    HINT_SETTING,
+    { type: 'number', key: 'managementFeePercent', label: 'Default management fee (%)' },
+    { type: 'checkbox', key: 'required', label: 'Gross budget required' },
+    DATA_SOURCE_SETTING,
+    VISIBILITY_SETTING,
+  ],
+  component: CostBreakdown,
+};
+
 @Injectable({
   providedIn: 'root',
 })
-
 export class FieldTypeService {
-  fieldTypes= new Map<string, FieldTypeDefinition>([
+  fieldTypes = new Map<string, FieldTypeDefinition>([
     ['text', TEXT_FIELD_TYPE],
     ['checkbox', CHECKBOX_FIELD_TYPE],
     ['radio', RADIO_FIELD_TYPE],
     ['textarea', TEXTAREA_FIELD_TYPE],
     ['datepicker', DATE_PICKER_FIELD_TYPE],
     ['dropdown', DROPDOWN_LIST_FIELD_TYPE],
-    // ['select', SELECT_FIELD_TYPE],
-    // ['number', NUMBER_FIELD_TYPE],
-    // ['email', EMAIL_FIELD]
-]);
-  
+    ['section-header', SECTION_HEADER_FIELD_TYPE],
+    ['cost-breakdown', COST_BREAKDOWN_FIELD_TYPE],
+  ]);
 
   getFieldTypeById(id: string): FieldTypeDefinition | undefined {
     return this.fieldTypes.get(id);
   }
 
   getFieldType(type: string): FieldTypeDefinition | undefined {
-    return  this.fieldTypes.get(type) ;
+    return this.fieldTypes.get(type);
   }
 
   getFieldTypes(): FieldTypeDefinition[] {

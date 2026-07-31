@@ -1,0 +1,28 @@
+<h2 mat-dialog-title>New task template</h2>
+
+<mat-dialog-content class="flex flex-col gap-4 pt-2">
+  <mat-form-field appearance="outline" class="w-full">
+    <mat-label>Template name</mat-label>
+    <input matInput [(ngModel)]="name" placeholder="Digital Advertising Task" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="w-full">
+    <mat-label>Context</mat-label>
+    <mat-select [(ngModel)]="context">
+      @for (ctx of contexts; track ctx.id) {
+        <mat-option [value]="ctx.id">{{ ctx.label }}</mat-option>
+      }
+    </mat-select>
+    <mat-hint>Filters the data catalog for this template</mat-hint>
+  </mat-form-field>
+
+  <p class="text-sm text-gray-600">
+    Or duplicate the pre-built <strong>New Task (Advertising)</strong> demo to start faster.
+  </p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="cancel()">Cancel</button>
+  <button mat-stroked-button type="button" (click)="startFromDemo()">Duplicate demo</button>
+  <button mat-flat-button color="primary" type="button" (click)="createBlank()">Create blank</button>
+</mat-dialog-actions>

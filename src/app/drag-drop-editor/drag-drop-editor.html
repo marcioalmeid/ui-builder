@@ -1,17 +1,27 @@
-<div class="flex flex-col h-screen  px-4 ">
-    <div class="flex flex-col justify-center items-center  py-10">
-        <h1 class="text-2xl text-primary tracking-wide font-medium ">Editor Design</h1>
+<div class="flex flex-col h-screen px-4">
+    <div class="flex items-center justify-between py-4 gap-4 flex-wrap">
+        <div class="flex flex-col gap-1">
+          <h1 class="text-2xl text-primary tracking-wide font-medium">Task Template Builder</h1>
+          <a routerLink="/jobs" class="text-sm text-blue-600 underline w-fit">View submitted tasks</a>
+        </div>
+        <div class="flex items-center gap-2">
+          <button mat-stroked-button (click)="undo()" [disabled]="!formService.canUndo()">
+            <mat-icon>undo</mat-icon> Undo
+          </button>
+          <button mat-stroked-button (click)="redo()" [disabled]="!formService.canRedo()">
+            <mat-icon>redo</mat-icon> Redo
+          </button>
+        </div>
     </div>
-    <div class="flex gap-4 relative" cdkDropListGroup>
-        <app-form-elements-menu class="w-64" />
-        <app-main-canvas class="flex-1" />
-        <app-field-settings class="w-64" />
+    <div class="flex gap-4 relative flex-1 min-h-0" cdkDropListGroup>
+        <app-builder-sidebar class="shrink-0" />
+        <app-main-canvas class="flex-1 min-w-0" />
+        @if (showRightPanel()) {
+          @if (isDataBindingContext()) {
+            <app-field-data-panel class="builder-right-panel shrink-0" />
+          } @else if (formService.selectedField()) {
+            <app-field-settings class="builder-right-panel shrink-0" />
+          }
+        }
     </div>
-   <button mat-flat-button class="!absolute top-30 right-[20px] bg-blue-500 font-bold py-2 px-4 rounded-full shadow-md compact-button"
-    (click)="formService.exportForm()"
-   >
-    Export Form 
-    <mat-icon name="download">download</mat-icon>
-</button>
-
 </div>

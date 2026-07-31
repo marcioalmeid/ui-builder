@@ -1,0 +1,44 @@
+<div
+  class="dev-payload-panel"
+  [class.dev-payload-panel--embedded]="embedded()"
+  [class.p-4]="!embedded()"
+  [class.bg-white]="!embedded()"
+  [class.rounded-lg]="!embedded()"
+  [class.border]="!embedded()"
+  [class.border-gray-200]="!embedded()"
+  [class.shadow-sm]="!embedded()"
+>
+  <div class="dev-payload-panel__header">
+    <div>
+      <h2 class="dev-payload-panel__title">API payload</h2>
+      <p class="dev-payload-panel__subtitle">{{ activeTemplateName() }} · JSON sent to the API</p>
+    </div>
+    <button mat-stroked-button type="button" (click)="copyPayload()">
+      <mat-icon>{{ copied() ? 'check' : 'content_copy' }}</mat-icon>
+      {{ copied() ? 'Copied' : 'Copy' }}
+    </button>
+  </div>
+
+  @if (!hasSimulatedData()) {
+    <p class="dev-payload-panel__hint">
+      Open <strong>Preview</strong>, enable <strong>Simulate operator</strong>, and fill fields to
+      see live values in the payload.
+    </p>
+  } @else {
+    <p class="dev-payload-panel__hint dev-payload-panel__hint--live">
+      Live preview — updates as you change simulated operator values.
+    </p>
+  }
+
+  @if (payload(); as current) {
+    <div class="dev-payload-panel__stats">
+      <span>{{ current.meta.fieldCount }} fields</span>
+      <span>{{ current.meta.dataBindingCount }} shared bindings</span>
+      <span>{{ current.meta.workflowRuleCount }} rules</span>
+      <span>{{ current.meta.connectedFieldCount }} connected</span>
+      <span>{{ current.meta.visibleFieldCount }} visible</span>
+    </div>
+  }
+
+  <pre class="dev-payload-panel__json"><code>{{ payloadJson() }}</code></pre>
+</div>

@@ -4,6 +4,10 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "mock-api": "node mock-api/server.mjs",
+    "start:dev": "sh scripts/start-dev.sh",
+    "dev": "sh scripts/restart-dev.sh",
+    "dev:stop": "sh scripts/stop-dev.sh",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"

@@ -1,14 +1,25 @@
 <div class="radio-field w-full" [style.border]="getBorderStyle()">
   <p class="radio-field__label">{{ field().label }}</p>
-  <mat-radio-group
-    class="radio-field__group"
-    [required]="field().required"
-    [attr.aria-label]="field().label"
-  >
-    @for (option of field().options ?? []; track option.value) {
-      <mat-radio-button [value]="option.value">
-        {{ option.label }}
-      </mat-radio-button>
-    }
-  </mat-radio-group>
+
+  @if (loading()) {
+    <mat-spinner diameter="24"></mat-spinner>
+  } @else {
+    <mat-radio-group
+      class="radio-field__group"
+      [required]="field().required"
+      [attr.aria-label]="field().label"
+      [value]="value()"
+      (change)="onRadioChange($event.value)"
+    >
+      @for (option of options(); track option.value) {
+        <mat-radio-button [value]="option.value">
+          {{ option.label }}
+        </mat-radio-button>
+      }
+    </mat-radio-group>
+  }
+
+  @if (error()) {
+    <p class="text-xs text-red-600 mt-1">{{ error() }}</p>
+  }
 </div>

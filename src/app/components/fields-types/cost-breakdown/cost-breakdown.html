@@ -1,0 +1,80 @@
+<div class="cost-breakdown">
+  <p class="cost-breakdown__title">{{ field().label }}</p>
+  @if (field().hint) {
+    <p class="cost-breakdown__hint">{{ field().hint }}</p>
+  }
+
+  <div class="cost-breakdown__grid">
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Gross budget</mat-label>
+      <span matTextPrefix>$&nbsp;</span>
+      <input
+        matInput
+        type="number"
+        min="0"
+        [value]="state().grossBudget"
+        (input)="onGrossChange($any($event.target).value)"
+      />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Management fee</mat-label>
+      <input
+        matInput
+        type="number"
+        min="0"
+        max="100"
+        [value]="state().managementFeePercent"
+        (input)="onFeePercentChange($any($event.target).value)"
+      />
+      <span matTextSuffix>%</span>
+      <mat-hint>{{ formatCurrency(managementFeeAmount()) }}</mat-hint>
+    </mat-form-field>
+  </div>
+
+  <div class="cost-breakdown__fees">
+    <div class="cost-breakdown__fees-header">
+      <span class="text-sm font-medium text-gray-700">Additional fees</span>
+      <button mat-stroked-button type="button" (click)="addFee()">
+        <mat-icon>add</mat-icon> Add fee
+      </button>
+    </div>
+
+    @for (fee of state().additionalFees; track $index) {
+      <div class="cost-breakdown__fee-row">
+        <mat-form-field appearance="outline" class="flex-1">
+          <mat-label>Fee name</mat-label>
+          <input
+            matInput
+            [value]="fee.label"
+            (input)="onFeeLabelChange($index, $any($event.target).value)"
+          />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="w-36">
+          <mat-label>Amount</mat-label>
+          <span matTextPrefix>$&nbsp;</span>
+          <input
+            matInput
+            type="number"
+            min="0"
+            [value]="fee.amount"
+            (input)="onFeeAmountChange($index, $any($event.target).value)"
+          />
+        </mat-form-field>
+        <button
+          mat-icon-button
+          type="button"
+          aria-label="Remove fee"
+          (click)="removeFee($index)"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    }
+  </div>
+
+  <div class="cost-breakdown__summary">
+    <span>Net ad spend</span>
+    <strong>{{ formatCurrency(netAdSpend()) }}</strong>
+  </div>
+</div>

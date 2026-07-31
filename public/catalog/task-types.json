@@ -1,0 +1,6 @@
+[
+  { "id": "digital-advertising", "name": "Digital Advertising" },
+  { "id": "print", "name": "Print Media" },
+  { "id": "social", "name": "Social Media" },
+  { "id": "general", "name": "General Task" }
+]

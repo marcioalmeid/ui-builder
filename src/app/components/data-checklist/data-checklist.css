@@ -1,0 +1,36 @@
+.data-checklist__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem 0.625rem;
+  border-radius: 0.375rem;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+}
+
+.data-checklist__item:hover {
+  background: #f9fafb;
+}
+
+.data-checklist__item--ok {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
+.data-checklist__item--warning {
+  border-color: #fde68a;
+  background: #fffbeb;
+}
+
+.data-checklist__item--error {
+  border-color: #fecaca;
+  background: #fef2f2;
+}
+
+.data-checklist__item--selected {
+  outline: 2px solid #3b82f6;
+  outline-offset: 1px;
+}

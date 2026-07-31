@@ -1,0 +1,75 @@
+<nav class="setup-stepper" aria-label="Template setup progress">
+  @for (step of steps(); track step.id; let i = $index; let last = $last) {
+    <button
+      type="button"
+      class="setup-step"
+      [class.setup-step--complete]="step.complete"
+      [class.setup-step--active]="activeStepId() === step.id"
+      [class.setup-step--progress]="currentStep()?.id === step.id && activeStepId() !== step.id"
+      (click)="onStepClick(step)"
+      [attr.aria-current]="activeStepId() === step.id ? 'step' : null"
+    >
+      <span class="setup-step__indicator" [class.setup-step__indicator--complete]="step.complete">
+        @if (step.complete) {
+          <svg class="setup-step__check" viewBox="0 0 12 12" aria-hidden="true">
+            <path
+              fill="currentColor"
+              d="M10.28 2.22a.75.75 0 0 1 0 1.06l-5.5 5.5a.75.75 0 0 1-1.06 0l-2.5-2.5a.75.75 0 1 1 1.06-1.06L4.5 7.19l4.97-4.97a.75.75 0 0 1 1.06 0Z"
+            />
+          </svg>
+        } @else {
+          <span class="setup-step__number">{{ i + 1 }}</span>
+        }
+      </span>
+      <span class="setup-step__body">
+        <span class="setup-step__label">{{ step.label }}</span>
+        <span class="setup-step__hint">{{ step.hint }}</span>
+      </span>
+    </button>
+    @if (!last) {
+      <span
+        class="setup-stepper__arrow"
+        [class.setup-stepper__arrow--complete]="step.complete"
+        aria-hidden="true"
+      >
+        <svg class="setup-stepper__arrow-icon" viewBox="0 0 48 12" preserveAspectRatio="none">
+          <path
+            class="setup-stepper__arrow-line"
+            d="M0 6 H36"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+          <path
+            class="setup-stepper__arrow-head"
+            d="M32 2 L44 6 L32 10"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </span>
+    }
+  }
+</nav>
+
+@if (nextAction(); as action) {
+  <div
+    class="setup-stepper__next"
+    [class.setup-stepper__next--ready]="readyToPublish()"
+  >
+    <p class="setup-stepper__next-message">{{ action.message }}</p>
+    <button
+      mat-stroked-button
+      type="button"
+      class="setup-stepper__next-button"
+      [class.setup-stepper__next-button--primary]="readyToPublish()"
+      (click)="onNextActionClick()"
+    >
+      {{ action.buttonLabel }}
+    </button>
+  </div>
+}

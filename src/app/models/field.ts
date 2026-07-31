@@ -1,4 +1,5 @@
 import { Type } from '@angular/core';
+import { EntityFieldMapping } from './entity-field';
 export interface FieldTypeDefinition {
   id: string;
   type: string;
@@ -16,20 +17,56 @@ export interface RadioOption {
   value: string;
 }
 
+export type OptionsSource = 'static' | 'api';
+
+export interface ApiDataSource {
+  url: string;
+  method?: 'GET' | 'POST';
+  labelKey: string;
+  valueKey: string;
+  responsePath?: string;
+  params?: Record<string, string>;
+}
+
 export interface FormField {
   id: string;
   type: string;
   label: string;
   placeholder?: string;
+  hint?: string;
   icon: string;
   required: boolean;
   inputType?: string;
+  optionsSource?: OptionsSource;
+  dataSource?: ApiDataSource;
+  dataCatalogId?: string;
+  dataBindingId?: string;
   options?: RadioOption[];
   border?: BorderConfig;
+  visibilityRule?: FieldVisibilityRule;
+  managementFeePercent?: number;
+  entityMapping?: EntityFieldMapping;
+}
+
+export interface FieldVisibilityRule {
+  fieldId: string;
+  operator: 'equals' | 'notEmpty';
+  value?: string;
+}
+
+export interface CostBreakdownFee {
+  label: string;
+  amount: number;
+}
+
+export interface CostBreakdownValue {
+  grossBudget: number | '';
+  managementFeePercent: number;
+  additionalFees: CostBreakdownFee[];
 }
 
 export interface FieldSettingsDefinition {
-  type: 'text'|'checkbox'|'radio'|'select'|'options-list'|'border';
+  type: 'text'|'checkbox'|'radio'|'select'|'options-list'|'options-source'|'data-source'|'entity-map'|'border'|'number'|'visibility-rule';
   label: string;
   icon?: string;
   key: string;

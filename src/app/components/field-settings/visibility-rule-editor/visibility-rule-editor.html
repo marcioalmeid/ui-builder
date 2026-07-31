@@ -1,0 +1,53 @@
+<div class="flex flex-col gap-3">
+  <label class="flex items-center gap-2 text-sm text-gray-700">
+    <input
+      type="checkbox"
+      [checked]="enabled()"
+      (change)="onToggle($any($event.target).checked)"
+    />
+    Show only when another field matches
+  </label>
+
+  @if (rule(); as current) {
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Depends on field</mat-label>
+      <mat-select [value]="current.fieldId" (valueChange)="onFieldChange($event)">
+        @for (field of candidateFields(); track field.id) {
+          <mat-option [value]="field.id">{{ labelFor(field) }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Condition</mat-label>
+      <mat-select [value]="current.operator" (valueChange)="onOperatorChange($event)">
+        <mat-option value="equals">Equals value</mat-option>
+        <mat-option value="notEmpty">Is not empty</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    @if (current.operator === 'equals') {
+      @if (hasOptionValues()) {
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>When value is</mat-label>
+          <mat-select [value]="current.value ?? ''" (valueChange)="onValueChange($event)">
+            @for (option of dependentOptions(); track option.value) {
+              <mat-option [value]="option.value">{{ option.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      } @else {
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Value</mat-label>
+          <input
+            matInput
+            [ngModel]="current.value ?? ''"
+            (ngModelChange)="onValueChange($event)"
+            placeholder="digital-advertising"
+          />
+          <mat-hint>Use the stored field value</mat-hint>
+        </mat-form-field>
+      }
+    }
+  }
+</div>

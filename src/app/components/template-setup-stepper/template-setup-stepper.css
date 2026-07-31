@@ -1,0 +1,197 @@
+.setup-stepper {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding: 0.75rem 0;
+  scrollbar-width: thin;
+}
+
+.setup-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  min-width: 0;
+  flex: 1 1 0;
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 0.25rem 0.375rem;
+  border-radius: 0.375rem;
+}
+
+.setup-step {
+  cursor: pointer;
+}
+
+.setup-step:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.setup-step--active {
+  background: rgba(37, 99, 235, 0.1);
+  box-shadow: inset 0 0 0 2px #2563eb;
+}
+
+.setup-step--active .setup-step__label {
+  color: #1d4ed8;
+  font-weight: 700;
+}
+
+.setup-step--active .setup-step__hint {
+  color: #3b82f6;
+}
+
+.setup-step--active .setup-step__indicator:not(.setup-step__indicator--complete) {
+  border-color: #2563eb;
+  background: #2563eb;
+  color: #fff;
+}
+
+.setup-step--active .setup-step__indicator--complete {
+  box-shadow: 0 0 0 2px #2563eb;
+}
+
+.setup-step--progress:not(.setup-step--active) .setup-step__indicator:not(.setup-step__indicator--complete) {
+  border-color: #93c5fd;
+  color: #2563eb;
+}
+
+.setup-step--progress:not(.setup-step--active) .setup-step__label {
+  color: #2563eb;
+}
+
+.setup-step__indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  flex-shrink: 0;
+  margin-top: 0.0625rem;
+  border-radius: 9999px;
+  border: 2px solid #d1d5db;
+  background: #fff;
+  color: #6b7280;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.setup-step__indicator--complete {
+  border-color: #16a34a;
+  background: #16a34a;
+  color: #fff;
+}
+
+.setup-step__number {
+  display: block;
+  transform: translateY(0.5px);
+}
+
+.setup-step__check {
+  width: 0.75rem;
+  height: 0.75rem;
+  display: block;
+}
+
+.setup-step__body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 0.125rem;
+}
+
+.setup-step__label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #374151;
+  line-height: 1.2;
+}
+
+.setup-step--complete .setup-step__label {
+  color: #166534;
+}
+
+.setup-step__hint {
+  font-size: 0.6875rem;
+  color: #6b7280;
+  line-height: 1.35;
+}
+
+.setup-stepper__arrow {
+  flex: 0 0 2.5rem;
+  align-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 1.5rem;
+  margin-top: 0.125rem;
+  color: #cbd5e1;
+}
+
+.setup-stepper__arrow--complete {
+  color: #22c55e;
+}
+
+.setup-stepper__arrow-icon {
+  width: 100%;
+  height: 0.75rem;
+  display: block;
+}
+
+.setup-stepper__next {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.setup-stepper__next--ready {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
+.setup-stepper__next-message {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: #374151;
+  line-height: 1.4;
+}
+
+.setup-stepper__next--ready .setup-stepper__next-message {
+  color: #166534;
+}
+
+.setup-stepper__next-button {
+  flex-shrink: 0;
+}
+
+.setup-stepper__next-button--primary {
+  border-color: #16a34a !important;
+  color: #166534 !important;
+  background: #dcfce7 !important;
+}
+
+@media (max-width: 768px) {
+  .setup-stepper {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .setup-stepper__arrow {
+    flex: 0 0 1.75rem;
+  }
+
+  .setup-step {
+    flex: 1 1 calc(50% - 1rem);
+    min-width: 8rem;
+  }
+}

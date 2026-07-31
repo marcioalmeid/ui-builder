@@ -1,1 +1,5 @@
-/* Main Canvas Styles */
+.main-canvas__content--json {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 280px);
+}

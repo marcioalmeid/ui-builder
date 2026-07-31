@@ -1,0 +1,113 @@
+<div class="flex flex-col gap-4">
+  @if (showStaticOptions()) {
+    <p class="options-source-hint">
+      Choose how this dropdown/radio gets its options.
+    </p>
+
+    <mat-button-toggle-group [value]="sourceMode()" class="w-full options-source-modes">
+      <mat-button-toggle value="static" class="flex-1" (click)="onModeChange('static')">
+        Static
+      </mat-button-toggle>
+      <mat-button-toggle value="field-catalog" class="flex-1" (click)="onModeChange('field-catalog')">
+        This field
+      </mat-button-toggle>
+      <mat-button-toggle value="shared-list" class="flex-1" (click)="onModeChange('shared-list')">
+        Shared list
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+
+    @if (sourceMode() === 'static') {
+      <p class="options-source-desc">Type options manually — only this field uses them.</p>
+    } @else if (sourceMode() === 'field-catalog') {
+      <p class="options-source-desc">Pick a catalog source — only this field uses it.</p>
+    } @else {
+      <p class="options-source-desc">
+        Reuse a list from the Data section — updates sync across all linked fields.
+      </p>
+    }
+  } @else {
+    <p class="options-source-hint">{{ modeHint() }}</p>
+
+    <mat-button-toggle-group
+      [value]="optionsSource() === 'api' ? 'catalog' : 'static'"
+      class="w-full"
+    >
+      <mat-button-toggle value="static" class="flex-1" (click)="onModeChange('static')">
+        Static
+      </mat-button-toggle>
+      <mat-button-toggle value="catalog" class="flex-1" (click)="onModeChange('field-catalog')">
+        Catalog
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+  }
+
+  @if (sourceMode() === 'static') {
+    @if (showStaticOptions()) {
+      <app-options-list-editor
+        [options]="options()"
+        (optionsChange)="onStaticOptionsChange($event)"
+      />
+    }
+  } @else if (sourceMode() === 'shared-list') {
+    @if (sharedLists().length === 0) {
+      <div class="options-source-callout">
+        <p>No shared lists yet. Create one in the <strong>Data</strong> section first.</p>
+        <button mat-stroked-button type="button" (click)="openSharedListsPanel()">
+          Open shared lists
+        </button>
+      </div>
+    } @else {
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Shared option list</mat-label>
+        <mat-select
+          [value]="dataBindingId() ?? ''"
+          (valueChange)="onSharedListSelected($event)"
+        >
+          @for (binding of sharedLists(); track binding.id) {
+            <mat-option [value]="binding.id">
+              {{ getSharedListLabel(binding.id) }}
+              ({{ binding.targetFieldIds.length }} field(s))
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      @if (activeSharedList(); as list) {
+        <p class="options-source-desc">
+          Linked with:
+          @for (fieldId of list.targetFieldIds; track fieldId; let last = $last) {
+            {{ formService.getFieldLabel(fieldId) }}@if (!last) {, }
+          }
+        </p>
+      }
+    }
+  } @else {
+    <app-data-catalog-picker
+      [selectedId]="selectedCatalogId()"
+      [context]="templateContext()"
+      label="Catalog source"
+      (selectionChange)="onCatalogSelected($event)"
+    />
+  }
+
+  @if (loading()) {
+    <p class="text-sm text-gray-500">Loading options...</p>
+  }
+
+  @if (statusMessage()) {
+    <p [class.text-red-600]="statusError()" [class.text-green-700]="!statusError()" class="text-sm">
+      {{ statusMessage() }}
+    </p>
+  }
+
+  @if (sourceMode() !== 'static' && options().length > 0) {
+    <div class="rounded border border-gray-200 p-3 bg-gray-50">
+      <p class="text-xs text-gray-500 mb-2">Preview ({{ options().length }} options)</p>
+      <ul class="text-sm space-y-1 max-h-32 overflow-y-auto">
+        @for (option of options(); track option.value) {
+          <li>{{ option.label }} — {{ option.value }}</li>
+        }
+      </ul>
+    </div>
+  }
+</div>

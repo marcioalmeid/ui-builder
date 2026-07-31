@@ -6,9 +6,9 @@
   [hideRequiredMarker]="!field().required">
   <mat-label>{{ field().label }}</mat-label>
   <textarea
-    #textareaElement
     [id]="'textarea-' + field().id"
     [placeholder]="field().placeholder || ''"
+    [value]="value()"
     (input)="onInputChange($event)"
     rows="4"
     matInput
@@ -16,5 +16,4 @@
     [style.border]="getBorderStyle()"
     class="resize-y">
   </textarea>
-  <mat-hint *ngIf="field().description">{{ field().label }}</mat-hint>
 </mat-form-field>

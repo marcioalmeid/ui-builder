@@ -1,11 +1,11 @@
 import { Component, signal } from '@angular/core';
-import { DragDropEditorComponent } from './drag-drop-editor/drag-drop-editor';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [DragDropEditorComponent, MatToolbarModule],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, MatToolbarModule],
   templateUrl: './app.html',
   styleUrls: ['./app.css']
 })

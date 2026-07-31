@@ -2,11 +2,24 @@
   <mat-label>{{ field().label }}</mat-label>
   <mat-select
     [required]="field().required"
-    [placeholder]="field().placeholder || ''">
-    @for (option of field().options; track option.value) {
-      <mat-option [value]="option.value">
-        {{ option.label }}
-      </mat-option>
+    [placeholder]="field().placeholder || ''"
+    [disabled]="loading()"
+    [value]="value()"
+    (selectionChange)="onSelectionChange($event.value)"
+  >
+    @if (loading()) {
+      <mat-option disabled>Loading options...</mat-option>
+    } @else {
+      @for (option of options(); track option.value) {
+        <mat-option [value]="option.value">
+          {{ option.label }}
+        </mat-option>
+      }
     }
   </mat-select>
+  @if (error()) {
+    <mat-hint class="text-red-600">{{ error() }}</mat-hint>
+  } @else if (field().hint) {
+    <mat-hint>{{ field().hint }}</mat-hint>
+  }
 </mat-form-field>

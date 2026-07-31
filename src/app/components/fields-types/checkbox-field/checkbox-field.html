@@ -1,3 +1,9 @@
 <div [style.border]="getBorderStyle()" class="p-2">
-  <mat-checkbox [required]="field().required" class="w-full">{{ field().label }}</mat-checkbox>
-</div> 
+  <mat-checkbox
+    [required]="field().required"
+    class="w-full"
+    [checked]="value()"
+    (change)="onCheckedChange($event.checked)">
+    {{ field().label }}
+  </mat-checkbox>
+</div>

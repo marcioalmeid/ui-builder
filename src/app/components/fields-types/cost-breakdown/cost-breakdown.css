@@ -1,0 +1,57 @@
+.cost-breakdown {
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  background: #fafafa;
+}
+
+.cost-breakdown__title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 0.25rem;
+}
+
+.cost-breakdown__hint {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin: 0 0 0.75rem;
+}
+
+.cost-breakdown__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 0.75rem;
+}
+
+.cost-breakdown__fees {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cost-breakdown__fees-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.cost-breakdown__fee-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cost-breakdown__summary {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+  color: #374151;
+}

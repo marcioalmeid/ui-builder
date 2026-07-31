@@ -1,27 +1,69 @@
 <div class="p-4 bg-white rounded-lg h-[calc(100vh-150px)] overflow-y-auto border-gray-200 shadow-sm">
-    <div class="pb-4 border-b border-gray-200 flex gap-2 items-center">
-        <h3 class="text-xl   font-medium text-primary">Form Canvas</h3>
-        <mat-button-toggle-group [(value)]="activeTab"
-         hideSingleSelectionIndicator="true"
+    <div class="pb-4 border-b border-gray-200">
+        <div class="flex gap-2 items-center flex-wrap mb-2">
+        <h3 class="text-xl font-medium text-primary">Template canvas</h3>
+        <mat-button-toggle-group
+          [value]="activeTab()"
+          (valueChange)="onTabChange($event)"
+          hideSingleSelectionIndicator="true"
         >
             <mat-button-toggle value="editor">Editor</mat-button-toggle>
+            <mat-button-toggle value="rules">Rules</mat-button-toggle>
             <mat-button-toggle value="preview">Preview</mat-button-toggle>
+            <mat-button-toggle value="json">JSON Data</mat-button-toggle>
         </mat-button-toggle-group>
-        @if((activeTab() === 'editor')) {
-            <div class="flex-1"></div>
-        <button mat-flat-button  color="primary" class="compact-button bg-background-primary"
-        (click)="formService.addRow()"
-        >Add Row
-            <mat-icon>add_circle</mat-icon>
-        </button>
+        @if (activeTab() === 'preview') {
+          <label class="flex items-center gap-2 text-sm text-gray-600 ml-2">
+            <mat-checkbox [checked]="simulateOperator()" (change)="simulateOperator.set($event.checked)" />
+            Simulate operator
+          </label>
         }
+        </div>
 
+        <app-template-setup-stepper
+          [previewVisited]="formService.previewVisited()"
+          (stepAction)="onStepAction($event)"
+        />
     </div>
-    <div class="mt-4">
+
+    @if (activeTab() === 'editor' && isLayoutEmpty() && !formService.isReadonly()) {
+      <div class="mt-4 rounded-lg border-2 border-dashed border-primary/30 bg-primary/5 p-6 text-center">
+        <mat-icon class="!text-4xl !w-10 !h-10 text-primary/70 mb-2">touch_app</mat-icon>
+        <p class="font-medium text-gray-800">Start with layout</p>
+        <p class="text-sm text-gray-600 mt-1 max-w-md mx-auto">
+          Use the <strong>Fields</strong> section in the sidebar and drag task fields into a row below.
+        </p>
+        <button mat-stroked-button type="button" class="mt-4" (click)="openFieldsSection()">
+          Open fields
+        </button>
+        @if (!formService.isReadonly()) {
+          <button mat-flat-button type="button" color="primary" class="mt-2" (click)="formService.addRow()">
+            Add row
+            <mat-icon>add_circle</mat-icon>
+          </button>
+        }
+      </div>
+    }
+
+    @if (activeTab() === 'preview' && simulateOperator()) {
+      <p class="text-xs text-blue-700 bg-blue-50 border border-blue-100 rounded px-3 py-2 mt-4">
+        Operator simulation active — change values to test conditional sections.
+      </p>
+    }
+
+    <div class="mt-4" [class.main-canvas__content--json]="activeTab() === 'json'">
         @if (activeTab()=== 'editor') {
         <app-form-editor></app-form-editor>
+        } @else if (activeTab() === 'rules') {
+          <app-workflow-builder />
         } @else if (activeTab() === 'preview') {
-               <app-form-preview></app-form-preview>
+          <app-form-preview
+            [interactive]="previewInteractive()"
+            [jobData]="formService.previewJobData()"
+            (fieldValueChange)="onPreviewFieldChange($event.fieldId, $event.value)"
+          />
+        } @else if (activeTab() === 'json') {
+          <app-dev-payload-panel [embedded]="true" />
         }
     </div>
 </div>

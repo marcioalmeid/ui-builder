@@ -1,0 +1,6 @@
+[
+  { "id": "vendor-a", "name": "Horizon Media" },
+  { "id": "vendor-b", "name": "Spark Digital" },
+  { "id": "vendor-c", "name": "Clear Channel" },
+  { "id": "vendor-d", "name": "In-house" }
+]

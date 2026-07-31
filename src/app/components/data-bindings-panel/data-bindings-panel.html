@@ -1,0 +1,96 @@
+<div class="shared-lists-panel">
+  <div class="shared-lists-panel__header">
+    <div>
+      <h2 class="shared-lists-panel__title">Shared option lists</h2>
+      <p class="shared-lists-panel__subtitle">Same catalog options on multiple dropdowns/radios</p>
+    </div>
+    <button mat-icon-button aria-label="Create shared list" (click)="startCreate()">
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
+
+  <div class="shared-lists-panel__list">
+    @for (binding of formService.dataBindings(); track binding.id) {
+      <div class="shared-lists-panel__card">
+        <div class="shared-lists-panel__card-header">
+          <div class="min-w-0">
+            <p class="shared-lists-panel__card-title">{{ getBindingLabel(binding) }}</p>
+            <p class="shared-lists-panel__card-meta">
+              {{ binding.targetFieldIds.length }} linked field(s)
+            </p>
+          </div>
+          <div class="shared-lists-panel__card-actions">
+            <button mat-icon-button aria-label="Reload options" (click)="refreshBinding(binding.id)">
+              <mat-icon class="!text-base">sync</mat-icon>
+            </button>
+            <button mat-icon-button aria-label="Edit shared list" (click)="startEdit(binding)">
+              <mat-icon class="!text-base">edit</mat-icon>
+            </button>
+            <button mat-icon-button aria-label="Delete shared list" color="warn" (click)="deleteBinding(binding.id)">
+              <mat-icon class="!text-base">delete</mat-icon>
+            </button>
+          </div>
+        </div>
+        @if (getTargetFieldLabels(binding); as labels) {
+          @if (labels.length) {
+            <p class="shared-lists-panel__targets">
+              @for (label of labels; track label; let last = $last) {
+                <span class="shared-lists-panel__target">{{ label }}</span>@if (!last) {<span>, </span>}
+              }
+            </p>
+          }
+        }
+      </div>
+    }
+  </div>
+
+  @if (editingId()) {
+    <div class="shared-lists-panel__editor">
+      <p class="shared-lists-panel__editor-title">
+        {{ isCreating() ? 'New shared list' : 'Edit shared list' }}
+      </p>
+
+      <app-data-catalog-picker
+        [selectedId]="selectedCatalogId()"
+        [context]="templateContext()"
+        label="Catalog source"
+        (selectionChange)="onCatalogSelected($event)"
+      />
+
+      <div>
+        <p class="shared-lists-panel__field-label">Link to fields</p>
+        @if (bindableFields().length === 0) {
+          <p class="shared-lists-panel__field-hint">Add a dropdown or radio field to the canvas first.</p>
+        } @else {
+          <div class="shared-lists-panel__field-list">
+            @for (field of bindableFields(); track field.id) {
+              <mat-checkbox
+                [checked]="isTargetSelected(field.id)"
+                (change)="toggleTarget(field.id, $event.checked)"
+              >
+                {{ field.label }}
+                <span class="shared-lists-panel__field-type">({{ field.type }})</span>
+              </mat-checkbox>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="shared-lists-panel__editor-actions">
+        <button mat-flat-button color="primary" class="flex-1" (click)="saveBinding()">
+          Save shared list
+        </button>
+        <button mat-stroked-button (click)="cancelEdit()">Cancel</button>
+      </div>
+    </div>
+  }
+
+  @if (statusMessage()) {
+    <p
+      class="shared-lists-panel__status"
+      [class.shared-lists-panel__status--error]="statusError()"
+    >
+      {{ statusMessage() }}
+    </p>
+  }
+</div>

@@ -1,0 +1,24 @@
+<mat-form-field appearance="outline" class="w-full">
+  <mat-label>{{ label() }}</mat-label>
+  <mat-select
+    [value]="localSelection()"
+    (valueChange)="onSelectionChange($event)"
+  >
+    @for (category of categories(); track category) {
+      <mat-optgroup [label]="category">
+        @for (item of catalogService.getByCategory(category, context()); track item.id) {
+          <mat-option [value]="item.id">
+            <span class="flex items-center gap-2">
+              <mat-icon class="!text-base !w-4 !h-4">{{ item.icon }}</mat-icon>
+              {{ item.name }}
+            </span>
+          </mat-option>
+        }
+      </mat-optgroup>
+    }
+  </mat-select>
+</mat-form-field>
+
+@if (selectedItem(); as item) {
+  <p class="text-xs text-gray-500 -mt-2">{{ item.description }}</p>
+}

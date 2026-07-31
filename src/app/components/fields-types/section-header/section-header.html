@@ -1,0 +1,19 @@
+<div class="section-header">
+  <span class="section-header__line" aria-hidden="true"></span>
+  <h3 class="section-header__title">{{ field().label }}</h3>
+  @if (field().hint) {
+    <p class="section-header__subtitle">{{ field().hint }}</p>
+  }
+  @if (usesApi()) {
+    <p class="section-header__data text-xs text-blue-700">
+      @if (loading()) {
+        Loading catalog data...
+      } @else if (options().length) {
+        Connected catalog · {{ options().length }} item(s)
+      } @else {
+        Catalog connected — awaiting data
+      }
+    </p>
+  }
+  <span class="section-header__line" aria-hidden="true"></span>
+</div>

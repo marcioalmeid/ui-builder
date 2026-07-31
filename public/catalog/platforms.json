@@ -1,0 +1,6 @@
+[
+  { "id": "google-ads", "name": "Google Ads" },
+  { "id": "meta-ads", "name": "Meta Ads" },
+  { "id": "linkedin-ads", "name": "LinkedIn Ads" },
+  { "id": "programmatic", "name": "Programmatic Display" }
+]

@@ -1,0 +1,57 @@
+.rules-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  min-width: 0;
+  padding: 0.75rem;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+}
+
+.rules-panel__summary {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #4b5563;
+}
+
+.rules-panel__hint {
+  margin: 0;
+  font-size: 0.6875rem;
+  color: #9ca3af;
+  line-height: 1.4;
+}
+
+.rules-panel__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.rules-panel__item {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  color: #374151;
+}
+
+.rules-panel__item--off {
+  opacity: 0.55;
+}
+
+.rules-panel__item mat-icon {
+  font-size: 1rem;
+  width: 1rem;
+  height: 1rem;
+  color: #6366f1;
+}
+
+.rules-panel__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}

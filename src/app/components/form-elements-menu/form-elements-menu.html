@@ -1,14 +1,12 @@
-<div class="p-4 bg-white rounded-lg h-[calc(100vh-4rem)] overflow-y-auto   border-gray-200 shadow-sm ">
-    <h3 class="text-xl font-medium text-primary mb-4  ">Form Elements</h3>
-    <div class="flex flex-col gap-4 elements-menu" 
-    cdkDropList
-    id="field-selector-list"
-    cdkDropListSortingDisabled="true" 
-    [cdkDropListData]="'field-selector'"
-    [cdkDropListEnterPredicate]="noDropAllowed" 
-    >
-        @for (type of fieldTypes; track type.type) {
-        <app-field-button [field]="type"></app-field-button>
-        }
-    </div>
+<div
+  class="flex flex-col gap-3 elements-menu min-w-0"
+  cdkDropList
+  id="field-selector-list"
+  cdkDropListSortingDisabled="true"
+  [cdkDropListData]="'field-selector'"
+  [cdkDropListEnterPredicate]="noDropAllowed"
+>
+  @for (type of fieldTypes; track type.type) {
+    <app-field-button [field]="type"></app-field-button>
+  }
 </div>

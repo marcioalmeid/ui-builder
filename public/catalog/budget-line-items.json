@@ -1,0 +1,6 @@
+[
+  { "id": "honda-q3", "name": "Honda Q3 Brand Campaign", "amount": 250000 },
+  { "id": "acura-launch", "name": "Acura Launch Support", "amount": 120000 },
+  { "id": "dealer-co-op", "name": "Dealer Co-op Fund", "amount": 80000 },
+  { "id": "always-on-search", "name": "Always-on Search", "amount": 45000 }
+]

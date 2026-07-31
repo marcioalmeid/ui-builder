@@ -1,7 +1,7 @@
-<mat-toolbar color="primary" class="mb-6">
+<mat-toolbar color="primary" class="mb-2">
   <span>UI Builder</span>
+  <span class="flex-1"></span>
+  <a mat-button routerLink="/builder" routerLinkActive="toolbar-active">Builder</a>
 </mat-toolbar>
 
-<div class="min-h-screen bg-background p-6">
-  <app-drag-drop-editor></app-drag-drop-editor>
-</div>
+<router-outlet />

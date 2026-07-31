@@ -1,0 +1,6 @@
+[
+  { "id": "new-campaign", "name": "New campaign" },
+  { "id": "budget-change", "name": "Budget change" },
+  { "id": "creative-update", "name": "Creative update" },
+  { "id": "reporting", "name": "Reporting request" }
+]

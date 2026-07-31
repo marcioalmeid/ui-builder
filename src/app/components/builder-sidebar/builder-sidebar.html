@@ -1,0 +1,68 @@
+<div class="builder-sidebar">
+  @if (formService.activeTemplate(); as template) {
+    <header class="builder-sidebar__context">
+      <p class="builder-sidebar__context-type">{{ contextLabel() }}</p>
+      <h2 class="builder-sidebar__context-name">{{ template.name }}</h2>
+      <span
+        class="builder-sidebar__context-status"
+        [class.builder-sidebar__context-status--draft]="template.status === 'draft'"
+        [class.builder-sidebar__context-status--published]="template.status === 'published'"
+      >
+        {{ template.status }} · v{{ template.version }}
+      </span>
+    </header>
+  }
+
+  <div class="builder-sidebar__panel">
+    @for (section of sections(); track section.id) {
+      <section
+        [id]="'sidebar-section-' + section.id"
+        class="builder-sidebar__section"
+        [class.builder-sidebar__section--collapsed]="!section.expanded"
+        [class.builder-sidebar__section--inactive]="!section.relevant"
+        [class.builder-sidebar__section--focused]="focusedSection() === section.id"
+      >
+        <button
+          type="button"
+          class="builder-sidebar__section-toggle"
+          [disabled]="!section.relevant"
+          (click)="toggleSection(section.id)"
+        >
+          <span class="builder-sidebar__section-heading">
+            <h3 class="builder-sidebar__section-title">{{ section.title }}</h3>
+            @if (!section.relevant) {
+              <span class="builder-sidebar__section-badge">Other context</span>
+            }
+          </span>
+          <mat-icon class="builder-sidebar__section-chevron">
+            {{ section.expanded && section.relevant ? 'expand_less' : 'expand_more' }}
+          </mat-icon>
+        </button>
+
+        @if (section.relevant && section.expanded) {
+          <div class="builder-sidebar__section-body">
+            <p class="builder-sidebar__section-hint">{{ section.hint }}</p>
+
+            @switch (section.id) {
+              @case ('template') {
+                <app-template-selector />
+              }
+              @case ('fields') {
+                <app-form-elements-menu />
+              }
+              @case ('data') {
+                <app-data-checklist />
+                <app-data-bindings-panel />
+              }
+              @case ('rules') {
+                <app-workflow-rules-panel />
+              }
+            }
+          </div>
+        } @else if (!section.relevant) {
+          <p class="builder-sidebar__section-unavailable">{{ section.unavailableHint }}</p>
+        }
+      </section>
+    }
+  </div>
+</div>

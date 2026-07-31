@@ -1,0 +1,32 @@
+<div class="min-w-0">
+  <p class="text-xs text-gray-500 mb-3">Click a field to configure its connection</p>
+
+  @if (!hasFields()) {
+    <p class="text-xs text-gray-400">No fields on the canvas yet.</p>
+  } @else if (items().length === 0) {
+    <p class="text-xs text-gray-400">No connectable fields found.</p>
+  } @else {
+    <ul class="flex flex-col gap-1.5">
+      @for (item of items(); track item.field.id) {
+        <li>
+          <button
+            type="button"
+            class="data-checklist__item data-checklist__item--{{ item.status }}"
+            [class.data-checklist__item--selected]="selectedFieldId() === item.field.id"
+            (click)="selectField(item.field.id)"
+          >
+            <mat-icon class="!text-base !w-4 !h-4 shrink-0">
+              @if (item.status === 'ok') { check_circle }
+              @else if (item.status === 'warning') { warning }
+              @else { error }
+            </mat-icon>
+            <span class="min-w-0 flex-1 text-left">
+              <span class="block text-sm font-medium truncate">{{ item.field.label }}</span>
+              <span class="block text-xs opacity-80 truncate">{{ item.message }}</span>
+            </span>
+          </button>
+        </li>
+      }
+    </ul>
+  }
+</div>

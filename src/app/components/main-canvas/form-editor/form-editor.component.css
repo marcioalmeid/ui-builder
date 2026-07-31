@@ -1,0 +1,21 @@
+.form-editor {
+  padding: 0 0.25rem 0.5rem;
+}
+
+.form-editor__toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.75rem;
+}
+
+.form-editor__toolbar--bottom {
+  justify-content: center;
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+  padding-top: 0.75rem;
+  border-top: 1px dashed #e5e7eb;
+}
+
+.form-editor__add-row mat-icon {
+  margin-left: 0.25rem;
+}

@@ -1,0 +1,266 @@
+<div class="workflow-builder">
+  <div class="workflow-builder__toolbar">
+    <div>
+      <h3 class="workflow-builder__title">Automation rules</h3>
+      <p class="workflow-builder__subtitle">
+        Trigger on field changes, show/hide fields, or emit events
+      </p>
+    </div>
+    @if (!formService.isReadonly()) {
+      <button mat-flat-button color="primary" type="button" (click)="addRule()">
+        <mat-icon>add</mat-icon>
+        Add rule
+      </button>
+    }
+  </div>
+
+  @if (rules().length === 0) {
+    <div class="workflow-builder__empty">
+      <mat-icon>account_tree</mat-icon>
+      <p>No automation rules yet.</p>
+      <p class="workflow-builder__empty-hint">
+        Example: when <strong>Task type</strong> equals <em>Digital Advertising</em>, show
+        <strong>Platform</strong> and emit <code>campaign.type.selected</code>.
+      </p>
+      @if (!formService.isReadonly()) {
+        <button mat-stroked-button type="button" (click)="addRule()">Create first rule</button>
+      }
+    </div>
+  } @else {
+    <div class="workflow-builder__rules">
+      @for (rule of rules(); track rule.id) {
+        <article
+          class="workflow-rule"
+          [class.workflow-rule--selected]="selectedRule()?.id === rule.id"
+          [class.workflow-rule--disabled]="!rule.enabled"
+        >
+          <header class="workflow-rule__header">
+            <button
+              type="button"
+              class="workflow-rule__select"
+              (click)="selectRule(rule.id)"
+            >
+              <mat-icon>account_tree</mat-icon>
+              <input
+                class="workflow-rule__name"
+                [ngModel]="rule.name"
+                (ngModelChange)="updateRule(rule, { name: $event })"
+                (click)="$event.stopPropagation()"
+                [readonly]="formService.isReadonly()"
+              />
+            </button>
+            <div class="workflow-rule__actions">
+              <mat-slide-toggle
+                [checked]="rule.enabled"
+                (change)="updateRule(rule, { enabled: $event.checked })"
+                [disabled]="formService.isReadonly()"
+              />
+              @if (!formService.isReadonly()) {
+                <button mat-icon-button type="button" (click)="deleteRule(rule.id)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              }
+            </div>
+          </header>
+
+          @if (selectedRule()?.id === rule.id) {
+            <div class="workflow-canvas">
+              <div class="workflow-canvas__nodes">
+                @for (node of rule.nodes; track node.id; let last = $last) {
+                  <div
+                    class="workflow-node"
+                    [style.--node-color]="nodeMeta[node.type].color"
+                  >
+                    <div class="workflow-node__head">
+                      <mat-icon>{{ nodeMeta[node.type].icon }}</mat-icon>
+                      <span>{{ nodeMeta[node.type].label }}</span>
+                      @if (!formService.isReadonly() && rule.nodes.length > 1) {
+                        <button
+                          mat-icon-button
+                          type="button"
+                          class="workflow-node__remove"
+                          (click)="removeNode(rule, node.id)"
+                        >
+                          <mat-icon>close</mat-icon>
+                        </button>
+                      }
+                    </div>
+
+                    <div class="workflow-node__body">
+                      @switch (node.type) {
+                        @case ('trigger') {
+                          <mat-form-field appearance="outline" class="w-full">
+                            <mat-label>Field</mat-label>
+                            <mat-select
+                              [value]="node.data.fieldId ?? ''"
+                              (valueChange)="onTriggerFieldChange(rule, node.id, $event)"
+                              [disabled]="formService.isReadonly()"
+                            >
+                              @for (field of triggerFields(); track field.id) {
+                                <mat-option [value]="field.id">{{ field.label }}</mat-option>
+                              }
+                            </mat-select>
+                          </mat-form-field>
+                          @if (triggerProfile(rule); as profile) {
+                            <p class="workflow-node__hint">{{ profile.dataHint }}</p>
+                          }
+                        }
+                        @case ('condition') {
+                          @if (triggerProfile(rule); as profile) {
+                            <p class="workflow-node__hint">{{ profile.dataHint }}</p>
+                            <mat-form-field appearance="outline" class="w-full">
+                              <mat-label>Operator</mat-label>
+                              <mat-select
+                                [value]="node.data.operator ?? profile.operators[0].id"
+                                (valueChange)="onConditionOperatorChange(rule, node.id, $event)"
+                                [disabled]="formService.isReadonly()"
+                              >
+                                @for (op of profile.operators; track op.id) {
+                                  <mat-option [value]="op.id">{{ op.label }}</mat-option>
+                                }
+                              </mat-select>
+                            </mat-form-field>
+
+                            @if (operatorNeedsValue(node.data.operator ?? profile.operators[0].id)) {
+                              @if (profile.valueInputType === 'select') {
+                                <mat-form-field appearance="outline" class="w-full">
+                                  <mat-label>Value</mat-label>
+                                  <mat-select
+                                    [value]="node.data.value ?? ''"
+                                    (valueChange)="onConditionValueChange(rule, node.id, $event)"
+                                    [disabled]="formService.isReadonly()"
+                                  >
+                                    @for (option of profile.valueOptions; track option.value) {
+                                      <mat-option [value]="option.value">{{ option.label }}</mat-option>
+                                    }
+                                  </mat-select>
+                                </mat-form-field>
+                              } @else if (profile.valueInputType === 'date') {
+                                <mat-form-field appearance="outline" class="w-full">
+                                  <mat-label>Date</mat-label>
+                                  <input
+                                    matInput
+                                    type="date"
+                                    [ngModel]="node.data.value ?? ''"
+                                    (ngModelChange)="onConditionValueChange(rule, node.id, $event)"
+                                    [readonly]="formService.isReadonly()"
+                                  />
+                                </mat-form-field>
+                              } @else if (profile.valueInputType === 'number') {
+                                <mat-form-field appearance="outline" class="w-full">
+                                  <mat-label>Number</mat-label>
+                                  <input
+                                    matInput
+                                    type="number"
+                                    [ngModel]="node.data.value ?? ''"
+                                    (ngModelChange)="onConditionValueChange(rule, node.id, $event)"
+                                    [readonly]="formService.isReadonly()"
+                                  />
+                                </mat-form-field>
+                              } @else if (profile.valueInputType === 'text') {
+                                <mat-form-field appearance="outline" class="w-full">
+                                  <mat-label>Value</mat-label>
+                                  <input
+                                    matInput
+                                    [ngModel]="node.data.value ?? ''"
+                                    (ngModelChange)="onConditionValueChange(rule, node.id, $event)"
+                                    [readonly]="formService.isReadonly()"
+                                  />
+                                </mat-form-field>
+                              }
+                            }
+                          } @else {
+                            <p class="workflow-node__hint workflow-node__hint--warn">
+                              Select a trigger field first.
+                            </p>
+                          }
+                        }
+                        @case ('action-show') {
+                          <mat-form-field appearance="outline" class="w-full">
+                            <mat-label>Show field</mat-label>
+                            <mat-select
+                              [value]="node.data.targetFieldId ?? ''"
+                              (valueChange)="updateNode(rule, node.id, { targetFieldId: $event })"
+                              [disabled]="formService.isReadonly()"
+                            >
+                              @for (field of targetFields(); track field.id) {
+                                <mat-option [value]="field.id">{{ field.label }}</mat-option>
+                              }
+                            </mat-select>
+                          </mat-form-field>
+                        }
+                        @case ('action-hide') {
+                          <mat-form-field appearance="outline" class="w-full">
+                            <mat-label>Hide field</mat-label>
+                            <mat-select
+                              [value]="node.data.targetFieldId ?? ''"
+                              (valueChange)="updateNode(rule, node.id, { targetFieldId: $event })"
+                              [disabled]="formService.isReadonly()"
+                            >
+                              @for (field of targetFields(); track field.id) {
+                                <mat-option [value]="field.id">{{ field.label }}</mat-option>
+                              }
+                            </mat-select>
+                          </mat-form-field>
+                        }
+                        @case ('action-event') {
+                          <mat-form-field appearance="outline" class="w-full">
+                            <mat-label>Event name</mat-label>
+                            <input
+                              matInput
+                              [ngModel]="node.data.eventName ?? ''"
+                              (ngModelChange)="updateNode(rule, node.id, { eventName: $event })"
+                              placeholder="campaign.type.selected"
+                              [readonly]="formService.isReadonly()"
+                            />
+                          </mat-form-field>
+                        }
+                      }
+                    </div>
+                  </div>
+
+                  @if (!last) {
+                    <div class="workflow-connector" aria-hidden="true">
+                      <span class="workflow-connector__line"></span>
+                      <span class="workflow-connector__arrow"></span>
+                    </div>
+                  }
+                }
+              </div>
+
+              @if (!formService.isReadonly()) {
+                <div class="workflow-canvas__add">
+                  <span class="workflow-canvas__add-label">Add step</span>
+                  <button mat-stroked-button type="button" (click)="addNode(rule, 'condition')">
+                    <mat-icon>call_split</mat-icon> If
+                  </button>
+                  <button mat-stroked-button type="button" (click)="addNode(rule, 'action-show')">
+                    <mat-icon>visibility</mat-icon> Show
+                  </button>
+                  <button mat-stroked-button type="button" (click)="addNode(rule, 'action-hide')">
+                    <mat-icon>visibility_off</mat-icon> Hide
+                  </button>
+                  <button mat-stroked-button type="button" (click)="addNode(rule, 'action-event')">
+                    <mat-icon>outgoing_mail</mat-icon> Event
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </article>
+      }
+    </div>
+
+    @if (liveEvents().length) {
+      <div class="workflow-builder__events">
+        <mat-icon>bolt</mat-icon>
+        <span>
+          Live events:
+          @for (event of liveEvents(); track event.ruleId + event.eventName; let last = $last) {
+            <code>{{ event.eventName }}</code>@if (!last) {<span>, </span>}
+          }
+        </span>
+      </div>
+    }
+  }
+</div>

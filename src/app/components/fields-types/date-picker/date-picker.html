@@ -5,7 +5,9 @@
     id="{{ field().id }}"
     [matDatepicker]="datePicker"
     [required]="field().required"
-    [placeholder]="field().placeholder || ''" />
+    [placeholder]="field().placeholder || ''"
+    [value]="value()"
+    (dateChange)="onDateChange($event)" />
   <mat-datepicker-toggle matIconSuffix [for]="datePicker"></mat-datepicker-toggle>
   <mat-datepicker #datePicker></mat-datepicker>
 </mat-form-field>

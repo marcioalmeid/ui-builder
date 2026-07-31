@@ -1,15 +1,68 @@
-<div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:border-primary cursor-pointer"
-[class]="formService.selectedField()?.id === field().id ? '!border-primary !bg-background' : '' "
-(click)="formService.setSelectedField(field().id)"
-onkeyup=""
- 
+<div
+  cdkDrag
+  [cdkDragDisabled]="readonly()"
+  [cdkDragData]="field()"
+  (cdkDragStarted)="whileDragging.set(true)"
+  (cdkDragEnded)="whileDragging.set(false)"
+  class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 cursor-pointer transition-shadow hover:border-primary/50 hover:shadow-sm"
+  [class.ring-2]="isSelected()"
+  [class.ring-primary]="isSelected()"
+  [class.!border-primary]="isSelected()"
+  [class.!bg-background]="isSelected()"
+  [class.!border-red-300]="issues().some(i => i.severity === 'error')"
+  [class.opacity-50]="whileDragging()"
+  tabindex="0"
+  role="button"
+  [attr.aria-label]="'Select ' + field().label"
+  [attr.aria-pressed]="isSelected()"
+  (click)="onSelectClick()"
+  (keydown)="onSelectKeydown($event)"
 >
-
-    <div class="flex items-center justify-between mb-1">
-        <span class="text-sm">{{field().type | titlecase }}</span>
-        <button mat-icon-button color="warn" class="float-right" (click)="onDeleteClick($event)">
-            <mat-icon>delete</mat-icon>
-        </button>
+  <div class="flex items-center justify-between mb-1 gap-2">
+    <div class="flex items-center gap-1 min-w-0 flex-1">
+      <mat-icon
+        cdkDragHandle
+        class="!text-lg !w-5 !h-5 text-gray-400 cursor-grab shrink-0"
+        aria-label="Drag to reorder"
+      >drag_indicator</mat-icon>
+      <div class="flex flex-col min-w-0">
+        <div class="flex items-center gap-1 min-w-0">
+          <span class="text-sm font-medium truncate">{{ field().label }}</span>
+          @if (connectionBadge(); as badge) {
+            <mat-icon
+              class="field-connection-icon"
+              [class.field-connection-icon--complete]="badge.complete"
+              [class.field-connection-icon--incomplete]="!badge.complete"
+              [matTooltip]="badge.label"
+              matTooltipPosition="above"
+              [attr.aria-label]="badge.label"
+            >{{ badge.icon }}</mat-icon>
+          }
+        </div>
+        <span class="text-xs text-gray-400">{{ field().type | titlecase }}</span>
+        @for (issue of issues(); track issue.message) {
+          <span
+            class="text-xs mt-0.5"
+            [class.text-red-600]="issue.severity === 'error'"
+            [class.text-amber-600]="issue.severity === 'warning'"
+          >
+            {{ issue.message }}
+          </span>
+        }
+      </div>
     </div>
-    <app-field-preview [field]="field()" ></app-field-preview>
+    @if (!readonly()) {
+    <button
+      mat-icon-button
+      color="warn"
+      class="shrink-0"
+      aria-label="Delete field"
+      (click)="onDeleteClick($event)"
+    >
+      <mat-icon>delete</mat-icon>
+    </button>
+    }
+  </div>
+  <app-field-preview [field]="field()"></app-field-preview>
+  <div *cdkDragPlaceholder class="cdk-drag-placeholder"></div>
 </div>

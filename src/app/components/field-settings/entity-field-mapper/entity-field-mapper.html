@@ -1,0 +1,58 @@
+<div class="entity-mapper">
+  <p class="entity-mapper__hint">
+    Link this field to a property on an entity. The operator still types the value — this mapping
+    is used when reading or writing task data.
+  </p>
+
+  <mat-button-toggle-group
+    [value]="enabled() ? 'entity' : 'none'"
+    class="entity-mapper__mode w-full"
+  >
+    <mat-button-toggle value="none" class="flex-1" (click)="onModeChange(false)">
+      None
+    </mat-button-toggle>
+    <mat-button-toggle value="entity" class="flex-1" (click)="onModeChange(true)">
+      Entity field
+    </mat-button-toggle>
+  </mat-button-toggle-group>
+
+  @if (enabled()) {
+    <app-data-catalog-picker
+      [selectedId]="selectedCatalogId()"
+      [context]="templateContext()"
+      label="Entity"
+      (selectionChange)="onCatalogSelected($event)"
+    />
+
+    @if (selectedCatalogId()) {
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Entity field</mat-label>
+        <mat-select
+          [value]="selectedEntityFieldKey()"
+          (valueChange)="onEntityFieldChange($event)"
+        >
+          @if (compatibleFields().length === 0) {
+            <mat-option disabled>No compatible fields for this component type</mat-option>
+          } @else {
+            @for (field of compatibleFields(); track field.key) {
+              <mat-option [value]="field.key">
+                {{ field.label }}
+                <span class="entity-mapper__field-type">({{ field.type }})</span>
+              </mat-option>
+            }
+          }
+        </mat-select>
+      </mat-form-field>
+    }
+
+    @if (mappingSummary(); as summary) {
+      <p class="entity-mapper__summary">
+        Mapped to <strong>{{ summary }}</strong>
+      </p>
+    } @else if (selectedCatalogId()) {
+      <p class="entity-mapper__summary entity-mapper__summary--pending">
+        Select an entity field to complete the mapping.
+      </p>
+    }
+  }
+</div>

@@ -1,0 +1,95 @@
+<div class="flex flex-col gap-3 min-w-0">
+  <button mat-stroked-button class="w-full" (click)="openNewTemplateDialog()">
+    <mat-icon>add</mat-icon> New template
+  </button>
+
+  <mat-form-field appearance="outline" class="w-full">
+    <mat-label>Active template</mat-label>
+    <mat-select
+      [value]="formService.activeTemplateId()"
+      (valueChange)="onTemplateChange($event)"
+    >
+      @for (template of formService.templates(); track template.id) {
+        <mat-option [value]="template.id">
+          {{ template.name }} ({{ template.context }})
+        </mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  @if (formService.activeTemplate()?.status === 'draft') {
+    <div class="flex flex-col gap-2 border border-gray-100 rounded p-2 bg-gray-50">
+      <p class="text-xs font-medium text-gray-600">Template settings</p>
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Name</mat-label>
+        <input matInput [(ngModel)]="editName" />
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Context</mat-label>
+        <mat-select [(ngModel)]="editContext">
+          @for (ctx of contexts; track ctx.id) {
+            <mat-option [value]="ctx.id">{{ ctx.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <button mat-stroked-button type="button" (click)="saveTemplateSettings()">Save settings</button>
+    </div>
+  }
+
+  @if (publishErrors().length) {
+    <ul class="text-xs text-red-700 bg-red-50 border border-red-100 rounded p-2 list-disc pl-5">
+      @for (error of publishErrors(); track error) {
+        <li>{{ error }}</li>
+      }
+    </ul>
+  }
+
+  @if (showPublishSuccess() && formService.activeTemplate(); as active) {
+    <div class="text-xs bg-green-50 border border-green-200 rounded p-3 flex flex-col gap-2">
+      <p class="font-medium text-green-800">Template published (v{{ active.version }})</p>
+      <p class="text-green-700">Next: test as an operator or share the run link.</p>
+      <div class="flex flex-wrap gap-2">
+        <a mat-flat-button color="primary" [routerLink]="['/run', active.id]">
+          <mat-icon>play_arrow</mat-icon> Test as operator
+        </a>
+        <a mat-stroked-button routerLink="/jobs">View submissions</a>
+        <button mat-button type="button" (click)="dismissPublishSuccess()">Dismiss</button>
+      </div>
+    </div>
+  }
+
+  @if (formService.isReadonly()) {
+    <p class="text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded p-2">
+      Published templates are read-only. Clone to draft to edit structure.
+    </p>
+  }
+
+  <div class="flex flex-wrap gap-2">
+    @if (formService.activeTemplate()?.status === 'draft') {
+      <button
+        #publishBtn
+        mat-stroked-button
+        class="template-selector__publish"
+        [class.template-selector__publish--highlight]="publishHighlight()"
+        (click)="publishTemplate()"
+      >
+        <mat-icon>publish</mat-icon> Publish
+      </button>
+    } @else {
+      <button mat-stroked-button (click)="unpublishTemplate()">Unpublish</button>
+    }
+    <button mat-stroked-button (click)="cloneTemplate()">
+      <mat-icon>content_copy</mat-icon> Clone
+    </button>
+    <button mat-stroked-button (click)="exportForm()">
+      <mat-icon>download</mat-icon> Export
+    </button>
+    @if (formService.activeTemplate(); as active) {
+      @if (active.status === 'published') {
+        <a mat-stroked-button [routerLink]="['/run', active.id]">
+          <mat-icon>play_arrow</mat-icon> Run
+        </a>
+      }
+    }
+  </div>
+</div>

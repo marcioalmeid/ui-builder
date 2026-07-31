@@ -1,0 +1,35 @@
+@if (selectedField(); as field) {
+  <div class="field-data-panel">
+    <header class="field-data-panel__header">
+      <p class="field-data-panel__section-label">Data connection</p>
+      <h3 class="field-data-panel__title">{{ field.label }}</h3>
+      <p class="field-data-panel__meta">{{ field.type }}</p>
+    </header>
+
+    @if (isEntityMap()) {
+      <app-entity-field-mapper
+        [fieldId]="field.id"
+        [fieldType]="field.type"
+        [inputType]="field.inputType"
+        [entityMapping]="field.entityMapping"
+        (fieldUpdate)="updateFieldPartial(field.id, $event)" />
+    } @else if (usesDataSourceEditor()) {
+      <app-data-source-editor
+        [fieldId]="field.id"
+        [fieldType]="field.type"
+        [options]="field.options || []"
+        [optionsSource]="field.optionsSource || 'static'"
+        [dataSource]="field.dataSource"
+        [dataCatalogId]="field.dataCatalogId"
+        [dataBindingId]="field.dataBindingId"
+        (fieldUpdate)="updateFieldPartial(field.id, $event)" />
+    }
+  </div>
+} @else {
+  <div class="field-data-panel field-data-panel--empty">
+    <p class="field-data-panel__section-label">Data connection</p>
+    <p class="field-data-panel__empty-text">
+      Select a field from the list on the left to configure its connection.
+    </p>
+  </div>
+}

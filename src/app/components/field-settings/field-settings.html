@@ -1,58 +1,130 @@
-<div class="p-4 bg-white rounded-lg h-[calc(100vh-4rem)] overflow-y-auto border border-gray-200 shadow-sm">
-    <div class="flex items-center justify-between py-4">
-        <h1 class="text-2xl tracking-wide font-medium ">Field Properties </h1>
-    </div>
-    @if(formService.selectedField(); as selectedField) {
-    <div class="flex flex-col gap-6">
-        @for (setting of fieldSettings(); track setting.key) {
-        @switch (setting.type) {
-        @case ('text'){
+@if (selectedField(); as selectedField) {
+  <div class="field-settings">
+    <header class="field-settings__header">
+      <h2 class="field-settings__title">{{ selectedField.label }}</h2>
+      <p class="field-settings__meta">{{ selectedField.type }}</p>
+    </header>
 
-       <mat-form-field appearance="outline" class="w-full">
-  <mat-label>{{ setting.label }}</mat-label>
-  <input  
-    matInput 
-    [ngModel]="fieldValues()[setting.key]"
-    (ngModelChange)="updateField(selectedField.id, setting.key, $event)"  
-  />
-</mat-form-field>
+    <div class="field-settings__groups">
+      @for (group of settingGroups(); track group.id) {
+        <section class="field-settings__group">
+          @if (showGroupHeaders()) {
+            <button
+              type="button"
+              class="field-settings__group-toggle"
+              (click)="toggleGroup(group.id)"
+            >
+              <span class="field-settings__group-title">{{ group.title }}</span>
+              <mat-icon>{{ group.expanded ? 'expand_less' : 'expand_more' }}</mat-icon>
+            </button>
+          }
 
-        }
-
-        @case ('checkbox'){
-            <div class="flex items-center">
-        <mat-checkbox  [ngModel]="fieldValues()[setting.key]"
-            (ngModelChange)="updateField(selectedField.id, setting.key, $event)">
-            {{ setting.label }}
-        </mat-checkbox>
-        </div>
-        }
-
-        @case ('select'){
-        <mat-form-field appearance="outline" class="w-full">
-            <mat-label>{{ setting.label }}</mat-label>
-            <mat-select [(ngModel)]="fieldValues()[setting.key]"
-                (ngModelChange)="updateField(selectedField.id, setting.key, $event)">
-                @for (option of setting.options|| []; track option.value) {
-                <mat-option [value]="option.value">{{ option.label }}</mat-option>
+          @if (!showGroupHeaders() || group.expanded) {
+            <div class="field-settings__group-body">
+              @for (setting of group.settings; track setting.key) {
+                @switch (setting.type) {
+                  @case ('text') {
+                    <mat-form-field appearance="outline" class="w-full">
+                      <mat-label>{{ setting.label }}</mat-label>
+                      <input
+                        matInput
+                        [ngModel]="fieldValues()[setting.key]"
+                        (ngModelChange)="updateField(selectedField.id, setting.key, $event)"
+                      />
+                    </mat-form-field>
+                  }
+                  @case ('checkbox') {
+                    <div class="flex items-center">
+                      <mat-checkbox
+                        [ngModel]="fieldValues()[setting.key]"
+                        (ngModelChange)="updateField(selectedField.id, setting.key, $event)"
+                      >
+                        {{ setting.label }}
+                      </mat-checkbox>
+                    </div>
+                  }
+                  @case ('select') {
+                    <mat-form-field appearance="outline" class="w-full">
+                      <mat-label>{{ setting.label }}</mat-label>
+                      <mat-select
+                        [(ngModel)]="fieldValues()[setting.key]"
+                        (ngModelChange)="updateField(selectedField.id, setting.key, $event)"
+                      >
+                        @for (option of setting.options || []; track option.value) {
+                          <mat-option [value]="option.value">{{ option.label }}</mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+                  }
+                  @case ('options-list') {
+                    <app-options-list-editor
+                      [options]="$any(fieldValues()[setting.key] || [])"
+                      (optionsChange)="updateField(selectedField.id, setting.key, $event)"
+                    />
+                  }
+                  @case ('options-source') {
+                    <app-data-source-editor
+                      [fieldId]="selectedField.id"
+                      [fieldType]="selectedField.type"
+                      [options]="fieldValues()['options'] || []"
+                      [optionsSource]="fieldValues()['optionsSource'] || 'static'"
+                      [dataSource]="fieldValues()['dataSource']"
+                      [dataCatalogId]="fieldValues()['dataCatalogId']"
+                      [dataBindingId]="fieldValues()['dataBindingId']"
+                      (fieldUpdate)="updateFieldPartial(selectedField.id, $event)"
+                    />
+                  }
+                  @case ('data-source') {
+                    <app-data-source-editor
+                      [fieldId]="selectedField.id"
+                      [fieldType]="selectedField.type"
+                      [options]="fieldValues()['options'] || []"
+                      [optionsSource]="fieldValues()['optionsSource'] || 'static'"
+                      [dataSource]="fieldValues()['dataSource']"
+                      [dataCatalogId]="fieldValues()['dataCatalogId']"
+                      [dataBindingId]="fieldValues()['dataBindingId']"
+                      (fieldUpdate)="updateFieldPartial(selectedField.id, $event)"
+                    />
+                  }
+                  @case ('entity-map') {
+                    <app-entity-field-mapper
+                      [fieldId]="selectedField.id"
+                      [fieldType]="selectedField.type"
+                      [inputType]="fieldValues()['inputType']"
+                      [entityMapping]="fieldValues()['entityMapping']"
+                      (fieldUpdate)="updateFieldPartial(selectedField.id, $event)"
+                    />
+                  }
+                  @case ('border') {
+                    <app-border-config
+                      [border]="$any(fieldValues().border)"
+                      (borderChange)="updateField(selectedField.id, setting.key, $event)"
+                    />
+                  }
+                  @case ('number') {
+                    <mat-form-field appearance="outline" class="w-full">
+                      <mat-label>{{ setting.label }}</mat-label>
+                      <input
+                        matInput
+                        type="number"
+                        [ngModel]="fieldValues()[setting.key]"
+                        (ngModelChange)="updateField(selectedField.id, setting.key, +$event)"
+                      />
+                    </mat-form-field>
+                  }
+                  @case ('visibility-rule') {
+                    <app-visibility-rule-editor
+                      [fieldId]="selectedField.id"
+                      [rule]="fieldValues()['visibilityRule']"
+                      (ruleChange)="updateField(selectedField.id, 'visibilityRule', $event)"
+                    />
+                  }
                 }
-            </mat-select>
-        </mat-form-field>
-        }
-
-        @case ('options-list') {
-          <app-options-list-editor
-            [options]="fieldValues()[setting.key] || []"
-            (optionsChange)="updateField(selectedField.id, setting.key, $event)" />
-        }
-
-        @case ('border') {
-          <app-border-config
-            [border]="fieldValues()[setting.key]"
-            (borderChange)="updateField(selectedField.id, setting.key, $event)" />
-        }
-        }
-        }
+              }
+            </div>
+          }
+        </section>
+      }
     </div>
-    }
-</div>
+  </div>
+}
