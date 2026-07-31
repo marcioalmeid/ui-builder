@@ -5,6 +5,7 @@ import { CdkDrag, DragDropModule } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-form-elements-menu',
+  standalone: true,
   imports: [FieldButton, DragDropModule],
   templateUrl: './form-elements-menu.html',
   styleUrl: './form-elements-menu.css',

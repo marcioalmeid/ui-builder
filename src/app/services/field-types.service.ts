@@ -218,7 +218,7 @@ const BUTTON_FIELD_TYPE: FieldTypeDefinition = {
   id: 'button',
   type: 'button',
   label: 'Button',
-  icon: 'smart_button',
+  icon: 'touch_app',
   defaultConfig: {
     label: 'Button',
     hint: '',
@@ -258,9 +258,14 @@ const INPUT_FIELD_TYPES: FieldTypeDefinition[] = [
 ];
 
 const LAYOUT_FIELD_TYPES: FieldTypeDefinition[] = [
-  SECTION_HEADER_FIELD_TYPE,
   BUTTON_FIELD_TYPE,
+  SECTION_HEADER_FIELD_TYPE,
   COST_BREAKDOWN_FIELD_TYPE,
+];
+
+const PALETTE_FIELD_TYPES: FieldTypeDefinition[] = [
+  ...LAYOUT_FIELD_TYPES,
+  ...INPUT_FIELD_TYPES,
 ];
 
 @Injectable({
@@ -293,8 +298,13 @@ export class FieldTypeService {
 
   getFieldPaletteGroups(): FieldPaletteGroup[] {
     return [
-      { id: 'inputs', label: 'Input fields', types: INPUT_FIELD_TYPES },
       { id: 'layout', label: 'Layout & actions', types: LAYOUT_FIELD_TYPES },
+      { id: 'inputs', label: 'Input fields', types: INPUT_FIELD_TYPES },
     ];
+  }
+
+  /** Flat palette order used in the Fields sidebar (inputs, then layout). */
+  getFieldPaletteTypes(): FieldTypeDefinition[] {
+    return PALETTE_FIELD_TYPES;
   }
 }

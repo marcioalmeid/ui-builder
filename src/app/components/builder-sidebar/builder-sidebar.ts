@@ -59,7 +59,7 @@ export class BuilderSidebar {
 
     const defs: Array<{ id: BuilderSidebarSection; title: string; hint: string }> = [
       { id: 'template', title: 'Template', hint: 'Switch, publish, and template settings' },
-      { id: 'fields', title: 'Fields', hint: 'Drag task fields onto a row in the canvas' },
+      { id: 'fields', title: 'Fields', hint: 'Layout & actions at top — Button, then input fields below' },
       {
         id: 'data',
         title: 'Data',
@@ -84,6 +84,17 @@ export class BuilderSidebar {
     effect(() => {
       const context = this.templateContext();
       this.expandedSections.set(getDefaultExpandedSections(context));
+    });
+
+    effect(() => {
+      if (this.formService.activeSetupStep() === 'layout') {
+        this.expandedSections.update((current) => new Set([...current, 'fields']));
+        queueMicrotask(() => {
+          document
+            .getElementById('sidebar-section-fields')
+            ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+      }
     });
 
     effect(() => {

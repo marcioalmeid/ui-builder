@@ -7,9 +7,15 @@
   [cdkDropListEnterPredicate]="noDropAllowed"
 >
   @for (group of paletteGroups(); track group.id) {
-    <section class="elements-menu__group">
+    <section
+      class="elements-menu__group"
+      [class.elements-menu__group--pinned]="group.id === 'layout'"
+    >
       <h4 class="elements-menu__group-title">{{ group.label }}</h4>
-      <div class="elements-menu__group-items">
+      <div
+        class="elements-menu__group-items"
+        [class.elements-menu__group-items--scroll]="group.id === 'inputs'"
+      >
         @for (type of group.types; track type.type) {
           <app-field-button [field]="type" />
         }

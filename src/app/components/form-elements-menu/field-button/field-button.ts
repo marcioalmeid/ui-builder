@@ -5,7 +5,8 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-field-button',
-  imports:   [MatIconModule, DragDropModule],
+  standalone: true,
+  imports: [MatIconModule, DragDropModule],
   templateUrl: './field-button.html',
   styleUrl: './field-button.css',
 })
