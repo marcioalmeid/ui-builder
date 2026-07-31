@@ -1,7 +1,7 @@
 import { ApiDataSource, FormField, RadioOption } from '../models/field';
 import { TaskTemplate } from '../models/task-template';
-import { WorkflowRule } from '../models/workflow-rule';
 import { DATA_CATALOG } from './data-catalog.items';
+import { createShowFieldsWorkflowRule } from '../utils/workflow-migration';
 
 function catalogField(
   id: string,
@@ -9,8 +9,7 @@ function catalogField(
   catalogId: string,
   placeholder: string,
   required = false,
-  hint?: string,
-  visibility?: FormField['visibilityRule']
+  hint?: string
 ): FormField {
   const item = DATA_CATALOG.find((entry) => entry.id === catalogId);
   const staticOptions: RadioOption[] =
@@ -56,46 +55,6 @@ function catalogField(
     dataCatalogId: catalogId,
     dataSource: item?.dataSource as ApiDataSource,
     options: staticOptions,
-    visibilityRule: visibility,
-  };
-}
-
-function createShowBudgetOnBudgetChangeRule(
-  requestTypeFieldId: string,
-  budgetFieldId: string
-): WorkflowRule {
-  const triggerId = crypto.randomUUID();
-  const conditionId = crypto.randomUUID();
-  const actionId = crypto.randomUUID();
-
-  return {
-    id: crypto.randomUUID(),
-    name: 'Show Budget when Request type is Budget change',
-    enabled: true,
-    nodes: [
-      {
-        id: triggerId,
-        type: 'trigger',
-        position: { x: 0, y: 0 },
-        data: { fieldId: requestTypeFieldId },
-      },
-      {
-        id: conditionId,
-        type: 'condition',
-        position: { x: 220, y: 0 },
-        data: { operator: 'equals', value: 'budget-change' },
-      },
-      {
-        id: actionId,
-        type: 'action-show',
-        position: { x: 440, y: 0 },
-        data: { targetFieldId: budgetFieldId },
-      },
-    ],
-    edges: [
-      { id: crypto.randomUUID(), source: triggerId, target: conditionId },
-      { id: crypto.randomUUID(), source: conditionId, target: actionId },
-    ],
   };
 }
 
@@ -104,24 +63,41 @@ export function createNewTaskDemoTemplate(): TaskTemplate {
   const taskTypeFieldId = crypto.randomUUID();
   const requestTypeFieldId = crypto.randomUUID();
   const budgetFieldId = crypto.randomUUID();
-
-  const advertisingVisibility: FormField['visibilityRule'] = {
-    fieldId: taskTypeFieldId,
-    operator: 'equals',
-    value: 'digital-advertising',
-  };
+  const sectionHeaderFieldId = crypto.randomUUID();
+  const platformFieldId = crypto.randomUUID();
+  const vendorFieldId = crypto.randomUUID();
+  const costBreakdownFieldId = crypto.randomUUID();
 
   return {
     id: templateId,
     name: 'New Task (Advertising)',
     context: 'advertising',
     version: 1,
-    status: 'published',
+    status: 'draft',
     updatedAt: Date.now(),
     layout: {
       dataBindings: [],
       workflowRules: [
-        createShowBudgetOnBudgetChangeRule(requestTypeFieldId, budgetFieldId),
+        createShowFieldsWorkflowRule(
+          'Show advertising section when Task type is Digital Advertising',
+          taskTypeFieldId,
+          'equals',
+          'digital-advertising',
+          [
+            sectionHeaderFieldId,
+            platformFieldId,
+            requestTypeFieldId,
+            vendorFieldId,
+            costBreakdownFieldId,
+          ]
+        ),
+        createShowFieldsWorkflowRule(
+          'Show Budget when Request type is Budget change',
+          requestTypeFieldId,
+          'equals',
+          'budget-change',
+          [budgetFieldId]
+        ),
       ],
       rows: [
         {
@@ -185,13 +161,12 @@ export function createNewTaskDemoTemplate(): TaskTemplate {
           templateId,
           fields: [
             {
-              id: crypto.randomUUID(),
+              id: sectionHeaderFieldId,
               type: 'section-header',
               label: 'Digital Advertising Details',
-              hint: 'Shown when task type is Digital Advertising',
+              hint: 'Shown via Rules when Task type is Digital Advertising',
               icon: 'view_agenda',
               required: false,
-              visibilityRule: advertisingVisibility,
             },
           ],
         },
@@ -200,13 +175,12 @@ export function createNewTaskDemoTemplate(): TaskTemplate {
           templateId,
           fields: [
             catalogField(
-              crypto.randomUUID(),
+              platformFieldId,
               'Platform',
               'platforms',
               'Select platform',
               true,
-              'Where the campaign runs.',
-              advertisingVisibility
+              'Where the campaign runs.'
             ),
             catalogField(
               requestTypeFieldId,
@@ -214,8 +188,7 @@ export function createNewTaskDemoTemplate(): TaskTemplate {
               'request-types',
               'Select request type',
               true,
-              'Budget line item appears when you pick Budget change.',
-              advertisingVisibility
+              'Budget appears via Rules when you pick Budget change.'
             ),
           ],
         },
@@ -224,13 +197,12 @@ export function createNewTaskDemoTemplate(): TaskTemplate {
           templateId,
           fields: [
             catalogField(
-              crypto.randomUUID(),
+              vendorFieldId,
               'Vendor',
               'vendors',
               'Select a vendor...',
               false,
-              'For external media buys.',
-              advertisingVisibility
+              'For external media buys.'
             ),
             catalogField(
               budgetFieldId,
@@ -238,7 +210,7 @@ export function createNewTaskDemoTemplate(): TaskTemplate {
               'budget-line-items',
               'Select a budget line item...',
               false,
-              'Shown via Rules when Request type is Budget change.',
+              'Shown via Rules when Request type is Budget change.'
             ),
           ],
         },
@@ -247,14 +219,13 @@ export function createNewTaskDemoTemplate(): TaskTemplate {
           templateId,
           fields: [
             {
-              id: crypto.randomUUID(),
+              id: costBreakdownFieldId,
               type: 'cost-breakdown',
               label: 'Cost breakdown',
               icon: 'calculate',
               required: false,
               hint: 'Net ad spend is calculated from gross budget, management fee, and additional fees.',
               managementFeePercent: 15,
-              visibilityRule: advertisingVisibility,
             },
           ],
         },
@@ -268,4 +239,4 @@ export function createAdvertisingDemoTemplate(): TaskTemplate {
   return createNewTaskDemoTemplate();
 }
 
-export const DEMO_TEMPLATE_SEED_KEY = 'ui-builder-demo-seeded-v3';
+export const DEMO_TEMPLATE_SEED_KEY = 'ui-builder-demo-seeded-v5';

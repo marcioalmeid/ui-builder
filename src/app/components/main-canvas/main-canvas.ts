@@ -86,6 +86,11 @@ export class MainCanvas {
     } else if (stepId === 'rules') {
       this.formService.focusSidebarSection('rules');
       this.onTabChange('rules');
+      const rules = this.formService.workflowRules();
+      const selected = this.formService.selectedWorkflowRuleId();
+      if (rules.length && !selected) {
+        this.formService.focusWorkflowRule(rules[0].id);
+      }
     } else if (stepId === 'layout') {
       this.formService.focusSidebarSection('fields');
       this.onTabChange('editor');

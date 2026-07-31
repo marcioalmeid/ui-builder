@@ -3,7 +3,7 @@
     <div>
       <h3 class="workflow-builder__title">Automation rules</h3>
       <p class="workflow-builder__subtitle">
-        Trigger on field changes, show/hide fields, or emit events
+        Central place for show/hide rules and events — fields no longer carry their own visibility settings
       </p>
     </div>
     @if (!formService.isReadonly()) {
@@ -31,6 +31,7 @@
       @for (rule of rules(); track rule.id) {
         <article
           class="workflow-rule"
+          [id]="'workflow-rule-' + rule.id"
           [class.workflow-rule--selected]="selectedRule()?.id === rule.id"
           [class.workflow-rule--disabled]="!rule.enabled"
         >
@@ -69,9 +70,14 @@
                 @for (node of rule.nodes; track node.id; let last = $last) {
                   <div
                     class="workflow-node"
+                    [id]="'workflow-node-' + node.id"
+                    [class.workflow-node--focused]="focusedNodeId() === node.id"
                     [style.--node-color]="nodeMeta[node.type].color"
                   >
-                    <div class="workflow-node__head">
+                    <div
+                      class="workflow-node__head"
+                      (click)="focusNode(rule, node.id, $event)"
+                    >
                       <mat-icon>{{ nodeMeta[node.type].icon }}</mat-icon>
                       <span>{{ nodeMeta[node.type].label }}</span>
                       @if (!formService.isReadonly() && rule.nodes.length > 1) {

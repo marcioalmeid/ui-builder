@@ -112,13 +112,6 @@
                       />
                     </mat-form-field>
                   }
-                  @case ('visibility-rule') {
-                    <app-visibility-rule-editor
-                      [fieldId]="selectedField.id"
-                      [rule]="fieldValues()['visibilityRule']"
-                      (ruleChange)="updateField(selectedField.id, 'visibilityRule', $event)"
-                    />
-                  }
                 }
               }
             </div>

@@ -1,5 +1,21 @@
 <div class="p-6">
-    <div class="py-6 flex flex-col gap-4 shadow-md rounded-lg border bg-gray-0">
+  @if (interactive() && hiddenFieldHints().length > 0) {
+    <div class="form-preview__hidden-panel">
+      <p class="form-preview__hidden-title">
+        {{ hiddenFieldHints().length }} field(s) hidden — simulation applies visibility rules
+      </p>
+      <ul class="form-preview__hidden-list">
+        @for (item of hiddenFieldHints(); track item.fieldId) {
+          <li>
+            <strong>{{ item.label }}</strong>
+            <span> — {{ item.reason }}</span>
+          </li>
+        }
+      </ul>
+    </div>
+  }
+
+  <div class="py-6 flex flex-col gap-4 shadow-md rounded-lg border bg-gray-0">
     @for (row of displayRows(); track row.id) {
          <div class="flex gap-4 flex-wrap ">
             @for (field of row.fields; track field.id) {

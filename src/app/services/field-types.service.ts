@@ -15,11 +15,6 @@ const ENTITY_MAP_SETTING = {
   key: 'entityMapping',
   label: 'Entity mapping',
 };
-const VISIBILITY_SETTING = {
-  type: 'visibility-rule' as const,
-  key: 'visibilityRule',
-  label: 'Visibility',
-};
 
 const TEXT_FIELD_TYPE: FieldTypeDefinition = {
   id: 'text',
@@ -50,7 +45,6 @@ const TEXT_FIELD_TYPE: FieldTypeDefinition = {
       ],
     },
     ENTITY_MAP_SETTING,
-    VISIBILITY_SETTING,
     { type: 'border', key: 'border', label: 'Border' },
   ],
   component: TextField,
@@ -71,7 +65,6 @@ const CHECKBOX_FIELD_TYPE: FieldTypeDefinition = {
     HINT_SETTING,
     { type: 'checkbox', key: 'required', label: 'Required' },
     ENTITY_MAP_SETTING,
-    VISIBILITY_SETTING,
     { type: 'border', key: 'border', label: 'Border' },
   ],
   component: CheckboxField,
@@ -97,7 +90,6 @@ const RADIO_FIELD_TYPE: FieldTypeDefinition = {
     HINT_SETTING,
     { type: 'checkbox', key: 'required', label: 'Required' },
     { type: 'data-source', key: 'options', label: 'Options' },
-    VISIBILITY_SETTING,
     { type: 'border', key: 'border', label: 'Border' },
   ],
   component: RadioField,
@@ -120,7 +112,6 @@ const TEXTAREA_FIELD_TYPE: FieldTypeDefinition = {
     HINT_SETTING,
     { type: 'checkbox', key: 'required', label: 'Required' },
     ENTITY_MAP_SETTING,
-    VISIBILITY_SETTING,
     { type: 'border', key: 'border', label: 'Border' },
   ],
   component: TextAreaComponent,
@@ -143,7 +134,6 @@ const DATE_PICKER_FIELD_TYPE: FieldTypeDefinition = {
     HINT_SETTING,
     { type: 'checkbox', key: 'required', label: 'Required' },
     ENTITY_MAP_SETTING,
-    VISIBILITY_SETTING,
     { type: 'border', key: 'border', label: 'Border' },
   ],
   component: DatePicker,
@@ -171,7 +161,6 @@ const DROPDOWN_LIST_FIELD_TYPE: FieldTypeDefinition = {
     HINT_SETTING,
     { type: 'checkbox', key: 'required', label: 'Required' },
     { type: 'data-source', key: 'options', label: 'Options' },
-    VISIBILITY_SETTING,
     { type: 'border', key: 'border', label: 'Border' },
   ],
   component: DropdownList,
@@ -198,7 +187,6 @@ const SECTION_HEADER_FIELD_TYPE: FieldTypeDefinition = {
     { type: 'text', key: 'label', label: 'Section title' },
     { type: 'text', key: 'hint', label: 'Subtitle (optional)' },
     DATA_SOURCE_SETTING,
-    VISIBILITY_SETTING,
   ],
   component: SectionHeader,
 };
@@ -221,7 +209,6 @@ const COST_BREAKDOWN_FIELD_TYPE: FieldTypeDefinition = {
     { type: 'number', key: 'managementFeePercent', label: 'Default management fee (%)' },
     { type: 'checkbox', key: 'required', label: 'Gross budget required' },
     DATA_SOURCE_SETTING,
-    VISIBILITY_SETTING,
   ],
   component: CostBreakdown,
 };

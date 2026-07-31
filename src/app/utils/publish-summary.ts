@@ -1,6 +1,7 @@
 import { FormRow } from '../models/form';
 import { FormField } from '../models/field';
 import { DataBinding } from '../models/data-binding';
+import { WorkflowRule } from '../models/workflow-rule';
 import { getAllFields, isFieldDataConfigured, isOptionField } from './template-readiness';
 import {
   getDataBindingMode,
@@ -84,7 +85,7 @@ export function buildDataChecklist(
     if (getDataBindingMode(field.type) === 'entity-map') {
       items.push({
         field,
-        status: 'warning',
+        status: 'error',
         message: 'Not connected',
       });
       continue;
@@ -121,7 +122,8 @@ export interface PublishSummary {
 export function buildPublishSummary(
   rows: FormRow[],
   dataBindings: DataBinding[],
-  previewVisited: boolean
+  previewVisited: boolean,
+  workflowRules: WorkflowRule[] = []
 ): PublishSummary {
   const fields = getAllFields(rows);
   const apiFields = fields.filter(usesApiDataSource);
@@ -134,7 +136,7 @@ export function buildPublishSummary(
       (n, f) => n + getFieldIssues(f).filter((i) => i.severity === 'error').length,
       0
     ),
-    hasConditionalFields: fields.some((f) => f.visibilityRule),
+    hasConditionalFields: workflowRules.some((rule) => rule.enabled),
     previewVisited,
   };
 }

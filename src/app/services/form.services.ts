@@ -10,7 +10,8 @@ import {
   TemplateStatus,
 } from "../models/task-template";
 import { DataSourceService, FetchOptionsResult } from "./data-source.service";
-import { mergeFieldDataSourceUpdate } from "../utils/field-data-source";
+import { mergeFieldDataSourceUpdate, mergeFieldUpdate } from "../utils/field-data-source";
+import { migrateLegacyVisibilityRules } from "../utils/workflow-migration";
 import { nestedValueToExportExpression } from "../utils/nested-value";
 import {
   setupStepFromSidebarSection,
@@ -44,6 +45,8 @@ export class FormService {
   private _dataBindings = signal<DataBinding[]>([]);
   private _workflowRules = signal<WorkflowRule[]>([]);
   private _selectedFieldId = signal<string | null>(null);
+  private _selectedWorkflowRuleId = signal<string | null>(null);
+  private _focusedWorkflowNodeId = signal<string | null>(null);
   private undoStack: PersistedState[] = [];
   private redoStack: PersistedState[] = [];
   private readonly maxUndo = 30;
@@ -66,6 +69,8 @@ export class FormService {
   public readonly rows = this._rows.asReadonly();
   public readonly dataBindings = this._dataBindings.asReadonly();
   public readonly workflowRules = this._workflowRules.asReadonly();
+  public readonly selectedWorkflowRuleId = this._selectedWorkflowRuleId.asReadonly();
+  public readonly focusedWorkflowNodeId = this._focusedWorkflowNodeId.asReadonly();
 
   public readonly activeTemplate = computed(() =>
     this._templates().find((t) => t.id === this._activeTemplateId())
@@ -123,6 +128,14 @@ export class FormService {
   requestRulesCanvasFocus() {
     this.focusSidebarSection("rules");
     this.rulesCanvasFocusRequest.update((count) => count + 1);
+  }
+
+  focusWorkflowRule(ruleId: string, nodeId?: string) {
+    this._selectedWorkflowRuleId.set(ruleId);
+    this._focusedWorkflowNodeId.set(nodeId ?? null);
+    this.setActiveSetupStep("rules");
+    this.rulesVisited.set(true);
+    this.requestRulesCanvasFocus();
   }
 
   cloneTemplate(sourceId?: string) {
@@ -204,7 +217,8 @@ export class FormService {
     this.syncActiveTemplateLayout();
     const validation = validateTemplateForPublish(
       this._rows(),
-      this._dataBindings()
+      this._dataBindings(),
+      this._workflowRules()
     );
 
     if (!validation.valid) {
@@ -375,7 +389,7 @@ export class FormService {
     const newRows = rows.map((row) => ({
       ...row,
       fields: row.fields.map((field) =>
-        field.id === fieldId ? mergeFieldDataSourceUpdate(field, data) : field
+        field.id === fieldId ? mergeFieldUpdate(field, data) : field
       ),
     }));
     this._rows.set(newRows);
@@ -420,6 +434,7 @@ export class FormService {
     this.recordUndo();
     const rule = createDefaultWorkflowRule(name);
     this._workflowRules.set([...this._workflowRules(), rule]);
+    this.focusWorkflowRule(rule.id);
     this.saveState();
     return rule;
   }
@@ -440,6 +455,11 @@ export class FormService {
     this._workflowRules.set(
       this._workflowRules().filter((rule) => rule.id !== ruleId)
     );
+    if (this._selectedWorkflowRuleId() === ruleId) {
+      const next = this._workflowRules()[0];
+      this._selectedWorkflowRuleId.set(next?.id ?? null);
+      this._focusedWorkflowNodeId.set(null);
+    }
     this.saveState();
   }
 
@@ -690,10 +710,22 @@ export class FormService {
   }
 
   private loadTemplateLayout(template: TaskTemplate) {
-    this._rows.set(structuredClone(template.layout.rows));
+    const migrated = migrateLegacyVisibilityRules(
+      structuredClone(template.layout.rows),
+      structuredClone(template.layout.workflowRules ?? [])
+    );
+
+    this._rows.set(migrated.rows);
     this._dataBindings.set(structuredClone(template.layout.dataBindings));
-    this._workflowRules.set(structuredClone(template.layout.workflowRules ?? []));
+    this._workflowRules.set(migrated.rules);
+    this._selectedWorkflowRuleId.set(null);
+    this._focusedWorkflowNodeId.set(null);
     this.pruneOrphanedDataBindings();
+
+    if (migrated.changed) {
+      this.syncActiveTemplateLayout();
+      this.saveState();
+    }
   }
 
   private pruneOrphanedDataBindings() {

@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -43,7 +43,6 @@ import {
 export class WorkflowBuilder {
   formService = inject(FormService);
   private catalogService = inject(DataCatalogService);
-  selectedRuleId = signal<string | null>(null);
 
   rules = computed(() => this.formService.workflowRules());
   fields = computed(() => getAllFields(this.formService.rows()));
@@ -52,9 +51,13 @@ export class WorkflowBuilder {
   );
   targetFields = computed(() => this.fields());
 
-  selectedRule = computed(() =>
-    this.rules().find((rule) => rule.id === this.selectedRuleId()) ?? this.rules()[0]
-  );
+  selectedRule = computed(() => {
+    const rules = this.rules();
+    const selectedId = this.formService.selectedWorkflowRuleId();
+    return rules.find((rule) => rule.id === selectedId) ?? rules[0];
+  });
+
+  focusedNodeId = computed(() => this.formService.focusedWorkflowNodeId());
 
   liveEvents = computed(() =>
     evaluateWorkflowRules(
@@ -66,13 +69,29 @@ export class WorkflowBuilder {
   nodeMeta = WORKFLOW_NODE_META;
   operatorNeedsValue = operatorNeedsValue;
 
+  constructor() {
+    effect(() => {
+      const ruleId = this.formService.selectedWorkflowRuleId();
+      const nodeId = this.formService.focusedWorkflowNodeId();
+      this.formService.rulesCanvasFocusRequest();
+
+      if (!ruleId) return;
+
+      queueMicrotask(() => this.scrollToWorkflowTarget(ruleId, nodeId));
+    });
+  }
+
   addRule() {
-    const rule = this.formService.addWorkflowRule(`Rule ${this.rules().length + 1}`);
-    this.selectedRuleId.set(rule.id);
+    this.formService.addWorkflowRule(`Rule ${this.rules().length + 1}`);
   }
 
   selectRule(ruleId: string) {
-    this.selectedRuleId.set(ruleId);
+    this.formService.focusWorkflowRule(ruleId);
+  }
+
+  focusNode(rule: WorkflowRule, nodeId: string, event: Event) {
+    event.stopPropagation();
+    this.formService.focusWorkflowRule(rule.id, nodeId);
   }
 
   updateRule(rule: WorkflowRule, patch: Partial<WorkflowRule>) {
@@ -81,8 +100,19 @@ export class WorkflowBuilder {
 
   deleteRule(ruleId: string) {
     this.formService.deleteWorkflowRule(ruleId);
-    if (this.selectedRuleId() === ruleId) {
-      this.selectedRuleId.set(this.rules()[0]?.id ?? null);
+  }
+
+  private scrollToWorkflowTarget(ruleId: string, nodeId: string | null) {
+    document
+      .getElementById(`workflow-rule-${ruleId}`)
+      ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    if (nodeId) {
+      document.getElementById(`workflow-node-${nodeId}`)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'center',
+      });
     }
   }
 

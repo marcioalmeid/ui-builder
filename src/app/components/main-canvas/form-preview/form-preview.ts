@@ -3,7 +3,8 @@ import { FormService } from '../../../services/form.services';
 import { FieldPreview } from '../field-preview/field-preview';
 import { FormRow } from '../../../models/form';
 import { FormField } from '../../../models/field';
-import { isFieldVisible } from '../../../utils/field-visibility';
+import { getHiddenFieldHints, isFieldVisible } from '../../../utils/field-visibility';
+import { getAllFields } from '../../../utils/template-readiness';
 
 @Component({
   selector: 'app-form-preview',
@@ -25,6 +26,12 @@ export class FormPreview {
       return this.formService.getTemplate(id)?.layout.rows ?? [];
     }
     return this.formService.rows();
+  });
+
+  hiddenFieldHints = computed(() => {
+    if (!this.interactive()) return [];
+    const fields = getAllFields(this.displayRows());
+    return getHiddenFieldHints(fields, this.jobData(), this.workflowRules());
   });
 
   onFieldValueChange(fieldId: string, value: unknown) {

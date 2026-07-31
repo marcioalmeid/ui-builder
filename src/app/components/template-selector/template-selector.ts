@@ -1,4 +1,4 @@
-import { Component, effect, ElementRef, inject, signal, OnInit, viewChild } from '@angular/core';
+import { Component, computed, effect, ElementRef, inject, signal, OnInit, viewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -42,6 +42,15 @@ export class TemplateSelector implements OnInit {
   publishErrors = signal<string[]>([]);
   showPublishSuccess = signal(false);
   publishHighlight = signal(false);
+
+  canPublish = computed(() => {
+    if (this.formService.activeTemplate()?.status !== 'draft') return false;
+    return validateTemplateForPublish(
+      this.formService.rows(),
+      this.formService.dataBindings(),
+      this.formService.workflowRules()
+    ).valid;
+  });
 
   constructor() {
     effect(() => {
@@ -101,13 +110,15 @@ export class TemplateSelector implements OnInit {
 
     const validation = validateTemplateForPublish(
       this.formService.rows(),
-      this.formService.dataBindings()
+      this.formService.dataBindings(),
+      this.formService.workflowRules()
     );
 
     const summary = buildPublishSummary(
       this.formService.rows(),
       this.formService.dataBindings(),
-      this.formService.previewVisited()
+      this.formService.previewVisited(),
+      this.formService.workflowRules()
     );
 
     const dialogRef = this.dialog.open(PublishConfirmDialog, {

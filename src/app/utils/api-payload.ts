@@ -225,7 +225,6 @@ function serializeFieldDefinition(field: FormField): Omit<ApiPayloadField, 'data
   if (field.placeholder) payload.placeholder = field.placeholder;
   if (field.hint) payload.hint = field.hint;
   if (field.inputType) payload.inputType = field.inputType;
-  if (field.visibilityRule) payload.visibilityRule = field.visibilityRule;
   if (field.managementFeePercent != null) {
     payload.managementFeePercent = field.managementFeePercent;
   }

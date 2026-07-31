@@ -1,5 +1,6 @@
 <div
   cdkDrag
+  [id]="'form-field-' + field().id"
   [cdkDragDisabled]="readonly()"
   [cdkDragData]="field()"
   (cdkDragStarted)="whileDragging.set(true)"

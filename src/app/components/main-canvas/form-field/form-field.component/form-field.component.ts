@@ -40,8 +40,15 @@ export class FormFieldComponent {
 
   connectionBadge = computed(() => {
     const currentField = this.field();
-    const catalogId =
-      currentField.entityMapping?.catalogId ?? currentField.dataCatalogId;
+    if (currentField.entityMapping?.catalogId) {
+      const catalog = this.catalogService.getById(currentField.entityMapping.catalogId);
+      const entityField = catalog?.entityFields.find(
+        (item) => item.key === currentField.entityMapping!.entityFieldKey
+      );
+      return getFieldConnectionBadge(currentField, catalog?.name, entityField);
+    }
+
+    const catalogId = currentField.dataCatalogId;
     const catalogName = catalogId
       ? this.catalogService.getDisplayName(catalogId)
       : undefined;

@@ -7,7 +7,7 @@
     <p class="text-xs text-gray-400">No connectable fields found.</p>
   } @else {
     <ul class="flex flex-col gap-1.5">
-      @for (item of items(); track item.field.id) {
+      @for (item of items(); track item.field.id + ':' + item.status + ':' + item.message + ':' + (item.field.entityMapping?.catalogId ?? '') + ':' + (item.field.entityMapping?.entityFieldKey ?? '')) {
         <li>
           <button
             type="button"

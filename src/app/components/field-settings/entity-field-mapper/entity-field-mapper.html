@@ -29,7 +29,7 @@
         <mat-label>Entity field</mat-label>
         <mat-select
           [value]="selectedEntityFieldKey()"
-          (valueChange)="onEntityFieldChange($event)"
+          (selectionChange)="onEntityFieldChange($event.value)"
         >
           @if (compatibleFields().length === 0) {
             <mat-option disabled>No compatible fields for this component type</mat-option>
@@ -46,8 +46,14 @@
     }
 
     @if (mappingSummary(); as summary) {
-      <p class="entity-mapper__summary">
-        Mapped to <strong>{{ summary }}</strong>
+      <p class="entity-mapper__summary" [class.entity-mapper__summary--pending]="!isPersisted()">
+        @if (isReadonly()) {
+          Published template — duplicate to edit mappings.
+        } @else if (isPersisted()) {
+          Connected: <strong>{{ summary }}</strong>
+        } @else {
+          Pending: <strong>{{ summary }}</strong> — saving…
+        }
       </p>
     } @else if (selectedCatalogId()) {
       <p class="entity-mapper__summary entity-mapper__summary--pending">

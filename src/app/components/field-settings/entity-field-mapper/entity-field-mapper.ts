@@ -39,6 +39,7 @@ export class EntityFieldMapper {
   enabled = signal(false);
   selectedCatalogId = signal('');
   selectedEntityFieldKey = signal('');
+  private lastSyncedFieldId = '';
 
   templateContext = computed(
     () => this.formService.activeTemplate()?.context ?? 'general'
@@ -61,21 +62,43 @@ export class EntityFieldMapper {
   });
 
   mappingSummary = computed(() => {
-    const catalog = this.selectedCatalog();
-    const fieldKey = this.selectedEntityFieldKey();
-    if (!catalog || !fieldKey) return null;
+    const persisted = this.entityMapping();
+    const catalogId = persisted?.catalogId ?? this.selectedCatalogId();
+    const fieldKey = persisted?.entityFieldKey || this.selectedEntityFieldKey();
+    if (!catalogId || !fieldKey) return null;
 
-    const entityField = catalog.entityFields.find((field) => field.key === fieldKey);
-    return formatEntityMappingPath(catalog.name, entityField);
+    const catalog = this.catalogService.getById(catalogId);
+    const entityField = catalog?.entityFields.find((field) => field.key === fieldKey);
+    return formatEntityMappingPath(catalog?.name ?? catalogId, entityField);
   });
+
+  isPersisted = computed(() => {
+    const persisted = this.entityMapping();
+    return Boolean(persisted?.catalogId && persisted?.entityFieldKey);
+  });
+
+  isReadonly = computed(() => this.formService.isReadonly());
 
   constructor() {
     effect(() => {
-      this.fieldId();
+      const fieldId = this.fieldId();
       const mapping = this.entityMapping();
-      this.enabled.set(Boolean(mapping?.catalogId));
-      this.selectedCatalogId.set(mapping?.catalogId ?? '');
-      this.selectedEntityFieldKey.set(mapping?.entityFieldKey ?? '');
+
+      if (fieldId !== this.lastSyncedFieldId) {
+        this.lastSyncedFieldId = fieldId;
+        this.enabled.set(Boolean(mapping?.catalogId));
+        this.selectedCatalogId.set(mapping?.catalogId ?? '');
+        this.selectedEntityFieldKey.set(mapping?.entityFieldKey ?? '');
+        return;
+      }
+
+      if (mapping?.catalogId) {
+        this.enabled.set(true);
+        this.selectedCatalogId.set(mapping.catalogId);
+        if (mapping.entityFieldKey) {
+          this.selectedEntityFieldKey.set(mapping.entityFieldKey);
+        }
+      }
     });
   }
 
@@ -84,32 +107,30 @@ export class EntityFieldMapper {
     if (!enabled) {
       this.selectedCatalogId.set('');
       this.selectedEntityFieldKey.set('');
-      this.fieldUpdate.emit({ entityMapping: undefined });
+      this.persistMapping(undefined);
     }
   }
 
   onCatalogSelected(item: DataCatalogItem) {
     this.selectedCatalogId.set(item.id);
     this.selectedEntityFieldKey.set('');
-    this.emitMapping();
+    this.persistMapping({ catalogId: item.id, entityFieldKey: '' });
   }
 
   onEntityFieldChange(fieldKey: string) {
     this.selectedEntityFieldKey.set(fieldKey);
-    this.emitMapping();
+    const catalogId = this.selectedCatalogId();
+    if (!catalogId) return;
+    this.persistMapping({ catalogId, entityFieldKey: fieldKey });
   }
 
-  private emitMapping() {
-    const catalogId = this.selectedCatalogId();
-    const entityFieldKey = this.selectedEntityFieldKey();
-
-    if (!catalogId) {
-      this.fieldUpdate.emit({ entityMapping: undefined });
+  private persistMapping(mapping: EntityFieldMapping | undefined) {
+    if (this.formService.isReadonly()) {
       return;
     }
 
-    this.fieldUpdate.emit({
-      entityMapping: { catalogId, entityFieldKey },
-    });
+    const update: Partial<FormField> = { entityMapping: mapping };
+    this.formService.updateField(this.fieldId(), update);
+    this.fieldUpdate.emit(update);
   }
 }

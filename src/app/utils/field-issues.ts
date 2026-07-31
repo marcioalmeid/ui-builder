@@ -1,8 +1,10 @@
 import { FormField } from '../models/field';
 import {
+  getDataBindingMode,
   hasEntityMapping,
   isFieldBindingConfigured,
   isOptionField,
+  requiresDataConnection,
   usesApiDataSource,
 } from './field-data-binding';
 
@@ -27,20 +29,30 @@ export function getFieldIssues(field: FormField): FieldIssue[] {
 
   if (hasEntityMapping(field) && !isFieldBindingConfigured(field)) {
     issues.push({ severity: 'error', message: 'Entity field not selected' });
+  } else if (
+    getDataBindingMode(field.type) === 'entity-map' &&
+    !isFieldBindingConfigured(field)
+  ) {
+    issues.push({ severity: 'error', message: 'Not connected to data' });
   }
 
   if (usesApiDataSource(field) && !isFieldBindingConfigured(field)) {
     issues.push({ severity: 'error', message: 'Catalog source not configured' });
   }
 
-  if (isOptionField(field)) {
-    if (!usesApiDataSource(field) && !(field.options?.length ?? 0)) {
-      issues.push({ severity: 'warning', message: 'No options defined' });
-    }
+  if (getDataBindingMode(field.type) === 'line-items' && !isFieldBindingConfigured(field)) {
+    issues.push({ severity: 'error', message: 'Catalog source not configured' });
   }
 
-  if (field.visibilityRule && !field.visibilityRule.fieldId) {
-    issues.push({ severity: 'warning', message: 'Incomplete visibility rule' });
+  if (isOptionField(field)) {
+    if (!isFieldBindingConfigured(field)) {
+      issues.push({
+        severity: 'error',
+        message: usesApiDataSource(field)
+          ? 'Catalog source not configured'
+          : 'No options defined',
+      });
+    }
   }
 
   return issues;

@@ -23,10 +23,23 @@ export class WorkflowRulesPanel {
 
   addRule() {
     this.formService.addWorkflowRule();
-    this.formService.focusSidebarSection('rules');
+  }
+
+  openRule(ruleId: string) {
+    this.formService.focusWorkflowRule(ruleId);
   }
 
   openRulesCanvas() {
+    const rules = this.formService.workflowRules();
+    const selected = this.formService.selectedWorkflowRuleId();
+    if (selected) {
+      this.formService.focusWorkflowRule(selected);
+      return;
+    }
+    if (rules.length) {
+      this.formService.focusWorkflowRule(rules[0].id);
+      return;
+    }
     this.formService.requestRulesCanvasFocus();
   }
 }

@@ -171,6 +171,11 @@
   overflow: hidden;
 }
 
+.workflow-node--focused {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
 .workflow-node__head {
   display: flex;
   align-items: center;
@@ -183,6 +188,7 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: #334155;
+  cursor: pointer;
 }
 
 .workflow-node__head mat-icon {

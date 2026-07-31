@@ -12,7 +12,6 @@ import { OptionsListEditor } from './options-list-editor/options-list-editor';
 import { DataSourceEditor } from './options-source-editor/options-source-editor';
 import { EntityFieldMapper } from './entity-field-mapper/entity-field-mapper';
 import { BorderConfigComponent } from './border-config/border-config';
-import { VisibilityRuleEditor } from './visibility-rule-editor/visibility-rule-editor';
 import {
   FieldSettingsGroupId,
   getDefaultExpandedFieldGroups,
@@ -34,7 +33,7 @@ const DATA_SETTING_TYPES = new Set([
   'options-list',
 ]);
 
-const ADVANCED_SETTING_TYPES = new Set(['border', 'visibility-rule']);
+const ADVANCED_SETTING_TYPES = new Set(['border']);
 
 function groupForSettingType(type: FieldSettingsDefinition['type']): FieldSettingsGroupId {
   if (DATA_SETTING_TYPES.has(type)) return 'data';
@@ -55,7 +54,6 @@ function groupForSettingType(type: FieldSettingsDefinition['type']): FieldSettin
     DataSourceEditor,
     EntityFieldMapper,
     BorderConfigComponent,
-    VisibilityRuleEditor,
   ],
   templateUrl: './field-settings.html',
   styleUrl: './field-settings.css',
@@ -101,13 +99,7 @@ export class FieldSettings {
     ];
 
     return defs
-      .map((def) => {
-        let settings = grouped[def.id];
-        if (def.id === 'advanced' && !rulesSupported) {
-          settings = settings.filter((setting) => setting.type !== 'visibility-rule');
-        }
-        return { ...def, settings };
-      })
+      .map((def) => ({ ...def, settings: grouped[def.id] }))
       .filter((def) => def.settings.length > 0)
       .filter((def) => isFieldSettingsGroupRelevant(def.id, context))
       .map((def) => ({
@@ -168,10 +160,6 @@ export class FieldSettings {
   }
 
   updateField(fieldId: string, key: string, value: unknown): void {
-    if (key === 'visibilityRule' && value === undefined) {
-      this.formService.updateField(fieldId, { visibilityRule: undefined });
-      return;
-    }
     this.formService.updateField(fieldId, { [key]: value });
   }
 

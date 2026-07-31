@@ -84,13 +84,17 @@ export class DataSourceEditor {
   statusMessage = signal<string | null>(null);
   statusError = signal(false);
   selectedCatalogId = signal<string>('');
+  private lastSyncedFieldId = '';
 
   constructor() {
     effect(() => {
-      this.fieldId();
+      const fieldId = this.fieldId();
+      if (fieldId !== this.lastSyncedFieldId) {
+        this.lastSyncedFieldId = fieldId;
+        this.statusMessage.set(null);
+        this.statusError.set(false);
+      }
       this.selectedCatalogId.set(this.dataCatalogId() ?? '');
-      this.statusMessage.set(null);
-      this.statusError.set(false);
     });
   }
 
@@ -147,26 +151,28 @@ export class DataSourceEditor {
     this.statusMessage.set(null);
     this.statusError.set(false);
 
+    this.fieldUpdate.emit({
+      optionsSource: 'api',
+      dataCatalogId: item.id,
+      dataSource: item.dataSource,
+      dataBindingId: undefined,
+    });
+
     this.dataSourceService.fetchOptions(item.dataSource, true).subscribe({
       next: ({ options, error }) => {
         this.loading.set(false);
 
         if (error) {
-          this.statusMessage.set(error);
+          this.statusMessage.set(
+            `Connected to ${item.name}, but options failed to load: ${error}`
+          );
           this.statusError.set(true);
           return;
         }
 
-        this.statusMessage.set(`Loaded ${options.length} options for this field only.`);
+        this.statusMessage.set(`Connected to ${item.name} (${options.length} options).`);
         this.statusError.set(false);
-
-        this.fieldUpdate.emit({
-          optionsSource: 'api',
-          dataCatalogId: item.id,
-          dataSource: item.dataSource,
-          dataBindingId: undefined,
-          options,
-        });
+        this.fieldUpdate.emit({ options });
       },
     });
   }

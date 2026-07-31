@@ -1,14 +1,25 @@
 <div class="rules-panel">
+  <p class="rules-panel__hint">
+    All show/hide logic is managed here — open the Rules canvas to edit.
+  </p>
   <p class="rules-panel__summary">{{ summary() }}</p>
 
   @if (rules().length === 0) {
-    <p class="rules-panel__hint">Optional — automate show/hide and events before preview.</p>
+    <p class="rules-panel__empty">No rules yet. Add one below or open the canvas.</p>
   } @else {
     <ul class="rules-panel__list">
       @for (rule of rules(); track rule.id) {
-        <li class="rules-panel__item" [class.rules-panel__item--off]="!rule.enabled">
-          <mat-icon>{{ rule.enabled ? 'play_circle' : 'pause_circle' }}</mat-icon>
-          <span>{{ rule.name }}</span>
+        <li>
+          <button
+            type="button"
+            class="rules-panel__item"
+            [class.rules-panel__item--off]="!rule.enabled"
+            [class.rules-panel__item--selected]="formService.selectedWorkflowRuleId() === rule.id"
+            (click)="openRule(rule.id)"
+          >
+            <mat-icon>{{ rule.enabled ? 'play_circle' : 'pause_circle' }}</mat-icon>
+            <span>{{ rule.name }}</span>
+          </button>
         </li>
       }
     </ul>

@@ -2,12 +2,18 @@ import { FormRow } from '../models/form';
 import { FormField } from '../models/field';
 import { DataBinding } from '../models/data-binding';
 import { TaskTemplate } from '../models/task-template';
+import { WorkflowRule } from '../models/workflow-rule';
 import {
-  hasEntityMapping,
+  getFieldDataConnectionError,
   isFieldBindingConfigured,
   isOptionField,
+  requiresDataConnection,
   usesApiDataSource,
 } from './field-data-binding';
+import {
+  areAllWorkflowRulesValid,
+  getInvalidWorkflowRuleIssues,
+} from './workflow-readiness';
 
 export { isOptionField } from './field-data-binding';
 
@@ -42,7 +48,8 @@ export function isFieldDataConfigured(field: FormField): boolean {
 
 export function validateTemplateForPublish(
   rows: FormRow[],
-  _dataBindings: DataBinding[] = []
+  _dataBindings: DataBinding[] = [],
+  workflowRules: WorkflowRule[] = []
 ): { valid: boolean; errors: string[] } {
   const fields = getAllFields(rows);
   const errors: string[] = [];
@@ -52,27 +59,31 @@ export function validateTemplateForPublish(
   }
 
   for (const field of fields) {
-    if (isFieldBindingConfigured(field)) continue;
+    if (!requiresDataConnection(field)) continue;
 
-    if (hasEntityMapping(field)) {
-      errors.push(
-        `"${field.label}" entity mapping is incomplete. Select an entity field.`
-      );
-      continue;
+    const connectionError = getFieldDataConnectionError(field);
+    if (connectionError) {
+      errors.push(connectionError);
     }
+  }
 
-    if (usesApiDataSource(field)) {
-      errors.push(
-        `"${field.label}" is set to Catalog but has no data source. Pick a catalog item or use Shared data bindings.`
-      );
-    }
+  for (const issue of getInvalidWorkflowRuleIssues(workflowRules, fields)) {
+    errors.push(`Rule "${issue.ruleName}": ${issue.message}`);
   }
 
   return { valid: errors.length === 0, errors };
 }
 
 export function getFirstUnconfiguredApiField(rows: FormRow[]): FormField | undefined {
-  return getAllFields(rows).find((field) => !isFieldBindingConfigured(field));
+  return getAllFields(rows).find(
+    (field) => requiresDataConnection(field) && !isFieldBindingConfigured(field)
+  );
+}
+
+export function getUnconfiguredDataFields(rows: FormRow[]): FormField[] {
+  return getAllFields(rows).filter(
+    (field) => requiresDataConnection(field) && !isFieldBindingConfigured(field)
+  );
 }
 
 export function getCurrentSetupStep(steps: SetupStep[]): SetupStep | undefined {
@@ -88,7 +99,8 @@ export interface SetupNextAction {
 export function getNextSetupAction(
   steps: SetupStep[],
   rows: FormRow[],
-  readyToPublish: boolean
+  readyToPublish: boolean,
+  workflowRules: WorkflowRule[] = []
 ): SetupNextAction | null {
   if (readyToPublish) {
     return {
@@ -115,9 +127,7 @@ export function getNextSetupAction(
         buttonLabel: 'Open fields',
       };
     case 'data': {
-      const unconfigured = getAllFields(rows).filter(
-        (field) => !isFieldBindingConfigured(field)
-      );
+      const unconfigured = getUnconfiguredDataFields(rows);
       const message =
         unconfigured.length === 1
           ? `"${unconfigured[0].label}" has an incomplete data connection.`
@@ -128,12 +138,18 @@ export function getNextSetupAction(
         buttonLabel: 'Fix data connections',
       };
     }
-    case 'rules':
+    case 'rules': {
+      const invalidRules = getInvalidWorkflowRuleIssues(workflowRules, getAllFields(rows));
+      const message =
+        invalidRules.length === 1
+          ? `Rule "${invalidRules[0].ruleName}": ${invalidRules[0].message}`
+          : `${invalidRules.length} rule(s) need fixes before continuing.`;
       return {
         stepId: 'rules',
-        message: 'Configure show/hide rules and events before preview.',
-        buttonLabel: 'Open rules',
+        message,
+        buttonLabel: 'Fix rules',
       };
+    }
     case 'preview':
       return {
         stepId: 'preview',
@@ -148,26 +164,30 @@ export function getNextSetupAction(
 export function buildSetupSteps(
   template: TaskTemplate | undefined,
   rows: FormRow[],
-  rulesVisited: boolean,
+  workflowRules: WorkflowRule[],
   previewVisited: boolean
 ): SetupStep[] {
   const fields = getAllFields(rows);
-  const connectedFields = fields.filter(
-    (field) => usesApiDataSource(field) || hasEntityMapping(field)
-  );
-  const dataComplete = fields.every(isFieldBindingConfigured);
-  const workflowCount = template?.layout.workflowRules?.length ?? 0;
+  const connectableFields = fields.filter(requiresDataConnection);
+  const connectedFields = connectableFields.filter(isFieldBindingConfigured);
+  const unconfiguredCount = connectableFields.length - connectedFields.length;
+  const enabledRules = workflowRules.filter((rule) => rule.enabled);
+  const invalidRuleCount = getInvalidWorkflowRuleIssues(workflowRules, fields).length;
 
-  const layoutComplete = fields.length > 0;
-  const rulesComplete = rulesVisited && layoutComplete;
-  const previewComplete = previewVisited && layoutComplete;
+  const templateComplete = Boolean(template?.name);
+  const layoutComplete = templateComplete && fields.length > 0;
+  const dataComplete =
+    layoutComplete && connectableFields.every(isFieldBindingConfigured);
+  const rulesValid = areAllWorkflowRulesValid(workflowRules, fields);
+  const rulesComplete = dataComplete && rulesValid;
+  const previewComplete = previewVisited && rulesComplete;
   const publishComplete = template?.status === 'published';
 
   return [
     {
       id: 'template',
       label: 'Template',
-      complete: Boolean(template?.name),
+      complete: templateComplete,
       hint: template
         ? `${template.name} (${template.context})`
         : 'Select or create a template',
@@ -185,28 +205,34 @@ export function buildSetupSteps(
       label: 'Data',
       complete: dataComplete,
       hint: dataComplete
-        ? connectedFields.length
-          ? `${connectedFields.length} field(s) connected to data`
-          : 'No data connections — optional step'
-        : 'Complete entity mappings and catalog sources',
+        ? `${connectedFields.length}/${connectableFields.length} field(s) connected to data`
+        : unconfiguredCount === 1
+          ? '1 field still needs a data connection'
+          : `${unconfiguredCount} field(s) still need data connections`,
     },
     {
       id: 'rules',
       label: 'Rules',
       complete: rulesComplete,
-      hint: rulesComplete
-        ? workflowCount
-          ? `${workflowCount} automation rule(s)`
-          : 'No rules — optional step'
-        : 'Build show/hide flows and events',
+      hint: !dataComplete
+        ? 'Connect all fields in Data first'
+        : rulesComplete
+          ? enabledRules.length
+            ? `${enabledRules.length} valid rule(s)`
+            : 'No rules — optional step'
+          : invalidRuleCount === 1
+            ? '1 rule needs fixes'
+            : `${invalidRuleCount} rule(s) need fixes`,
     },
     {
       id: 'preview',
       label: 'Preview',
       complete: previewComplete,
-      hint: previewComplete
-        ? 'Preview reviewed'
-        : 'Open Preview to check the form',
+      hint: !dataComplete
+        ? 'Connect all fields in Data first'
+        : previewComplete
+          ? 'Preview reviewed'
+          : 'Open Preview to check the form',
     },
     {
       id: 'publish',
@@ -214,7 +240,9 @@ export function buildSetupSteps(
       complete: publishComplete,
       hint: publishComplete
         ? `Published · v${template?.version ?? 1}`
-        : 'Publish when all steps above are done',
+        : dataComplete
+          ? 'Publish when all steps above are done'
+          : 'Connect every field before publishing',
     },
   ];
 }

@@ -32,5 +32,5 @@ export function formatEntityMappingPath(
   entityField?: EntityFieldDefinition
 ): string {
   if (!entityField) return catalogName;
-  return `${catalogName}.${entityField.key}`;
+  return `${catalogName}.${entityField.label}`;
 }

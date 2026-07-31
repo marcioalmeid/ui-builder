@@ -4,6 +4,21 @@
       <p class="field-data-panel__section-label">Data connection</p>
       <h3 class="field-data-panel__title">{{ field.label }}</h3>
       <p class="field-data-panel__meta">{{ field.type }}</p>
+      @if (connectionBadge(); as badge) {
+        <p
+          class="field-data-panel__status"
+          [class.field-data-panel__status--ok]="badge.complete"
+          [class.field-data-panel__status--pending]="!badge.complete"
+        >
+          <mat-icon>{{ badge.icon }}</mat-icon>
+          {{ badge.label }}
+        </p>
+      } @else if (isConnected()) {
+        <p class="field-data-panel__status field-data-panel__status--ok">
+          <mat-icon>check_circle</mat-icon>
+          Connected
+        </p>
+      }
     </header>
 
     @if (isEntityMap()) {
@@ -23,6 +38,10 @@
         [dataCatalogId]="field.dataCatalogId"
         [dataBindingId]="field.dataBindingId"
         (fieldUpdate)="updateFieldPartial(field.id, $event)" />
+    } @else {
+      <p class="field-data-panel__empty-text">
+        This field type has no data connection options.
+      </p>
     }
   </div>
 } @else {

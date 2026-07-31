@@ -25,6 +25,13 @@ export class DataChecklist {
   selectedFieldId = computed(() => this.formService.selectedField()?.id);
 
   selectField(fieldId: string) {
+    this.formService.setActiveSetupStep('data');
     this.formService.setSelectedField(fieldId);
+    queueMicrotask(() => {
+      document.getElementById(`form-field-${fieldId}`)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+      });
+    });
   }
 }

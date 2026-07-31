@@ -25,7 +25,7 @@ export class TemplateSetupStepper {
     buildSetupSteps(
       this.formService.activeTemplate(),
       this.formService.rows(),
-      this.formService.rulesVisited(),
+      this.formService.workflowRules(),
       this.previewVisited()
     )
   );
@@ -49,7 +49,8 @@ export class TemplateSetupStepper {
     getNextSetupAction(
       this.steps(),
       this.formService.rows(),
-      this.readyToPublish()
+      this.readyToPublish(),
+      this.formService.workflowRules()
     )
   );
 
