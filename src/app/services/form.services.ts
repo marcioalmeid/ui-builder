@@ -804,7 +804,8 @@ export class FormService {
   }
 
   private seedDemoTemplateIfNeeded() {
-    if (localStorage.getItem(DEMO_TEMPLATE_SEED_KEY)) return;
+    const currentSeed = localStorage.getItem(DEMO_TEMPLATE_SEED_KEY);
+    if (currentSeed === '1') return;
 
     const withoutLegacyDemo = this._templates().filter(
       (t) =>
@@ -816,6 +817,7 @@ export class FormService {
     this._templates.set([...withoutLegacyDemo, demo]);
     localStorage.setItem(DEMO_TEMPLATE_SEED_KEY, '1');
     localStorage.removeItem('ui-builder-demo-seeded-v1');
+    localStorage.removeItem('ui-builder-demo-seeded-v5');
     this.saveState();
   }
 

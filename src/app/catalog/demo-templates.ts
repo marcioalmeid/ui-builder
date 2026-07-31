@@ -239,4 +239,4 @@ export function createAdvertisingDemoTemplate(): TaskTemplate {
   return createNewTaskDemoTemplate();
 }
 
-export const DEMO_TEMPLATE_SEED_KEY = 'ui-builder-demo-seeded-v5';
+export const DEMO_TEMPLATE_SEED_KEY = 'ui-builder-demo-seeded-v6';

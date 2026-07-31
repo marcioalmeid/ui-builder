@@ -125,25 +125,46 @@ export function evaluateWorkflowRules(
   return { shownFieldIds, hiddenFieldIds, events };
 }
 
+export function isShowTargetField(
+  fieldId: string,
+  rules: WorkflowRule[]
+): boolean {
+  return rules.some((rule) =>
+    rule.enabled &&
+    rule.nodes.some(
+      (node) => node.type === 'action-show' && node.data.targetFieldId === fieldId
+    )
+  );
+}
+
+export function isHideTargetField(
+  fieldId: string,
+  rules: WorkflowRule[]
+): boolean {
+  return rules.some((rule) =>
+    rule.enabled &&
+    rule.nodes.some(
+      (node) => node.type === 'action-hide' && node.data.targetFieldId === fieldId
+    )
+  );
+}
+
 export function isFieldVisibleViaWorkflows(
   fieldId: string,
   rules: WorkflowRule[],
   data: Record<string, unknown>
 ): boolean | undefined {
-  const result = evaluateWorkflowRules(rules, data);
+  const enabledRules = rules.filter((rule) => rule.enabled);
+  const result = evaluateWorkflowRules(enabledRules, data);
 
   if (result.hiddenFieldIds.has(fieldId)) return false;
   if (result.shownFieldIds.has(fieldId)) return true;
 
-  const controlled = rules.some((rule) =>
-    rule.nodes.some(
-      (node) =>
-        (node.type === 'action-show' || node.type === 'action-hide') &&
-        node.data.targetFieldId === fieldId
-    )
-  );
+  // Show targets start hidden until their rule condition passes.
+  if (isShowTargetField(fieldId, enabledRules)) return false;
 
-  return controlled ? false : undefined;
+  // Hide targets stay visible until a hide action actually runs.
+  return undefined;
 }
 
 export function countWorkflowRulesForField(

@@ -1,6 +1,9 @@
 import { FormField } from '../models/field';
 import { WorkflowRule } from '../models/workflow-rule';
-import { isFieldVisibleViaWorkflows } from './workflow-evaluation';
+import {
+  evaluateWorkflowRules,
+  isFieldVisibleViaWorkflows,
+} from './workflow-evaluation';
 
 export interface HiddenFieldHint {
   fieldId: string;
@@ -20,34 +23,60 @@ export function isFieldVisible(
   return true;
 }
 
+function describeRuleCondition(
+  rule: WorkflowRule,
+  allFields: FormField[]
+): string | null {
+  const trigger = rule.nodes.find((node) => node.type === 'trigger');
+  const condition = rule.nodes.find((node) => node.type === 'condition');
+  const triggerField = allFields.find((item) => item.id === trigger?.data.fieldId);
+
+  if (!triggerField || !condition) {
+    return null;
+  }
+
+  const operator = condition.data.operator ?? 'equals';
+  const expected = condition.data.value ?? '';
+  if (operator === 'equals') {
+    return `"${triggerField.label}" = "${expected}"`;
+  }
+
+  return `rule "${rule.name}" condition`;
+}
+
 export function getFieldVisibilityHint(
   field: FormField,
   data: Record<string, unknown>,
   allFields: FormField[],
   workflowRules: WorkflowRule[] = []
 ): string {
-  for (const rule of workflowRules.filter((item) => item.enabled)) {
-    const showOrHide = rule.nodes.find(
+  const enabledRules = workflowRules.filter((item) => item.enabled);
+  const evaluation = evaluateWorkflowRules(enabledRules, data);
+
+  for (const rule of enabledRules) {
+    const action = rule.nodes.find(
       (node) =>
         (node.type === 'action-show' || node.type === 'action-hide') &&
         node.data.targetFieldId === field.id
     );
-    if (!showOrHide) continue;
+    if (!action) continue;
 
-    const trigger = rule.nodes.find((node) => node.type === 'trigger');
-    const condition = rule.nodes.find((node) => node.type === 'condition');
-    const triggerField = allFields.find((item) => item.id === trigger?.data.fieldId);
+    const conditionHint = describeRuleCondition(rule, allFields);
 
-    if (showOrHide.type === 'action-show' && triggerField && condition) {
-      const operator = condition.data.operator ?? 'equals';
-      const expected = condition.data.value ?? '';
-      if (operator === 'equals') {
-        return `Select "${triggerField.label}" = "${expected}"`;
+    if (action.type === 'action-show') {
+      if (conditionHint) {
+        return `Select ${conditionHint}`;
       }
-      return `Rule "${rule.name}" not met yet`;
+      return `Shown by rule "${rule.name}" when its condition is met`;
     }
 
-    if (showOrHide.type === 'action-hide') {
+    if (
+      action.type === 'action-hide' &&
+      evaluation.hiddenFieldIds.has(field.id)
+    ) {
+      if (conditionHint) {
+        return `Hidden because ${conditionHint} (rule "${rule.name}")`;
+      }
       return `Hidden by rule "${rule.name}"`;
     }
   }
