@@ -1,20 +1,20 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { FieldTypeService } from '../../services/field-types.service';
 import { FieldButton } from './field-button/field-button';
 import { CdkDrag, DragDropModule } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-form-elements-menu',
-  // standalone: true,
-  imports: [ FieldButton , DragDropModule],
+  imports: [FieldButton, DragDropModule],
   templateUrl: './form-elements-menu.html',
   styleUrl: './form-elements-menu.css',
 })
 export class FormElementsMenu {
-    fieldTypeService = inject(FieldTypeService);
-    fieldTypes = this.fieldTypeService.getFieldTypes() || [];
+  private fieldTypeService = inject(FieldTypeService);
 
-    noDropAllowed(item: CdkDrag<any>) {
-       return false;
-    }
+  paletteGroups = computed(() => this.fieldTypeService.getFieldPaletteGroups());
+
+  noDropAllowed(_item: CdkDrag<unknown>) {
+    return false;
+  }
 }

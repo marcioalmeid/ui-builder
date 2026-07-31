@@ -246,7 +246,7 @@
 
 .workflow-builder__events {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.5rem;
   padding: 0.625rem 0.75rem;
   border-radius: 0.5rem;
@@ -254,6 +254,26 @@
   border: 1px solid #e9d5ff;
   font-size: 0.75rem;
   color: #6b21a8;
+}
+
+.workflow-builder__events-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.workflow-builder__events-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.workflow-builder__events-list {
+  margin: 0;
+  padding-left: 1rem;
+}
+
+.workflow-builder__events-list li + li {
+  margin-top: 0.2rem;
 }
 
 .workflow-builder__events code {

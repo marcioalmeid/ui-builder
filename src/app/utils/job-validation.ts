@@ -13,7 +13,7 @@ export function validateJobData(
   );
 
   for (const field of visibleFields.filter((f) => f.required)) {
-    if (field.type === 'section-header') continue;
+    if (field.type === 'section-header' || field.type === 'button') continue;
 
     if (field.type === 'cost-breakdown') {
       const value = data[field.id] as CostBreakdownValue | undefined;
@@ -42,7 +42,7 @@ export function validateJobData(
 export function buildInitialJobData(fields: FormField[]): Record<string, unknown> {
   const data: Record<string, unknown> = {};
   for (const field of fields) {
-    if (field.type === 'section-header') continue;
+    if (field.type === 'section-header' || field.type === 'button') continue;
     if (field.type === 'checkbox') {
       data[field.id] = false;
     } else if (field.type === 'cost-breakdown') {

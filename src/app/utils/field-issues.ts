@@ -16,7 +16,7 @@ export interface FieldIssue {
 export function getFieldIssues(field: FormField): FieldIssue[] {
   const issues: FieldIssue[] = [];
 
-  if (field.type === 'section-header') {
+  if (field.type === 'section-header' || field.type === 'button') {
     if (!field.label?.trim()) {
       issues.push({ severity: 'error', message: 'Missing label' });
     }

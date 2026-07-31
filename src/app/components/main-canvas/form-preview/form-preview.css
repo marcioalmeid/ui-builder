@@ -22,3 +22,40 @@
 .form-preview__hidden-list li + li {
   margin-top: 0.25rem;
 }
+
+.form-preview__events-panel {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ddd6fe;
+  background: #f5f3ff;
+  color: #4c1d95;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.form-preview__events-title {
+  margin: 0 0 0.5rem;
+  font-weight: 600;
+}
+
+.form-preview__events-list {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.form-preview__events-list li + li {
+  margin-top: 0.25rem;
+}
+
+.form-preview__events-list code {
+  font-size: 0.75rem;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 0.1rem 0.35rem;
+  border-radius: 0.25rem;
+}
+
+.form-preview__events-rule {
+  color: #6b21a8;
+  opacity: 0.85;
+}

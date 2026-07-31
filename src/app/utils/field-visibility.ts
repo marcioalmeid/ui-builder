@@ -99,11 +99,11 @@ export function getHiddenFieldHints(
 }
 
 export function isInputField(field: FormField): boolean {
-  return field.type !== 'section-header';
+  return field.type !== 'section-header' && field.type !== 'button';
 }
 
 export function isLayoutField(field: FormField): boolean {
-  return field.type === 'section-header';
+  return field.type === 'section-header' || field.type === 'button';
 }
 
 export function isCompositeField(field: FormField): boolean {

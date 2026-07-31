@@ -2,6 +2,7 @@ import { DataBinding } from '../models/data-binding';
 import { FormRow } from '../models/form';
 import { ApiDataSource, FormField, RadioOption } from '../models/field';
 import { TaskTemplate } from '../models/task-template';
+import { WorkflowEmittedEvent } from '../models/workflow-event';
 import { WorkflowRule } from '../models/workflow-rule';
 import { DataCatalogItem } from '../catalog/data-catalog.items';
 import {
@@ -11,6 +12,7 @@ import {
   usesApiDataSource,
 } from './field-data-binding';
 import { isFieldVisible } from './field-visibility';
+import { getWorkflowEmittedEvents } from './workflow-evaluation';
 
 export interface ApiPayloadDataSourceRef {
   url: string;
@@ -83,6 +85,7 @@ export interface ApiSubmissionPayload {
   };
   dataBindings: ApiPayloadDataBinding[];
   workflowRules: WorkflowRule[];
+  events: WorkflowEmittedEvent[];
   layout: ApiPayloadRow[];
   resolved: {
     entities: Record<string, Record<string, unknown>>;
@@ -94,6 +97,7 @@ export interface ApiSubmissionPayload {
     connectedFieldCount: number;
     visibleFieldCount: number;
     workflowRuleCount: number;
+    emittedEventCount: number;
   };
 }
 
@@ -286,7 +290,7 @@ function buildPayloadField(
   const visible = isFieldVisible(field, jobData, workflowRules);
   const dataConnection = buildFieldDataConnection(field, dataBindings, getCatalogItem);
 
-  if (visible && field.type !== 'section-header') {
+  if (visible && field.type !== 'section-header' && field.type !== 'button') {
     applyResolvedEntityValue(field, value, dataConnection, entities);
   }
 
@@ -381,7 +385,13 @@ export function buildApiSubmissionPayload(
 
   const visibleFieldCount = layout
     .flatMap((row) => row.fields)
-    .filter((field) => field.runtime.visible && field.type !== 'section-header').length;
+    .filter((field) => field.runtime.visible && field.type !== 'section-header' && field.type !== 'button').length;
+
+  const events = getWorkflowEmittedEvents(workflowRules, scopedJobData, {
+    fields: allFields,
+    templateId: template.id,
+    templateVersion: template.version,
+  });
 
   return {
     template: {
@@ -393,6 +403,7 @@ export function buildApiSubmissionPayload(
     },
     dataBindings: payloadBindings,
     workflowRules,
+    events,
     layout,
     resolved: { entities },
     meta: {
@@ -402,6 +413,7 @@ export function buildApiSubmissionPayload(
       connectedFieldCount,
       visibleFieldCount,
       workflowRuleCount: workflowRules.length,
+      emittedEventCount: events.length,
     },
   };
 }

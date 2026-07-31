@@ -3,8 +3,13 @@ import { FormService } from '../../../services/form.services';
 import { FieldPreview } from '../field-preview/field-preview';
 import { FormRow } from '../../../models/form';
 import { FormField } from '../../../models/field';
+import { TaskTemplate } from '../../../models/task-template';
 import { getHiddenFieldHints, isFieldVisible } from '../../../utils/field-visibility';
 import { getAllFields } from '../../../utils/template-readiness';
+import {
+  formatWorkflowEventSummary,
+  getWorkflowEmittedEvents,
+} from '../../../utils/workflow-evaluation';
 
 @Component({
   selector: 'app-form-preview',
@@ -34,6 +39,19 @@ export class FormPreview {
     return getHiddenFieldHints(fields, this.jobData(), this.workflowRules());
   });
 
+  emittedEvents = computed(() => {
+    if (!this.interactive()) return [];
+    const template = this.activeTemplate();
+    const fields = getAllFields(this.displayRows());
+    return getWorkflowEmittedEvents(this.workflowRules(), this.jobData(), {
+      fields,
+      templateId: template?.id,
+      templateVersion: template?.version,
+    });
+  });
+
+  formatEventSummary = formatWorkflowEventSummary;
+
   onFieldValueChange(fieldId: string, value: unknown) {
     this.fieldValueChange.emit({ fieldId, value });
   }
@@ -48,5 +66,13 @@ export class FormPreview {
       return this.formService.getTemplate(id)?.layout.workflowRules ?? [];
     }
     return this.formService.workflowRules();
+  }
+
+  private activeTemplate(): TaskTemplate | undefined {
+    const id = this.templateId();
+    if (id) {
+      return this.formService.getTemplate(id);
+    }
+    return this.formService.activeTemplate();
   }
 }

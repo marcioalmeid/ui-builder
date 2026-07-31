@@ -1,7 +1,31 @@
 import { ApiDataSource, FormField, RadioOption } from '../models/field';
 import { TaskTemplate } from '../models/task-template';
+import { WorkflowRule } from '../models/workflow-rule';
 import { DATA_CATALOG } from './data-catalog.items';
 import { createShowFieldsWorkflowRule } from '../utils/workflow-migration';
+
+function appendEmitEventToRule(rule: WorkflowRule, eventName: string): WorkflowRule {
+  const lastNode = rule.nodes[rule.nodes.length - 1];
+  if (!lastNode) return rule;
+
+  const eventId = crypto.randomUUID();
+  return {
+    ...rule,
+    nodes: [
+      ...rule.nodes,
+      {
+        id: eventId,
+        type: 'action-event',
+        position: { x: (lastNode.position.x ?? 0) + 220, y: 0 },
+        data: { eventName },
+      },
+    ],
+    edges: [
+      ...rule.edges,
+      { id: crypto.randomUUID(), source: lastNode.id, target: eventId },
+    ],
+  };
+}
 
 function catalogField(
   id: string,
@@ -78,25 +102,31 @@ export function createNewTaskDemoTemplate(): TaskTemplate {
     layout: {
       dataBindings: [],
       workflowRules: [
-        createShowFieldsWorkflowRule(
-          'Show advertising section when Task type is Digital Advertising',
-          taskTypeFieldId,
-          'equals',
-          'digital-advertising',
-          [
-            sectionHeaderFieldId,
-            platformFieldId,
-            requestTypeFieldId,
-            vendorFieldId,
-            costBreakdownFieldId,
-          ]
+        appendEmitEventToRule(
+          createShowFieldsWorkflowRule(
+            'Show advertising section when Task type is Digital Advertising',
+            taskTypeFieldId,
+            'equals',
+            'digital-advertising',
+            [
+              sectionHeaderFieldId,
+              platformFieldId,
+              requestTypeFieldId,
+              vendorFieldId,
+              costBreakdownFieldId,
+            ]
+          ),
+          'campaign.type.selected'
         ),
-        createShowFieldsWorkflowRule(
-          'Show Budget when Request type is Budget change',
-          requestTypeFieldId,
-          'equals',
-          'budget-change',
-          [budgetFieldId]
+        appendEmitEventToRule(
+          createShowFieldsWorkflowRule(
+            'Show Budget when Request type is Budget change',
+            requestTypeFieldId,
+            'equals',
+            'budget-change',
+            [budgetFieldId]
+          ),
+          'budget.change.requested'
         ),
       ],
       rows: [
@@ -239,4 +269,4 @@ export function createAdvertisingDemoTemplate(): TaskTemplate {
   return createNewTaskDemoTemplate();
 }
 
-export const DEMO_TEMPLATE_SEED_KEY = 'ui-builder-demo-seeded-v6';
+export const DEMO_TEMPLATE_SEED_KEY = 'ui-builder-demo-seeded-v7';

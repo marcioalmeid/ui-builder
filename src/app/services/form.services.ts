@@ -818,6 +818,7 @@ export class FormService {
     localStorage.setItem(DEMO_TEMPLATE_SEED_KEY, '1');
     localStorage.removeItem('ui-builder-demo-seeded-v1');
     localStorage.removeItem('ui-builder-demo-seeded-v5');
+    localStorage.removeItem('ui-builder-demo-seeded-v6');
     this.saveState();
   }
 
@@ -890,7 +891,7 @@ export class FormService {
       const pct = field.managementFeePercent ?? 15;
       return `{ grossBudget: '', managementFeePercent: ${pct}, additionalFees: [] }`;
     }
-    if (field.type === "section-header") {
+    if (field.type === "section-header" || field.type === "button") {
       return "null";
     }
     return "''";
@@ -912,7 +913,7 @@ export class FormService {
     code += `  jobData = signal<Record<string, unknown>>({\n`;
 
     for (const field of allFields) {
-      if (field.type === "section-header") continue;
+      if (field.type === "section-header" || field.type === "button") continue;
       code += `    '${field.id}': ${this.getInitialFieldValue(field)},\n`;
     }
 
@@ -936,7 +937,7 @@ export class FormService {
     code += `    const data = this.jobData();\n`;
     code += `    const errors: string[] = [];\n`;
     for (const field of requiredFields) {
-      if (field.type === "section-header") continue;
+      if (field.type === "section-header" || field.type === "button") continue;
       const label = field.label.replace(/'/g, "\\'");
       if (field.type === "cost-breakdown") {
         code += `    const ${this.sanitizeFieldKey(field.id)}Val = data['${field.id}'] as { grossBudget?: unknown } | undefined;\n`;
@@ -1027,6 +1028,15 @@ export class FormService {
           template += `        <h3 class="text-xs font-bold tracking-wide uppercase text-gray-500 border-t border-gray-200 pt-4">${field.label}</h3>\n`;
           if (field.hint) {
             template += `        <p class="text-xs text-gray-400 mt-1">${field.hint}</p>\n`;
+          }
+          template += `      </div>\n`;
+          continue;
+        }
+        if (field.type === "button") {
+          template += `      <div class="shrink-0">\n`;
+          template += `        <button type="button" class="px-4 py-2 bg-blue-600 text-white rounded shadow-sm">${field.label}</button>\n`;
+          if (field.hint) {
+            template += `        <p class="text-xs text-gray-500 mt-1">${field.hint}</p>\n`;
           }
           template += `      </div>\n`;
           continue;

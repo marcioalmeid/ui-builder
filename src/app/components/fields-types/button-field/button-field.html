@@ -1,0 +1,22 @@
+<div class="button-field">
+  @switch (variant()) {
+    @case ('stroked') {
+      <button mat-stroked-button type="button" color="primary">
+        {{ field().label }}
+      </button>
+    }
+    @case ('basic') {
+      <button mat-button type="button" color="primary">
+        {{ field().label }}
+      </button>
+    }
+    @default {
+      <button mat-flat-button type="button" color="primary">
+        {{ field().label }}
+      </button>
+    }
+  }
+  @if (field().hint) {
+    <p class="button-field__hint">{{ field().hint }}</p>
+  }
+</div>

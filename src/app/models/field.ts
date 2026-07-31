@@ -46,6 +46,7 @@ export interface FormField {
   visibilityRule?: FieldVisibilityRule;
   managementFeePercent?: number;
   entityMapping?: EntityFieldMapping;
+  buttonVariant?: 'primary' | 'stroked' | 'basic';
 }
 
 export interface FieldVisibilityRule {

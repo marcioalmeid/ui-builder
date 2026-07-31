@@ -1,14 +1,22 @@
 import { FormField } from '../models/field';
+import { WorkflowEmittedEvent } from '../models/workflow-event';
 import {
   WorkflowConditionOperator,
   WorkflowNode,
   WorkflowRule,
 } from '../models/workflow-rule';
 
+export interface WorkflowEvaluationContext {
+  fields?: FormField[];
+  templateId?: string;
+  templateVersion?: number;
+  emittedAt?: number;
+}
+
 export interface WorkflowEvaluationResult {
   shownFieldIds: Set<string>;
   hiddenFieldIds: Set<string>;
-  events: Array<{ ruleId: string; ruleName: string; eventName: string }>;
+  events: WorkflowEmittedEvent[];
 }
 
 function isEmptyValue(value: unknown): boolean {
@@ -79,24 +87,60 @@ function getOrderedChain(rule: WorkflowRule): WorkflowNode[] {
   return chain;
 }
 
+function buildEmittedEvent(
+  rule: WorkflowRule,
+  triggerFieldId: string,
+  chain: WorkflowNode[],
+  node: WorkflowNode,
+  data: Record<string, unknown>,
+  context?: WorkflowEvaluationContext
+): WorkflowEmittedEvent {
+  const triggerField = context?.fields?.find((field) => field.id === triggerFieldId);
+  const conditionNode = chain.find((item) => item.type === 'condition');
+  const emittedAt = context?.emittedAt ?? Date.now();
+
+  return {
+    eventName: node.data.eventName!.trim(),
+    ruleId: rule.id,
+    ruleName: rule.name,
+    templateId: context?.templateId,
+    templateVersion: context?.templateVersion,
+    trigger: {
+      fieldId: triggerFieldId,
+      label: triggerField?.label ?? triggerFieldId,
+      value: data[triggerFieldId],
+    },
+    condition: conditionNode
+      ? {
+          operator: (conditionNode.data.operator ?? 'equals') as WorkflowConditionOperator,
+          value: conditionNode.data.value ?? '',
+        }
+      : undefined,
+    payload: {},
+    timestamp: new Date(emittedAt).toISOString(),
+  };
+}
+
 export function evaluateWorkflowRules(
   rules: WorkflowRule[],
-  data: Record<string, unknown>
+  data: Record<string, unknown>,
+  context?: WorkflowEvaluationContext
 ): WorkflowEvaluationResult {
   const shownFieldIds = new Set<string>();
   const hiddenFieldIds = new Set<string>();
-  const events: WorkflowEvaluationResult['events'] = [];
+  const events: WorkflowEmittedEvent[] = [];
 
   for (const rule of rules.filter((item) => item.enabled)) {
     const chain = getOrderedChain(rule);
     const trigger = chain.find((node) => node.type === 'trigger');
     if (!trigger?.data.fieldId) continue;
 
+    const triggerFieldId = trigger.data.fieldId;
     let conditionPassed = true;
 
     for (const node of chain) {
       if (node.type === 'condition') {
-        conditionPassed = evaluateCondition(node, trigger.data.fieldId, data);
+        conditionPassed = evaluateCondition(node, triggerFieldId, data);
         if (!conditionPassed) break;
       }
 
@@ -113,16 +157,34 @@ export function evaluateWorkflowRules(
       }
 
       if (node.type === 'action-event' && node.data.eventName?.trim()) {
-        events.push({
-          ruleId: rule.id,
-          ruleName: rule.name,
-          eventName: node.data.eventName.trim(),
-        });
+        events.push(
+          buildEmittedEvent(rule, triggerFieldId, chain, node, data, context)
+        );
       }
     }
   }
 
   return { shownFieldIds, hiddenFieldIds, events };
+}
+
+export function getWorkflowEmittedEvents(
+  rules: WorkflowRule[],
+  data: Record<string, unknown>,
+  context: WorkflowEvaluationContext
+): WorkflowEmittedEvent[] {
+  return evaluateWorkflowRules(
+    rules.filter((rule) => rule.enabled),
+    data,
+    context
+  ).events;
+}
+
+export function formatWorkflowEventSummary(event: WorkflowEmittedEvent): string {
+  const triggerValue =
+    event.trigger.value === '' || event.trigger.value == null
+      ? '(empty)'
+      : String(event.trigger.value);
+  return `${event.trigger.label} = ${triggerValue}`;
 }
 
 export function isShowTargetField(

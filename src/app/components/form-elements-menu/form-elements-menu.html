@@ -1,12 +1,19 @@
 <div
-  class="flex flex-col gap-3 elements-menu min-w-0"
+  class="elements-menu"
   cdkDropList
   id="field-selector-list"
   cdkDropListSortingDisabled="true"
   [cdkDropListData]="'field-selector'"
   [cdkDropListEnterPredicate]="noDropAllowed"
 >
-  @for (type of fieldTypes; track type.type) {
-    <app-field-button [field]="type"></app-field-button>
+  @for (group of paletteGroups(); track group.id) {
+    <section class="elements-menu__group">
+      <h4 class="elements-menu__group-title">{{ group.label }}</h4>
+      <div class="elements-menu__group-items">
+        @for (type of group.types; track type.type) {
+          <app-field-button [field]="type" />
+        }
+      </div>
+    </section>
   }
 </div>

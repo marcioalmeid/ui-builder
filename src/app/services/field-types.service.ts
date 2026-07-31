@@ -8,6 +8,7 @@ import { DropdownList } from '../components/fields-types/dropdown-list/dropdown-
 import { DatePicker } from '../components/fields-types/date-picker/date-picker';
 import { SectionHeader } from '../components/fields-types/section-header/section-header';
 import { CostBreakdown } from '../components/fields-types/cost-breakdown/cost-breakdown';
+import { ButtonField } from '../components/fields-types/button-field/button-field';
 
 const HINT_SETTING = { type: 'text' as const, key: 'hint', label: 'Help text' };
 const ENTITY_MAP_SETTING = {
@@ -213,6 +214,55 @@ const COST_BREAKDOWN_FIELD_TYPE: FieldTypeDefinition = {
   component: CostBreakdown,
 };
 
+const BUTTON_FIELD_TYPE: FieldTypeDefinition = {
+  id: 'button',
+  type: 'button',
+  label: 'Button',
+  icon: 'smart_button',
+  defaultConfig: {
+    label: 'Button',
+    hint: '',
+    required: false,
+    buttonVariant: 'primary',
+  },
+  settingsConfig: [
+    { type: 'text', key: 'label', label: 'Button label' },
+    HINT_SETTING,
+    {
+      type: 'select',
+      key: 'buttonVariant',
+      label: 'Style',
+      options: [
+        { value: 'primary', label: 'Primary (filled)' },
+        { value: 'stroked', label: 'Outlined' },
+        { value: 'basic', label: 'Text' },
+      ],
+    },
+  ],
+  component: ButtonField,
+};
+
+export interface FieldPaletteGroup {
+  id: string;
+  label: string;
+  types: FieldTypeDefinition[];
+}
+
+const INPUT_FIELD_TYPES: FieldTypeDefinition[] = [
+  TEXT_FIELD_TYPE,
+  TEXTAREA_FIELD_TYPE,
+  CHECKBOX_FIELD_TYPE,
+  RADIO_FIELD_TYPE,
+  DATE_PICKER_FIELD_TYPE,
+  DROPDOWN_LIST_FIELD_TYPE,
+];
+
+const LAYOUT_FIELD_TYPES: FieldTypeDefinition[] = [
+  SECTION_HEADER_FIELD_TYPE,
+  BUTTON_FIELD_TYPE,
+  COST_BREAKDOWN_FIELD_TYPE,
+];
+
 @Injectable({
   providedIn: 'root',
 })
@@ -225,6 +275,7 @@ export class FieldTypeService {
     ['datepicker', DATE_PICKER_FIELD_TYPE],
     ['dropdown', DROPDOWN_LIST_FIELD_TYPE],
     ['section-header', SECTION_HEADER_FIELD_TYPE],
+    ['button', BUTTON_FIELD_TYPE],
     ['cost-breakdown', COST_BREAKDOWN_FIELD_TYPE],
   ]);
 
@@ -238,5 +289,12 @@ export class FieldTypeService {
 
   getFieldTypes(): FieldTypeDefinition[] {
     return Array.from(this.fieldTypes.values());
+  }
+
+  getFieldPaletteGroups(): FieldPaletteGroup[] {
+    return [
+      { id: 'inputs', label: 'Input fields', types: INPUT_FIELD_TYPES },
+      { id: 'layout', label: 'Layout & actions', types: LAYOUT_FIELD_TYPES },
+    ];
   }
 }

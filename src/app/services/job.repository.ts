@@ -28,6 +28,7 @@ export class JobRepository {
           templateVersion: parsed.templateVersion,
           templateName: parsed.templateName,
           data: parsed.data ?? {},
+          events: parsed.events ?? [],
           submittedAt: parsed.submittedAt ?? 0,
         });
       } catch {

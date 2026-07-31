@@ -40,6 +40,7 @@ export class TaskRuntime {
       (f) =>
         f.required &&
         f.type !== 'section-header' &&
+        f.type !== 'button' &&
         isFieldVisible(f, this.jobData(), this.template?.layout.workflowRules ?? [])
     )
   );

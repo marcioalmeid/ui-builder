@@ -24,7 +24,7 @@ export class VisibilityRuleEditor {
     this.formService
       .rows()
       .flatMap((row) => row.fields)
-      .filter((f) => f.id !== this.fieldId() && f.type !== 'section-header')
+      .filter((f) => f.id !== this.fieldId() && f.type !== 'section-header' && f.type !== 'button')
   );
 
   enabled = computed(() => Boolean(this.rule()));

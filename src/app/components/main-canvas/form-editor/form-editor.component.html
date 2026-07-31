@@ -35,8 +35,9 @@
         [field]="field"
         [readonly]="formService.isReadonly()"
         (fieldDelete)="onDeleteField($event, row.id)"
-        [class.flex-1]="field.type !== 'section-header' && field.type !== 'cost-breakdown'"
+        [class.flex-1]="field.type !== 'section-header' && field.type !== 'cost-breakdown' && field.type !== 'button'"
         [class.basis-full]="field.type === 'section-header' || field.type === 'cost-breakdown'"
+        [class.shrink-0]="field.type === 'button'"
       />
       } @empty {
       <p class="w-full bg-background p-4 border-dashed border-primary-container rounded text-gray-400 text-center">Drag and Drop form elements here</p>

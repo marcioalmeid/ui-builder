@@ -129,7 +129,7 @@ export function buildPublishSummary(
   const apiFields = fields.filter(usesApiDataSource);
 
   return {
-    fieldCount: fields.filter((f) => f.type !== 'section-header').length,
+    fieldCount: fields.filter((f) => f.type !== 'section-header' && f.type !== 'button').length,
     apiFieldCount: apiFields.length,
     configuredApiCount: apiFields.filter(isFieldDataConfigured).length,
     issueCount: fields.reduce(

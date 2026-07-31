@@ -16,7 +16,7 @@ import {
   WorkflowRule,
 } from '../../models/workflow-rule';
 import { getAllFields } from '../../utils/template-readiness';
-import { evaluateWorkflowRules } from '../../utils/workflow-evaluation';
+import { evaluateWorkflowRules, formatWorkflowEventSummary } from '../../utils/workflow-evaluation';
 import {
   getTriggerFieldProfile,
   getWorkflowFieldProfile,
@@ -47,7 +47,7 @@ export class WorkflowBuilder {
   rules = computed(() => this.formService.workflowRules());
   fields = computed(() => getAllFields(this.formService.rows()));
   triggerFields = computed(() =>
-    this.fields().filter((field) => field.type !== 'section-header')
+    this.fields().filter((field) => field.type !== 'section-header' && field.type !== 'button')
   );
   targetFields = computed(() => this.fields());
 
@@ -62,9 +62,16 @@ export class WorkflowBuilder {
   liveEvents = computed(() =>
     evaluateWorkflowRules(
       this.rules().filter((rule) => rule.enabled),
-      this.formService.previewJobData()
+      this.formService.previewJobData(),
+      {
+        fields: this.fields(),
+        templateId: this.formService.activeTemplate()?.id,
+        templateVersion: this.formService.activeTemplate()?.version,
+      }
     ).events
   );
+
+  formatEventSummary = formatWorkflowEventSummary;
 
   nodeMeta = WORKFLOW_NODE_META;
   operatorNeedsValue = operatorNeedsValue;

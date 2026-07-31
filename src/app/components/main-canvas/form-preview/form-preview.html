@@ -15,6 +15,23 @@
     </div>
   }
 
+  @if (interactive() && emittedEvents().length > 0) {
+    <div class="form-preview__events-panel">
+      <p class="form-preview__events-title">
+        {{ emittedEvents().length }} event(s) active — rules that match current values
+      </p>
+      <ul class="form-preview__events-list">
+        @for (event of emittedEvents(); track event.ruleId + event.eventName) {
+          <li>
+            <code>{{ event.eventName }}</code>
+            <span> — {{ formatEventSummary(event) }}</span>
+            <span class="form-preview__events-rule">({{ event.ruleName }})</span>
+          </li>
+        }
+      </ul>
+    </div>
+  }
+
   <div class="py-6 flex flex-col gap-4 shadow-md rounded-lg border bg-gray-0">
     @for (row of displayRows(); track row.id) {
          <div class="flex gap-4 flex-wrap ">
@@ -25,8 +42,9 @@
                   [interactive]="interactive()"
                   [value]="jobData()[field.id]"
                   (valueChange)="onFieldValueChange(field.id, $event)"
-                  [class.flex-1]="field.type !== 'section-header' && field.type !== 'cost-breakdown'"
-                  [class.basis-full]="field.type === 'section-header' || field.type === 'cost-breakdown'" />
+                  [class.flex-1]="field.type !== 'section-header' && field.type !== 'cost-breakdown' && field.type !== 'button'"
+                  [class.basis-full]="field.type === 'section-header' || field.type === 'cost-breakdown'"
+                  [class.shrink-0]="field.type === 'button'" />
               }
             }
          </div>

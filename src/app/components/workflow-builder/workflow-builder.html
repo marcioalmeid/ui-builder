@@ -260,12 +260,17 @@
     @if (liveEvents().length) {
       <div class="workflow-builder__events">
         <mat-icon>bolt</mat-icon>
-        <span>
-          Live events:
-          @for (event of liveEvents(); track event.ruleId + event.eventName; let last = $last) {
-            <code>{{ event.eventName }}</code>@if (!last) {<span>, </span>}
-          }
-        </span>
+        <div class="workflow-builder__events-body">
+          <span class="workflow-builder__events-label">Live events:</span>
+          <ul class="workflow-builder__events-list">
+            @for (event of liveEvents(); track event.ruleId + event.eventName) {
+              <li>
+                <code>{{ event.eventName }}</code>
+                <span> — {{ formatEventSummary(event) }}</span>
+              </li>
+            }
+          </ul>
+        </div>
       </div>
     }
   }

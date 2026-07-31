@@ -17,6 +17,7 @@ export function getDataBindingMode(fieldType: string): DataBindingMode {
     case 'cost-breakdown':
       return 'line-items';
     case 'section-header':
+    case 'button':
       return 'label';
     default:
       return 'entity-map';
