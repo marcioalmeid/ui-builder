@@ -1,0 +1,36 @@
+model_list:
+  - model_name: claude-3-5-sonnet-20241022
+    litellm_params:
+      model: ollama/qwen3-coder:30b
+      api_base: http://localhost:11434
+      max_tokens: 8192
+
+  - model_name: claude-3-7-sonnet-20250219
+    litellm_params:
+      model: ollama/qwen3-coder:30b
+      api_base: http://localhost:11434
+
+  - model_name: claude-3-opus-20240229
+    litellm_params:
+      model: ollama/qwen3-coder:30b
+      api_base: http://localhost:11434
+
+  - model_name: claude-3-5-haiku-20241022
+    litellm_params:
+      model: ollama/qwen2.5-coder:7b
+      api_base: http://localhost:11434
+
+  - model_name: ollama/qwen2.5-coder:7b
+    litellm_params:
+      model: ollama/qwen2.5-coder:7b
+      api_base: http://localhost:11434
+
+  - model_name: ollama/gemma4-max
+    litellm_params:
+      model: ollama/gemma4-max
+      api_base: http://localhost:11434
+
+  - model_name: gemma4-max
+    litellm_params:
+      model: ollama/gemma4-max
+      api_base: http://localhost:11434

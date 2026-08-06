@@ -1,0 +1,49 @@
+<div class="page">
+  <header class="header">
+    <div>
+      <h1>Knowledge Assistant</h1>
+      <p class="muted">Perguntas sobre a documentacao New Job Q (vault Obsidian + RAG)</p>
+    </div>
+    <a mat-stroked-button routerLink="/builder">Voltar ao Builder</a>
+  </header>
+
+  @if (indexPoints() !== null) {
+    <p class="muted">Indice: {{ indexPoints() }} chunks no Qdrant</p>
+  }
+
+  <mat-form-field appearance="outline" class="question-field">
+    <mat-label>Pergunta</mat-label>
+    <textarea matInput rows="3" [(ngModel)]="question" placeholder="Ex: Como funciona a Rule Engine?"></textarea>
+  </mat-form-field>
+
+  <div class="actions">
+    <button mat-flat-button color="primary" (click)="ask()" [disabled]="loading()">Perguntar</button>
+    <button mat-stroked-button (click)="syncIndex()" [disabled]="loading()">Sync indice</button>
+  </div>
+
+  @if (loading()) {
+    <mat-spinner diameter="32"></mat-spinner>
+  }
+
+  @if (error()) {
+    <p class="error">{{ error() }}</p>
+  }
+
+  @if (result(); as r) {
+    <section class="card">
+      <p><strong>Confianca:</strong> {{ r.confidence }} · <strong>Modelo:</strong> {{ r.model }}</p>
+      <div class="answer">{{ r.answer }}</div>
+    </section>
+    @if (r.sources.length) {
+      <section class="card">
+        <h2>Fontes</h2>
+        @for (s of r.sources; track s.path) {
+          <details>
+            <summary>{{ s.path }} ({{ s.method }})</summary>
+            <pre>{{ s.snippet }}</pre>
+          </details>
+        }
+      </section>
+    }
+  }
+</div>

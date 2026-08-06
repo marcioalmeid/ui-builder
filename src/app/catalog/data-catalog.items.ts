@@ -15,6 +15,10 @@ export interface DataCatalogItem {
 const ID_NAME: EntityFieldDefinition[] = [
   { key: 'id', label: 'ID', type: 'text' },
   { key: 'name', label: 'Name', type: 'text' },
+  { key: 'description', label: 'Description', type: 'text' },
+   
+  { key: 'due_date', label: 'Due Date', type: 'date' },
+
 ];
 
 /** Catalog sources for the advertising task template demo (mock API: /api/*) */
@@ -26,7 +30,7 @@ export const DATA_CATALOG: DataCatalogItem[] = [
     icon: 'people',
     category: 'People',
     contexts: ['general', 'advertising', 'print', 'social'],
-    dataSource: {
+    dataSource: { 
       url: '/api/users',
       method: 'GET',
       labelKey: 'name',

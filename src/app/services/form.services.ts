@@ -89,12 +89,14 @@ export class FormService {
   constructor() {
     this.loadState();
     this.seedDemoTemplateIfNeeded();
+
     if (this._templates().length === 0) {
       const template = createEmptyTemplate("General Task", "general");
       this._templates.set([template]);
-      this._activeTemplateId.set(template.id);
-      this.loadTemplateLayout(template);
-      this.saveState();
+    }
+
+    if (!this._activeTemplateId() && this._templates().length > 0) {
+      this.switchTemplate(this._templates()[0].id, false);
     }
   }
 

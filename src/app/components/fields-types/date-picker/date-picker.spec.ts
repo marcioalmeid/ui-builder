@@ -13,6 +13,14 @@ describe('DatePicker', () => {
 
     fixture = TestBed.createComponent(DatePicker);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('field', {
+      id: 'test',
+      type: 'datepicker',
+      label: 'Test label',
+      icon: 'calendar_today',
+      required: false,
+    });
+    fixture.detectChanges();
     await fixture.whenStable();
   });
 

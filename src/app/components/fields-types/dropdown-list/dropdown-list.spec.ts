@@ -13,6 +13,14 @@ describe('DropdownList', () => {
     
     fixture = TestBed.createComponent(DropdownList);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('field', {
+      id: 'test',
+      type: 'dropdown',
+      label: 'Test label',
+      icon: 'arrow_drop_down',
+      required: false,
+      options: [],
+    });
     fixture.detectChanges();
   });
 

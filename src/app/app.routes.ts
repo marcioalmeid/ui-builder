@@ -13,6 +13,11 @@ export const routes: Routes = [
       import('./components/task-runtime/task-runtime').then((m) => m.TaskRuntime),
   },
   {
+    path: 'knowledge',
+    loadComponent: () =>
+      import('./components/knowledge-assistant/knowledge-assistant').then((m) => m.KnowledgeAssistant),
+  },
+  {
     path: 'jobs',
     loadComponent: () =>
       import('./components/job-list/job-list').then((m) => m.JobList),

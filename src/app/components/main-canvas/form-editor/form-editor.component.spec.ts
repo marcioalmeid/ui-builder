@@ -20,6 +20,7 @@ describe('FormEditorComponent', () => {
       required: false,
     },
     component: class {},
+    settingsConfig: [],
   };
 
   beforeEach(async () => {
@@ -28,6 +29,7 @@ describe('FormEditorComponent', () => {
     }).compileComponents();
 
     formService = TestBed.inject(FormService);
+    formService.createTemplate('Test', 'general');
     fixture = TestBed.createComponent(FormEditorComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -43,15 +45,11 @@ describe('FormEditorComponent', () => {
 
     component.onDropInRow(
       {
-        previousContainer: 'field-selector',
-        container: rowId,
+        previousContainer: { data: 'field-selector' },
+        container: { data: rowId },
         item: dragItem,
         currentIndex: 0,
         previousIndex: 0,
-        isPointerOverContainer: true,
-        distance: { x: 0, y: 0 },
-        dropPoint: { x: 0, y: 0 },
-        event: new MouseEvent('mouseup'),
       } as unknown as CdkDragDrop<string>,
       rowId,
     );

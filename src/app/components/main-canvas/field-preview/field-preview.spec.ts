@@ -13,6 +13,14 @@ describe('FieldPreview', () => {
 
     fixture = TestBed.createComponent(FieldPreview);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('field', {
+      id: 'test',
+      type: 'text',
+      label: 'Test label',
+      icon: 'text_fields',
+      required: false,
+    });
+    fixture.detectChanges();
     await fixture.whenStable();
   });
 

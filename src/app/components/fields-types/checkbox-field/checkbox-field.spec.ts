@@ -13,6 +13,14 @@ describe('CheckboxField', () => {
 
     fixture = TestBed.createComponent(CheckboxField);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('field', {
+      id: 'test',
+      type: 'checkbox',
+      label: 'Test label',
+      icon: 'check_box',
+      required: false,
+    });
+    fixture.detectChanges();
     await fixture.whenStable();
   });
 

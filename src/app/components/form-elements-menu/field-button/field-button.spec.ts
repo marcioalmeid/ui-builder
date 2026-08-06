@@ -13,6 +13,16 @@ describe('FieldButton', () => {
 
     fixture = TestBed.createComponent(FieldButton);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('field', {
+      id: 'text',
+      type: 'text',
+      label: 'Text',
+      icon: 'text_fields',
+      defaultConfig: {},
+      settingsConfig: [],
+      component: class {},
+    });
+    fixture.detectChanges();
     await fixture.whenStable();
   });
 
