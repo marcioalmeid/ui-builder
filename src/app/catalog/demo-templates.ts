@@ -27,6 +27,30 @@ function appendEmitEventToRule(rule: WorkflowRule, eventName: string): WorkflowR
   };
 }
 
+function catalogItem(catalogId: string) {
+  return DATA_CATALOG.find((entry) => entry.id === catalogId);
+}
+
+function mappedField(
+  id: string,
+  type: FormField['type'],
+  label: string,
+  icon: string,
+  catalogId: string,
+  entityFieldKey: string,
+  extra: Partial<FormField> = {}
+): FormField {
+  return {
+    id,
+    type,
+    label,
+    icon,
+    required: false,
+    entityMapping: { catalogId, entityFieldKey },
+    ...extra,
+  };
+}
+
 function catalogField(
   id: string,
   label: string,
@@ -35,7 +59,7 @@ function catalogField(
   required = false,
   hint?: string
 ): FormField {
-  const item = DATA_CATALOG.find((entry) => entry.id === catalogId);
+  const item = catalogItem(catalogId);
   const staticOptions: RadioOption[] =
     catalogId === 'users'
       ? [
@@ -82,7 +106,18 @@ function catalogField(
   };
 }
 
-export function createNewTaskDemoTemplate(): TaskTemplate {
+export interface AdvertisingFixture {
+  template: TaskTemplate;
+  titleId: string;
+  taskTypeId: string;
+  vendorId: string;
+  descriptionId: string;
+  platformId: string;
+}
+
+export function createAdvertisingFixture(
+  name = 'New Task (Advertising)'
+): AdvertisingFixture {
   const templateId = crypto.randomUUID();
   const taskTypeFieldId = crypto.randomUUID();
   const requestTypeFieldId = crypto.randomUUID();
@@ -91,13 +126,18 @@ export function createNewTaskDemoTemplate(): TaskTemplate {
   const platformFieldId = crypto.randomUUID();
   const vendorFieldId = crypto.randomUUID();
   const costBreakdownFieldId = crypto.randomUUID();
+  const titleId = crypto.randomUUID();
+  const descriptionId = crypto.randomUUID();
 
-  return {
+  const template: TaskTemplate = {
     id: templateId,
-    name: 'New Task (Advertising)',
+    name,
     context: 'advertising',
-    version: 1,
+    version: 0,
     status: 'draft',
+    versions: [],
+    retiredFieldIds: [],
+    riskPolicy: 'ADDITIVE',
     updatedAt: Date.now(),
     layout: {
       dataBindings: [],
@@ -134,28 +174,33 @@ export function createNewTaskDemoTemplate(): TaskTemplate {
           id: crypto.randomUUID(),
           templateId,
           fields: [
-            {
-              id: crypto.randomUUID(),
-              type: 'text',
-              label: 'Title',
-              icon: 'text_fields',
-              required: true,
-              placeholder: "Confirm next month's Honda budget",
-            },
+            mappedField(
+              titleId,
+              'text',
+              'Title',
+              'text_fields',
+              'task-types',
+              'name',
+              {
+                required: true,
+                placeholder: "Confirm next month's Honda budget",
+              }
+            ),
           ],
         },
         {
           id: crypto.randomUUID(),
           templateId,
           fields: [
-            {
-              id: crypto.randomUUID(),
-              type: 'textarea',
-              label: 'Description',
-              icon: 'notes',
-              required: false,
-              placeholder: 'Add context for the operator...',
-            },
+            mappedField(
+              descriptionId,
+              'textarea',
+              'Description',
+              'notes',
+              'task-types',
+              'description',
+              { placeholder: 'Add context for the operator...' }
+            ),
           ],
         },
         {
@@ -169,14 +214,15 @@ export function createNewTaskDemoTemplate(): TaskTemplate {
               'Select task type',
               true
             ),
-            {
-              id: crypto.randomUUID(),
-              type: 'datepicker',
-              label: 'Due date',
-              icon: 'calendar_month',
-              required: false,
-              placeholder: 'mm/dd/yyyy',
-            },
+            mappedField(
+              crypto.randomUUID(),
+              'datepicker',
+              'Due date',
+              'calendar_month',
+              'task-types',
+              'due_date',
+              { placeholder: 'mm/dd/yyyy' }
+            ),
             catalogField(
               crypto.randomUUID(),
               'Assign to',
@@ -256,12 +302,27 @@ export function createNewTaskDemoTemplate(): TaskTemplate {
               required: false,
               hint: 'Net ad spend is calculated from gross budget, management fee, and additional fees.',
               managementFeePercent: 15,
+              dataCatalogId: 'budget-line-items',
+              dataSource: catalogItem('budget-line-items')?.dataSource,
             },
           ],
         },
       ],
     },
   };
+
+  return {
+    template,
+    titleId,
+    taskTypeId: taskTypeFieldId,
+    vendorId: vendorFieldId,
+    descriptionId,
+    platformId: platformFieldId,
+  };
+}
+
+export function createNewTaskDemoTemplate(): TaskTemplate {
+  return createAdvertisingFixture().template;
 }
 
 /** @deprecated use createNewTaskDemoTemplate */
@@ -269,4 +330,4 @@ export function createAdvertisingDemoTemplate(): TaskTemplate {
   return createNewTaskDemoTemplate();
 }
 
-export const DEMO_TEMPLATE_SEED_KEY = 'ui-builder-demo-seeded-v7';
+export const DEMO_TEMPLATE_SEED_KEY = 'ui-builder-demo-seeded-v9';

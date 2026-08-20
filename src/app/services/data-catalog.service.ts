@@ -37,10 +37,12 @@ export class DataCatalogService {
     if (!catalogId) {
       return fallback ?? 'Custom API';
     }
-    return this.getById(catalogId)?.name ?? fallback ?? catalogId;
+    const item = this.getById(catalogId);
+    return item?.name ?? fallback ?? catalogId;
   }
 
   getEntityFields(catalogId: string): EntityFieldDefinition[] {
-    return this.getById(catalogId)?.entityFields ?? [];
+    const item = this.getById(catalogId);
+    return item?.entityFields ?? [];
   }
 }

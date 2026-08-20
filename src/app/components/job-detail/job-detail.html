@@ -1,0 +1,90 @@
+<div class="min-h-screen bg-gray-50 p-6">
+  <div class="max-w-4xl mx-auto">
+    <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
+      <div>
+        <a mat-stroked-button routerLink="/tasks">
+          <mat-icon>arrow_back</mat-icon> All tasks
+        </a>
+        @if (job(); as current) {
+          <h1 class="text-2xl font-medium mt-4">{{ templateLabel() }}</h1>
+          <p class="text-sm text-gray-500 mt-1 flex flex-wrap gap-2 items-center">
+            <span class="inline-flex items-center rounded-full bg-slate-800 text-white text-xs px-2 py-0.5">
+              Form v{{ pin() }}
+            </span>
+            @if (template(); as tmpl) {
+              <span class="inline-flex items-center rounded-full bg-slate-200 text-slate-800 text-xs px-2 py-0.5">
+                @if (tmpl.status === 'published') {
+                  published v{{ publishedVersion() }}
+                } @else if (publishedVersion(); as last) {
+                  @if (last > 0) {
+                    last published v{{ last }} · draft
+                  } @else {
+                    draft · not published yet
+                  }
+                }
+              </span>
+              @if (canMigrate()) {
+                <span class="text-amber-700">Update available</span>
+              }
+            } @else {
+              <span class="text-red-600">Template missing — reopen from Tasks after reloading a scenario</span>
+            }
+          </p>
+        } @else {
+          <h1 class="text-2xl font-medium mt-4 text-red-600">Task not found</h1>
+        }
+      </div>
+      <div class="flex flex-wrap gap-2">
+        @if (job() && template()) {
+          <button mat-stroked-button type="button" (click)="cloneTask()">
+            <mat-icon>content_copy</mat-icon>
+            Clone
+          </button>
+          <button mat-stroked-button type="button" (click)="saveJob()">
+            <mat-icon>save</mat-icon>
+            {{ saved() ? 'Saved' : 'Save values' }}
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (canMigrate()) {
+      <div class="mb-4 border border-amber-100 rounded bg-amber-50">
+        <button
+          type="button"
+          class="w-full text-left px-3 py-2 text-sm text-amber-900 font-medium flex items-center justify-between"
+          (click)="showAdvanced.set(!showAdvanced())"
+        >
+          <span>Form update available</span>
+          <mat-icon>{{ showAdvanced() ? 'expand_less' : 'expand_more' }}</mat-icon>
+        </button>
+        @if (showAdvanced()) {
+          <div class="px-3 pb-3 space-y-2">
+            <p class="text-sm text-amber-800">
+              Apply pending template changes to this task (advanced). Breaking versions are never skipped.
+            </p>
+            <button mat-flat-button color="primary" type="button" (click)="migrate()">
+              <mat-icon>upgrade</mat-icon>
+              Update form
+            </button>
+          </div>
+        }
+      </div>
+    }
+
+    @if (job() && !template()) {
+      <div class="text-sm text-red-800 bg-red-50 border border-red-100 rounded p-4">
+        This task points to a template that no longer exists (often after loading another spike scenario).
+        Go back to Tasks or load the matching scenario again from Templates → Spike tools.
+      </div>
+    }
+
+    @if (job() && effectiveLayout()) {
+      <app-form-preview
+        [layout]="effectiveLayout()"
+        [interactive]="true"
+        [jobData]="job()!.data"
+        (fieldValueChange)="updateField($event.fieldId, $event.value)" />
+    }
+  </div>
+</div>

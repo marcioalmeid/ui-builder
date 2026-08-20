@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": {
+    "ANTHROPIC_BASE_URL": "http://localhost:11434",
+    "ANTHROPIC_AUTH_TOKEN": "ollama",
+    "ANTHROPIC_MODEL": "qwen3-coder:30b",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "qwen3-coder:30b",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "qwen3-coder:30b",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "qwen2.5-coder:7b",
+    "CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS": "1",
+    "CLAUDE_CODE_SKIP_AUTH_LOGIN": "1"
+  },
+  "model": "qwen3-coder:30b"
+}

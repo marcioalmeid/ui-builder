@@ -24,6 +24,10 @@ import {
   operatorNeedsValue,
   WorkflowFieldProfile,
 } from '../../utils/workflow-field-profile';
+import {
+  getWorkflowRuleIssues,
+  WorkflowRuleIssue,
+} from '../../utils/workflow-readiness';
 
 @Component({
   selector: 'app-workflow-builder',
@@ -59,6 +63,36 @@ export class WorkflowBuilder {
 
   focusedNodeId = computed(() => this.formService.focusedWorkflowNodeId());
 
+  /** Enabled-rule issues keyed by rule id (for canvas badges). */
+  issuesByRuleId = computed(() => {
+    const fields = this.fields();
+    const map = new Map<string, WorkflowRuleIssue[]>();
+    for (const rule of this.rules()) {
+      if (!rule.enabled) continue;
+      const issues = getWorkflowRuleIssues(rule, fields);
+      if (issues.length) {
+        map.set(rule.id, issues);
+      }
+    }
+    return map;
+  });
+
+  ruleIssues(ruleId: string): WorkflowRuleIssue[] {
+    return this.issuesByRuleId().get(ruleId) ?? [];
+  }
+
+  nodeIssues(ruleId: string, nodeId: string): WorkflowRuleIssue[] {
+    return this.ruleIssues(ruleId).filter((issue) => issue.nodeId === nodeId);
+  }
+
+  hasRuleIssues(ruleId: string): boolean {
+    return this.ruleIssues(ruleId).length > 0;
+  }
+
+  hasNodeIssues(ruleId: string, nodeId: string): boolean {
+    return this.nodeIssues(ruleId, nodeId).length > 0;
+  }
+
   liveEvents = computed(() =>
     evaluateWorkflowRules(
       this.rules().filter((rule) => rule.enabled),
@@ -84,7 +118,10 @@ export class WorkflowBuilder {
 
       if (!ruleId) return;
 
-      queueMicrotask(() => this.scrollToWorkflowTarget(ruleId, nodeId));
+      // Wait a frame so the expanded canvas / invalid node styles are painted.
+      queueMicrotask(() =>
+        requestAnimationFrame(() => this.scrollToWorkflowTarget(ruleId, nodeId))
+      );
     });
   }
 
@@ -93,7 +130,8 @@ export class WorkflowBuilder {
   }
 
   selectRule(ruleId: string) {
-    this.formService.focusWorkflowRule(ruleId);
+    const firstIssue = this.ruleIssues(ruleId)[0];
+    this.formService.focusWorkflowRule(ruleId, firstIssue?.nodeId);
   }
 
   focusNode(rule: WorkflowRule, nodeId: string, event: Event) {

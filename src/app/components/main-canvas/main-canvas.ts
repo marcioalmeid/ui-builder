@@ -11,6 +11,7 @@ import { DevPayloadPanel } from '../dev-payload-panel/dev-payload-panel';
 import { WorkflowBuilder } from '../workflow-builder/workflow-builder';
 import { getAllFields, getFirstUnconfiguredApiField } from '../../utils/template-readiness';
 import { buildInitialJobData } from '../../utils/job-validation';
+import { getFirstInvalidWorkflowIssue } from '../../utils/workflow-readiness';
 
 export type CanvasTab = 'editor' | 'rules' | 'preview' | 'json';
 
@@ -86,10 +87,19 @@ export class MainCanvas {
     } else if (stepId === 'rules') {
       this.formService.focusSidebarSection('rules');
       this.onTabChange('rules');
-      const rules = this.formService.workflowRules();
-      const selected = this.formService.selectedWorkflowRuleId();
-      if (rules.length && !selected) {
-        this.formService.focusWorkflowRule(rules[0].id);
+      const fields = getAllFields(this.formService.rows());
+      const firstIssue = getFirstInvalidWorkflowIssue(
+        this.formService.workflowRules(),
+        fields
+      );
+      if (firstIssue) {
+        this.formService.focusWorkflowRule(firstIssue.ruleId, firstIssue.nodeId);
+      } else {
+        const rules = this.formService.workflowRules();
+        const selected = this.formService.selectedWorkflowRuleId();
+        if (rules.length && !selected) {
+          this.formService.focusWorkflowRule(rules[0].id);
+        }
       }
     } else if (stepId === 'layout') {
       this.formService.focusSidebarSection('fields');
@@ -101,10 +111,7 @@ export class MainCanvas {
       if (field) {
         this.formService.setSelectedField(field.id);
       }
-    } else if (stepId === 'template') {
-      this.formService.focusSidebarSection('template');
-      this.onTabChange('editor');
-    } else if (stepId === 'publish') {
+    } else if (stepId === 'template' || stepId === 'publish') {
       this.formService.requestPublishFocus();
     }
   }

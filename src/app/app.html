@@ -1,9 +1,19 @@
-<mat-toolbar color="primary" class="mb-2">
-  <span>UI Builder</span>
+<mat-toolbar color="primary" class="app-toolbar">
+  <span class="app-toolbar__brand">UI Builder</span>
   <span class="flex-1"></span>
-  <a mat-button routerLink="/knowledge" routerLinkActive="toolbar-active">Knowledge</a>
-  <a mat-button routerLink="/builder" routerLinkActive="toolbar-active">Builder</a>
-  <a mat-button routerLink="/jobs" routerLinkActive="toolbar-active">Jobs</a>
+  <nav class="app-toolbar__nav" aria-label="Main">
+    <a
+      mat-button
+      routerLink="/tasks"
+      routerLinkActive="toolbar-active"
+      [routerLinkActiveOptions]="{ exact: false }"
+    >
+      Tasks
+    </a>
+    <a mat-button routerLink="/templates" routerLinkActive="toolbar-active">
+      Templates
+    </a>
+  </nav>
 </mat-toolbar>
 
 <router-outlet />

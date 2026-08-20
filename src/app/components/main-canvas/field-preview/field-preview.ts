@@ -2,32 +2,10 @@ import { Component, computed, input, inject, output } from '@angular/core';
 import { NgComponentOutlet } from '@angular/common';
 import { FormField } from '../../../models/field';
 import { FieldTypeService } from '../../../services/field-types.service';
-import { ButtonField } from '../../fields-types/button-field/button-field';
-import { CheckboxField } from '../../fields-types/checkbox-field/checkbox-field';
-import { CostBreakdown } from '../../fields-types/cost-breakdown/cost-breakdown';
-import { DatePicker } from '../../fields-types/date-picker/date-picker';
-import { DropdownList } from '../../fields-types/dropdown-list/dropdown-list';
-import { RadioField } from '../../fields-types/radio-field/radio-field';
-import { SectionHeader } from '../../fields-types/section-header/section-header';
-import { TextAreaComponent } from '../../fields-types/text-area/text-area.component';
-import { TextField } from '../../fields-types/text-field/text-field';
-
-/** Ensures dynamic field components stay in the bundle for NgComponentOutlet. */
-const FIELD_PREVIEW_IMPORTS = [
-  TextField,
-  TextAreaComponent,
-  CheckboxField,
-  RadioField,
-  DatePicker,
-  DropdownList,
-  SectionHeader,
-  CostBreakdown,
-  ButtonField,
-];
 
 @Component({
   selector: 'app-field-preview',
-  imports: [NgComponentOutlet, ...FIELD_PREVIEW_IMPORTS],
+  imports: [NgComponentOutlet],
   templateUrl: './field-preview.html',
   styleUrl: './field-preview.css',
 })

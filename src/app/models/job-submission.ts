@@ -8,4 +8,6 @@ export interface JobSubmission {
   data: Record<string, unknown>;
   events: WorkflowEmittedEvent[];
   submittedAt: number;
+  appliedFieldEventIds?: string[];
+  appliedRuleEventIds?: string[];
 }

@@ -32,21 +32,13 @@
         [class.setup-stepper__arrow--complete]="step.complete"
         aria-hidden="true"
       >
-        <svg class="setup-stepper__arrow-icon" viewBox="0 0 48 12" preserveAspectRatio="none">
+        <span class="setup-stepper__arrow-line"></span>
+        <svg class="setup-stepper__arrow-head" viewBox="0 0 8 12" aria-hidden="true">
           <path
-            class="setup-stepper__arrow-line"
-            d="M0 6 H36"
+            d="M1 1.5 L6.5 6 L1 10.5"
             fill="none"
             stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-          />
-          <path
-            class="setup-stepper__arrow-head"
-            d="M32 2 L44 6 L32 10"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
+            stroke-width="1.75"
             stroke-linecap="round"
             stroke-linejoin="round"
           />

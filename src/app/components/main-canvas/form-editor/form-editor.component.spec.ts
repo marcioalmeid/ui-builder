@@ -24,12 +24,14 @@ describe('FormEditorComponent', () => {
   };
 
   beforeEach(async () => {
+    localStorage.clear();
     await TestBed.configureTestingModule({
       imports: [FormEditorComponent],
     }).compileComponents();
 
     formService = TestBed.inject(FormService);
-    formService.createTemplate('Test', 'general');
+    const created = formService.createTemplate('Test', 'general');
+    expect(created.success).toBe(true);
     fixture = TestBed.createComponent(FormEditorComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

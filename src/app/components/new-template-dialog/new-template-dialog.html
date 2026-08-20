@@ -6,23 +6,42 @@
     <input matInput [(ngModel)]="name" placeholder="Digital Advertising Task" />
   </mat-form-field>
 
-  <mat-form-field appearance="outline" class="w-full">
-    <mat-label>Context</mat-label>
-    <mat-select [(ngModel)]="context">
-      @for (ctx of contexts; track ctx.id) {
-        <mat-option [value]="ctx.id">{{ ctx.label }}</mat-option>
-      }
-    </mat-select>
-    <mat-hint>Filters the data catalog for this template</mat-hint>
-  </mat-form-field>
+  @if (availableContexts().length === 0) {
+    <p class="text-sm text-amber-800 bg-amber-50 border border-amber-100 rounded p-3">
+      Every department already has an active template. Delete or change a template’s
+      context before creating another.
+    </p>
+  } @else {
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Department / context</mat-label>
+      <mat-select [(ngModel)]="context">
+        @for (ctx of availableContexts(); track ctx.id) {
+          <mat-option [value]="ctx.id">{{ ctx.label }}</mat-option>
+        }
+      </mat-select>
+      <mat-hint>Only one active template per department</mat-hint>
+    </mat-form-field>
+  }
+
+  @if (error(); as message) {
+    <p class="text-sm text-red-700 bg-red-50 border border-red-100 rounded p-2">{{ message }}</p>
+  }
 
   <p class="text-sm text-gray-600">
-    Or duplicate the pre-built <strong>New Task (Advertising)</strong> demo to start faster.
+    Or duplicate the pre-built demo into a <strong>free</strong> department.
   </p>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
   <button mat-button type="button" (click)="cancel()">Cancel</button>
   <button mat-stroked-button type="button" (click)="startFromDemo()">Duplicate demo</button>
-  <button mat-flat-button color="primary" type="button" (click)="createBlank()">Create blank</button>
+  <button
+    mat-flat-button
+    color="primary"
+    type="button"
+    [disabled]="availableContexts().length === 0"
+    (click)="createBlank()"
+  >
+    Create blank
+  </button>
 </mat-dialog-actions>

@@ -2,13 +2,13 @@
   <div class="max-w-4xl mx-auto">
     <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
       <div>
-        <a mat-stroked-button routerLink="/builder">
-          <mat-icon>arrow_back</mat-icon> Back to builder
+        <a mat-stroked-button routerLink="/tasks">
+          <mat-icon>arrow_back</mat-icon> Back to tasks
         </a>
         @if (template) {
           <h1 class="text-2xl font-medium mt-4">{{ template.name }}</h1>
           <p class="text-sm text-gray-500">
-            Context: {{ template.context }} · Version {{ template.version }} · {{ template.status }}
+            Context: {{ template.context }} · Published v{{ publishedVersion }} · {{ template.status }}
           </p>
         } @else {
           <h1 class="text-2xl font-medium mt-4 text-red-600">Template not found</h1>
@@ -36,7 +36,7 @@
     @if (submitted()) {
       <div class="text-green-700 bg-green-50 border border-green-100 rounded p-3 mb-4 text-sm flex flex-wrap gap-3 items-center">
         <span>Task submitted.</span>
-        <a routerLink="/jobs" class="underline font-medium">View all submissions</a>
+        <a routerLink="/tasks" class="underline font-medium">View all tasks</a>
         <button mat-stroked-button type="button" (click)="submitAnother()">Submit another</button>
       </div>
     }
@@ -57,6 +57,7 @@
       }
       <app-form-preview
         [templateId]="templateId"
+        [layout]="runtimeLayout"
         [interactive]="true"
         [jobData]="jobData()"
         (fieldValueChange)="updateField($event.fieldId, $event.value)" />

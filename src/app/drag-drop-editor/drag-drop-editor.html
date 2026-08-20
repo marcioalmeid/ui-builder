@@ -1,17 +1,17 @@
 <div class="flex flex-col h-screen px-4">
-    <div class="flex items-center justify-between py-4 gap-4 flex-wrap">
-        <div class="flex flex-col gap-1">
-          <h1 class="text-2xl text-primary tracking-wide font-medium">Task Template Builder</h1>
-          <a routerLink="/jobs" class="text-sm text-blue-600 underline w-fit">View submitted tasks</a>
+    <div class="flex flex-col gap-3 py-4">
+        <div class="flex items-center justify-between gap-4 flex-wrap">
+          <h1 class="text-2xl text-primary tracking-wide font-medium">Template studio</h1>
+          <div class="flex items-center gap-2">
+            <button mat-stroked-button (click)="undo()" [disabled]="!formService.canUndo()">
+              <mat-icon>undo</mat-icon> Undo
+            </button>
+            <button mat-stroked-button (click)="redo()" [disabled]="!formService.canRedo()">
+              <mat-icon>redo</mat-icon> Redo
+            </button>
+          </div>
         </div>
-        <div class="flex items-center gap-2">
-          <button mat-stroked-button (click)="undo()" [disabled]="!formService.canUndo()">
-            <mat-icon>undo</mat-icon> Undo
-          </button>
-          <button mat-stroked-button (click)="redo()" [disabled]="!formService.canRedo()">
-            <mat-icon>redo</mat-icon> Redo
-          </button>
-        </div>
+        <app-template-selector />
     </div>
     <div class="flex gap-4 relative flex-1 min-h-0" cdkDropListGroup>
         <app-builder-sidebar class="shrink-0" />

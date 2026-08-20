@@ -121,13 +121,13 @@
 }
 
 .setup-stepper__arrow {
-  flex: 0 0 2.5rem;
-  align-self: center;
+  flex: 0 0 1.75rem;
+  align-self: flex-start;
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 0.125rem;
   height: 1.5rem;
-  margin-top: 0.125rem;
+  margin-top: calc(0.25rem + 0.0625rem);
   color: #cbd5e1;
 }
 
@@ -135,8 +135,17 @@
   color: #22c55e;
 }
 
-.setup-stepper__arrow-icon {
-  width: 100%;
+.setup-stepper__arrow-line {
+  flex: 1 1 auto;
+  min-width: 0.5rem;
+  height: 1.5px;
+  border-radius: 9999px;
+  background: currentColor;
+}
+
+.setup-stepper__arrow-head {
+  flex: 0 0 auto;
+  width: 0.5rem;
   height: 0.75rem;
   display: block;
 }
@@ -187,7 +196,7 @@
   }
 
   .setup-stepper__arrow {
-    flex: 0 0 1.75rem;
+    flex: 0 0 1.25rem;
   }
 
   .setup-step {

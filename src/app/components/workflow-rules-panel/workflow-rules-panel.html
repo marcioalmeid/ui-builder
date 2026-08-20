@@ -15,10 +15,14 @@
             class="rules-panel__item"
             [class.rules-panel__item--off]="!rule.enabled"
             [class.rules-panel__item--selected]="formService.selectedWorkflowRuleId() === rule.id"
+            [class.rules-panel__item--invalid]="hasRuleIssues(rule.id)"
             (click)="openRule(rule.id)"
           >
             <mat-icon>{{ rule.enabled ? 'play_circle' : 'pause_circle' }}</mat-icon>
-            <span>{{ rule.name }}</span>
+            <span class="rules-panel__item-label">{{ rule.name }}</span>
+            @if (hasRuleIssues(rule.id)) {
+              <mat-icon class="rules-panel__item-error" aria-label="Needs fixes">error</mat-icon>
+            }
           </button>
         </li>
       }

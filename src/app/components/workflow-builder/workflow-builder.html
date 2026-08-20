@@ -32,8 +32,9 @@
         <article
           class="workflow-rule"
           [id]="'workflow-rule-' + rule.id"
-          [class.workflow-rule--selected]="selectedRule()?.id === rule.id"
+          [class.workflow-rule--selected]="selectedRule().id === rule.id"
           [class.workflow-rule--disabled]="!rule.enabled"
+          [class.workflow-rule--invalid]="hasRuleIssues(rule.id)"
         >
           <header class="workflow-rule__header">
             <button
@@ -49,6 +50,15 @@
                 (click)="$event.stopPropagation()"
                 [readonly]="formService.isReadonly()"
               />
+              @if (hasRuleIssues(rule.id)) {
+                <span
+                  class="workflow-rule__error-badge"
+                  [attr.aria-label]="ruleIssues(rule.id).length + ' validation error(s)'"
+                >
+                  <mat-icon>error</mat-icon>
+                  {{ ruleIssues(rule.id).length }}
+                </span>
+              }
             </button>
             <div class="workflow-rule__actions">
               <mat-slide-toggle
@@ -64,7 +74,31 @@
             </div>
           </header>
 
-          @if (selectedRule()?.id === rule.id) {
+          @if (selectedRule().id === rule.id) {
+            @if (ruleIssues(rule.id); as issues) {
+              @if (issues.length) {
+                <div class="workflow-rule__errors" role="alert">
+                  <mat-icon>error_outline</mat-icon>
+                  <ul>
+                    @for (issue of issues; track issue.nodeId + issue.message) {
+                      <li>
+                        @if (issue.nodeId) {
+                          <button
+                            type="button"
+                            class="workflow-rule__error-link"
+                            (click)="focusNode(rule, issue.nodeId, $event)"
+                          >
+                            {{ issue.message }}
+                          </button>
+                        } @else {
+                          {{ issue.message }}
+                        }
+                      </li>
+                    }
+                  </ul>
+                </div>
+              }
+            }
             <div class="workflow-canvas">
               <div class="workflow-canvas__nodes">
                 @for (node of rule.nodes; track node.id; let last = $last) {
@@ -72,6 +106,7 @@
                     class="workflow-node"
                     [id]="'workflow-node-' + node.id"
                     [class.workflow-node--focused]="focusedNodeId() === node.id"
+                    [class.workflow-node--invalid]="hasNodeIssues(rule.id, node.id)"
                     [style.--node-color]="nodeMeta[node.type].color"
                   >
                     <div
@@ -80,22 +115,36 @@
                     >
                       <mat-icon>{{ nodeMeta[node.type].icon }}</mat-icon>
                       <span>{{ nodeMeta[node.type].label }}</span>
-                      @if (!formService.isReadonly() && rule.nodes.length > 1) {
-                        <button
-                          mat-icon-button
-                          type="button"
-                          class="workflow-node__remove"
-                          (click)="removeNode(rule, node.id)"
-                        >
-                          <mat-icon>close</mat-icon>
-                        </button>
+                      @if (hasNodeIssues(rule.id, node.id) || (!formService.isReadonly() && rule.nodes.length > 1)) {
+                        <span class="workflow-node__head-actions">
+                          @if (hasNodeIssues(rule.id, node.id)) {
+                            <mat-icon
+                              class="workflow-node__error-icon"
+                              aria-hidden="true"
+                            >error</mat-icon>
+                          }
+                          @if (!formService.isReadonly() && rule.nodes.length > 1) {
+                            <button
+                              mat-icon-button
+                              type="button"
+                              class="workflow-node__remove"
+                              (click)="removeNode(rule, node.id)"
+                            >
+                              <mat-icon>close</mat-icon>
+                            </button>
+                          }
+                        </span>
                       }
                     </div>
 
                     <div class="workflow-node__body">
                       @switch (node.type) {
                         @case ('trigger') {
-                          <mat-form-field appearance="outline" class="w-full">
+                          <mat-form-field
+                            appearance="outline"
+                            class="w-full"
+                            [class.workflow-node__field--error]="hasNodeIssues(rule.id, node.id)"
+                          >
                             <mat-label>Field</mat-label>
                             <mat-select
                               [value]="node.data.fieldId ?? ''"
@@ -129,7 +178,11 @@
 
                             @if (operatorNeedsValue(node.data.operator ?? profile.operators[0].id)) {
                               @if (profile.valueInputType === 'select') {
-                                <mat-form-field appearance="outline" class="w-full">
+                                <mat-form-field
+                                  appearance="outline"
+                                  class="w-full"
+                                  [class.workflow-node__field--error]="hasNodeIssues(rule.id, node.id)"
+                                >
                                   <mat-label>Value</mat-label>
                                   <mat-select
                                     [value]="node.data.value ?? ''"
@@ -142,7 +195,11 @@
                                   </mat-select>
                                 </mat-form-field>
                               } @else if (profile.valueInputType === 'date') {
-                                <mat-form-field appearance="outline" class="w-full">
+                                <mat-form-field
+                                  appearance="outline"
+                                  class="w-full"
+                                  [class.workflow-node__field--error]="hasNodeIssues(rule.id, node.id)"
+                                >
                                   <mat-label>Date</mat-label>
                                   <input
                                     matInput
@@ -153,7 +210,11 @@
                                   />
                                 </mat-form-field>
                               } @else if (profile.valueInputType === 'number') {
-                                <mat-form-field appearance="outline" class="w-full">
+                                <mat-form-field
+                                  appearance="outline"
+                                  class="w-full"
+                                  [class.workflow-node__field--error]="hasNodeIssues(rule.id, node.id)"
+                                >
                                   <mat-label>Number</mat-label>
                                   <input
                                     matInput
@@ -164,7 +225,11 @@
                                   />
                                 </mat-form-field>
                               } @else if (profile.valueInputType === 'text') {
-                                <mat-form-field appearance="outline" class="w-full">
+                                <mat-form-field
+                                  appearance="outline"
+                                  class="w-full"
+                                  [class.workflow-node__field--error]="hasNodeIssues(rule.id, node.id)"
+                                >
                                   <mat-label>Value</mat-label>
                                   <input
                                     matInput
@@ -182,7 +247,11 @@
                           }
                         }
                         @case ('action-show') {
-                          <mat-form-field appearance="outline" class="w-full">
+                          <mat-form-field
+                            appearance="outline"
+                            class="w-full"
+                            [class.workflow-node__field--error]="hasNodeIssues(rule.id, node.id)"
+                          >
                             <mat-label>Show field</mat-label>
                             <mat-select
                               [value]="node.data.targetFieldId ?? ''"
@@ -196,7 +265,11 @@
                           </mat-form-field>
                         }
                         @case ('action-hide') {
-                          <mat-form-field appearance="outline" class="w-full">
+                          <mat-form-field
+                            appearance="outline"
+                            class="w-full"
+                            [class.workflow-node__field--error]="hasNodeIssues(rule.id, node.id)"
+                          >
                             <mat-label>Hide field</mat-label>
                             <mat-select
                               [value]="node.data.targetFieldId ?? ''"
@@ -210,7 +283,11 @@
                           </mat-form-field>
                         }
                         @case ('action-event') {
-                          <mat-form-field appearance="outline" class="w-full">
+                          <mat-form-field
+                            appearance="outline"
+                            class="w-full"
+                            [class.workflow-node__field--error]="hasNodeIssues(rule.id, node.id)"
+                          >
                             <mat-label>Event name</mat-label>
                             <input
                               matInput
@@ -221,6 +298,9 @@
                             />
                           </mat-form-field>
                         }
+                      }
+                      @for (issue of nodeIssues(rule.id, node.id); track issue.message) {
+                        <p class="workflow-node__error">{{ issue.message }}</p>
                       }
                     </div>
                   </div>

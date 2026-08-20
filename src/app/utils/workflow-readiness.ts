@@ -5,6 +5,8 @@ import { operatorNeedsValue } from './workflow-field-profile';
 export interface WorkflowRuleIssue {
   ruleId: string;
   ruleName: string;
+  /** Node that needs attention; omitted for rule-level issues (e.g. missing action). */
+  nodeId?: string;
   message: string;
 }
 
@@ -20,6 +22,7 @@ export function getWorkflowRuleIssues(
     issues.push({
       ruleId: rule.id,
       ruleName: rule.name,
+      nodeId: trigger?.id,
       message: 'Select a trigger field',
     });
   }
@@ -45,6 +48,7 @@ export function getWorkflowRuleIssues(
         issues.push({
           ruleId: rule.id,
           ruleName: rule.name,
+          nodeId: node.id,
           message: 'Condition value is missing',
         });
       }
@@ -55,6 +59,7 @@ export function getWorkflowRuleIssues(
         issues.push({
           ruleId: rule.id,
           ruleName: rule.name,
+          nodeId: node.id,
           message: 'Select a target field for the show/hide action',
         });
       }
@@ -64,6 +69,7 @@ export function getWorkflowRuleIssues(
       issues.push({
         ruleId: rule.id,
         ruleName: rule.name,
+        nodeId: node.id,
         message: 'Event name is required',
       });
     }
@@ -79,6 +85,13 @@ export function getInvalidWorkflowRuleIssues(
   return rules
     .filter((rule) => rule.enabled)
     .flatMap((rule) => getWorkflowRuleIssues(rule, fields));
+}
+
+export function getFirstInvalidWorkflowIssue(
+  rules: WorkflowRule[],
+  fields: FormField[]
+): WorkflowRuleIssue | undefined {
+  return getInvalidWorkflowRuleIssues(rules, fields)[0];
 }
 
 export function areAllWorkflowRulesValid(

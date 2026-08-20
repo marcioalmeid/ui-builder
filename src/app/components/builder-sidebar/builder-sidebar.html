@@ -8,7 +8,7 @@
         [class.builder-sidebar__context-status--draft]="template.status === 'draft'"
         [class.builder-sidebar__context-status--published]="template.status === 'published'"
       >
-        {{ template.status }} · v{{ template.version }}
+        {{ template.status }}@if (template.version) { · v{{ template.version }} }
       </span>
     </header>
   }
@@ -44,9 +44,6 @@
             <p class="builder-sidebar__section-hint">{{ section.hint }}</p>
 
             @switch (section.id) {
-              @case ('template') {
-                <app-template-selector />
-              }
               @case ('fields') {
                 <app-form-elements-menu />
               }

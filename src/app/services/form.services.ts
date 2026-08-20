@@ -6,10 +6,14 @@ import { DataBinding } from "../models/data-binding";
 import { WorkflowRule, createDefaultWorkflowRule } from "../models/workflow-rule";
 import {
   createEmptyTemplate,
+  RiskPolicy,
+  TASK_TEMPLATE_CONTEXTS,
   TaskTemplate,
   TemplateStatus,
 } from "../models/task-template";
 import { DataSourceService, FetchOptionsResult } from "./data-source.service";
+import { RetroactivityService } from "./retroactivity.service";
+import { normalizeTemplate } from "../utils/retroactivity";
 import { mergeFieldDataSourceUpdate, mergeFieldUpdate } from "../utils/field-data-source";
 import { migrateLegacyVisibilityRules } from "../utils/workflow-migration";
 import { generateAngularFormCode } from "../utils/code-generator";
@@ -39,6 +43,7 @@ interface PersistedState {
 })
 export class FormService {
   private dataSourceService = inject(DataSourceService);
+  private retroactivity = inject(RetroactivityService);
   private _templates = signal<TaskTemplate[]>([]);
   private _activeTemplateId = signal<string>("");
   private _rows = signal<FormRow[]>([]);
@@ -61,6 +66,8 @@ export class FormService {
   public readonly rulesVisited = signal(false);
   public readonly previewJobData = signal<Record<string, unknown>>({});
   public readonly publishFocusRequest = signal(0);
+  /** Last publishFocusRequest count that opened the confirm dialog (survives remounts). */
+  private publishFocusHandled = 0;
   public readonly rulesCanvasFocusRequest = signal(0);
   public readonly activeSetupStep = signal<SetupStepId>("layout");
 
@@ -112,12 +119,44 @@ export class FormService {
     return this._templates().find((t) => t.id === templateId);
   }
 
-  createTemplate(name: string, context: string) {
+  /** True when more than one template shares any context. */
+  hasDuplicateContexts(): boolean {
+    const seen = new Set<string>();
+    for (const template of this._templates()) {
+      if (seen.has(template.context)) return true;
+      seen.add(template.context);
+    }
+    return false;
+  }
+
+  findTemplateByContext(context: string): TaskTemplate | undefined {
+    return this._templates().find((t) => t.context === context);
+  }
+
+  isContextTaken(context: string, exceptTemplateId?: string): boolean {
+    return this._templates().some(
+      (t) => t.context === context && t.id !== exceptTemplateId
+    );
+  }
+
+  createTemplate(
+    name: string,
+    context: string
+  ): { success: boolean; error?: string } {
+    if (this.isContextTaken(context)) {
+      const existing = this.findTemplateByContext(context);
+      return {
+        success: false,
+        error: `Only one active template per department. "${existing?.name ?? context}" already uses this context.`,
+      };
+    }
+
     this.recordUndo();
     const template = createEmptyTemplate(name, context);
     this._templates.set([...this._templates(), template]);
     this.switchTemplate(template.id, false);
     this.focusSidebarSection("fields");
+    return { success: true };
   }
 
   setActiveSetupStep(stepId: SetupStepId) {
@@ -130,9 +169,18 @@ export class FormService {
   }
 
   requestPublishFocus() {
-    this.focusSidebarSection("template");
     this.setActiveSetupStep("publish");
     this.publishFocusRequest.update((count) => count + 1);
+  }
+
+  /** True once per publishFocusRequest tick — safe across TemplateSelector remounts. */
+  consumePublishFocusRequest(): boolean {
+    const count = this.publishFocusRequest();
+    if (count === 0 || count <= this.publishFocusHandled) {
+      return false;
+    }
+    this.publishFocusHandled = count;
+    return true;
   }
 
   requestRulesCanvasFocus() {
@@ -148,14 +196,33 @@ export class FormService {
     this.requestRulesCanvasFocus();
   }
 
-  cloneTemplate(sourceId?: string) {
-    this.recordUndo();
+  cloneTemplate(sourceId?: string): { success: boolean; error?: string } {
     const source =
       this.getTemplate(sourceId ?? this._activeTemplateId()) ??
       this.activeTemplate();
-    if (!source) return;
+    if (!source) {
+      return { success: false, error: 'No template to clone.' };
+    }
 
-    const clone = createEmptyTemplate(`${source.name} (copy)`, source.context);
+    const freeContext = TASK_TEMPLATE_CONTEXTS.find(
+      (ctx) => !this.isContextTaken(ctx.id)
+    );
+    if (!freeContext) {
+      return {
+        success: false,
+        error:
+          'Every department already has an active template. Free a context before cloning.',
+      };
+    }
+
+    this.recordUndo();
+    const contextLabel =
+      TASK_TEMPLATE_CONTEXTS.find((c) => c.id === freeContext.id)?.label ??
+      freeContext.id;
+    const clone = createEmptyTemplate(
+      `${source.name} (${contextLabel})`,
+      freeContext.id
+    );
     clone.layout = structuredClone(source.layout);
     clone.layout.rows = clone.layout.rows.map((row) => ({
       ...row,
@@ -164,6 +231,7 @@ export class FormService {
 
     this._templates.set([...this._templates(), clone]);
     this.switchTemplate(clone.id, false);
+    return { success: true };
   }
 
   switchTemplate(templateId: string, persist = true) {
@@ -179,10 +247,23 @@ export class FormService {
     }
   }
 
-  updateTemplateMeta(name: string, context: string) {
+  updateTemplateMeta(
+    name: string,
+    context: string
+  ): { success: boolean; error?: string } {
     this.assertEditable();
     const active = this.activeTemplate();
-    if (!active) return;
+    if (!active) {
+      return { success: false, error: 'No active template.' };
+    }
+
+    if (this.isContextTaken(context, active.id)) {
+      const existing = this.findTemplateByContext(context);
+      return {
+        success: false,
+        error: `Only one active template per department. "${existing?.name ?? context}" already uses this context.`,
+      };
+    }
 
     const contextChanged = active.context !== context;
 
@@ -198,6 +279,7 @@ export class FormService {
       this.clearSelectedField();
     }
     this.saveState();
+    return { success: true };
   }
 
   undo() {
@@ -218,7 +300,20 @@ export class FormService {
     this.updateUndoFlags();
   }
 
-  publishTemplate(): { success: boolean; errors: string[] } {
+  previewPublish() {
+    this.syncActiveTemplateLayout();
+    const active = this.activeTemplate();
+    if (!active) {
+      return {
+        nextVersion: 1,
+        jobCount: 0,
+        diff: { fieldEvents: [], ruleEvent: null as null },
+      };
+    }
+    return this.retroactivity.preview(active);
+  }
+
+  publishTemplate(policy?: RiskPolicy): { success: boolean; errors: string[] } {
     const active = this.activeTemplate();
     if (!active || active.status === "published") {
       return { success: false, errors: ["This template is already published."] };
@@ -235,18 +330,20 @@ export class FormService {
       return { success: false, errors: validation.errors };
     }
 
+    const riskPolicy = policy ?? active.riskPolicy ?? "ADDITIVE";
+    const committed = this.retroactivity.commit(active, riskPolicy);
+    if (committed.error === "FIELD_ID_REUSED") {
+      return {
+        success: false,
+        errors: [
+          `Field id "${committed.fieldId}" was retired and cannot be reused.`,
+        ],
+      };
+    }
+
     this.recordUndo();
     this._templates.set(
-      this._templates().map((t) =>
-        t.id === active.id
-          ? {
-              ...t,
-              status: "published" as TemplateStatus,
-              version: t.version + 1,
-              updatedAt: Date.now(),
-            }
-          : t
-      )
+      this._templates().map((t) => (t.id === active.id ? committed.template : t))
     );
     this.saveState();
     return { success: true, errors: [] };
@@ -278,6 +375,12 @@ export class FormService {
     } else {
       this.saveState();
     }
+  }
+
+  replaceAllTemplates(templates: TaskTemplate[], activeId: string) {
+    this._templates.set(templates.map(normalizeTemplate));
+    this.switchTemplate(activeId, false);
+    this.saveState();
   }
 
   private assertEditable() {
@@ -767,7 +870,7 @@ export class FormService {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const state = JSON.parse(saved) as PersistedState;
-        this._templates.set(state.templates ?? []);
+        this._templates.set((state.templates ?? []).map(normalizeTemplate));
         this._activeTemplateId.set(state.activeTemplateId);
         const active = this.getTemplate(state.activeTemplateId);
         if (active) {
@@ -819,10 +922,13 @@ export class FormService {
 
     const demo = createNewTaskDemoTemplate();
     this._templates.set([...withoutLegacyDemo, demo]);
+    this.switchTemplate(demo.id, false);
     localStorage.setItem(DEMO_TEMPLATE_SEED_KEY, '1');
     localStorage.removeItem('ui-builder-demo-seeded-v1');
     localStorage.removeItem('ui-builder-demo-seeded-v5');
     localStorage.removeItem('ui-builder-demo-seeded-v6');
+    localStorage.removeItem('ui-builder-demo-seeded-v7');
+    localStorage.removeItem('ui-builder-demo-seeded-v8');
     this.saveState();
   }
 

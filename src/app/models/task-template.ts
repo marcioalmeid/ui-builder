@@ -3,11 +3,17 @@ import { FormRow } from './form';
 import { WorkflowRule } from './workflow-rule';
 
 export type TemplateStatus = 'draft' | 'published';
+export type RiskPolicy = 'NONE' | 'COSMETIC' | 'ADDITIVE';
 
 export interface TaskTemplateLayout {
   rows: FormRow[];
   dataBindings: DataBinding[];
   workflowRules?: WorkflowRule[];
+}
+
+export interface TemplateVersionSnapshot {
+  version: number;
+  layout: TaskTemplateLayout;
 }
 
 export interface TaskTemplate {
@@ -17,6 +23,9 @@ export interface TaskTemplate {
   version: number;
   status: TemplateStatus;
   layout: TaskTemplateLayout;
+  versions?: TemplateVersionSnapshot[];
+  retiredFieldIds?: string[];
+  riskPolicy?: RiskPolicy;
   updatedAt: number;
 }
 
@@ -36,8 +45,11 @@ export function createEmptyTemplate(
     id,
     name,
     context,
-    version: 1,
+    version: 0,
     status: 'draft',
+    versions: [],
+    retiredFieldIds: [],
+    riskPolicy: 'ADDITIVE',
     updatedAt: Date.now(),
     layout: {
       rows: [

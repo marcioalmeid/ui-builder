@@ -1,6 +1,5 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { TemplateSelector } from '../template-selector/template-selector';
 import { FormElementsMenu } from '../form-elements-menu/form-elements-menu';
 import { DataBindingsPanel } from '../data-bindings-panel/data-bindings-panel';
 import { DataChecklist } from '../data-checklist/data-checklist';
@@ -14,8 +13,10 @@ import {
 } from '../../utils/template-context-ui';
 import { setupStepFromSidebarSection } from '../../utils/template-readiness';
 
+type AuthoringSection = Exclude<BuilderSidebarSection, 'template'>;
+
 interface SidebarSectionView {
-  id: BuilderSidebarSection;
+  id: AuthoringSection;
   title: string;
   hint: string;
   relevant: boolean;
@@ -28,7 +29,6 @@ interface SidebarSectionView {
   standalone: true,
   imports: [
     MatIconModule,
-    TemplateSelector,
     FormElementsMenu,
     DataBindingsPanel,
     DataChecklist,
@@ -57,8 +57,7 @@ export class BuilderSidebar {
     const context = this.templateContext();
     const expanded = this.expandedSections();
 
-    const defs: Array<{ id: BuilderSidebarSection; title: string; hint: string }> = [
-      { id: 'template', title: 'Template', hint: 'Switch, publish, and template settings' },
+    const defs: Array<{ id: AuthoringSection; title: string; hint: string }> = [
       { id: 'fields', title: 'Fields', hint: 'Layout & actions at top — Button, then input fields below' },
       {
         id: 'data',
@@ -99,7 +98,7 @@ export class BuilderSidebar {
 
     effect(() => {
       const focus = this.formService.sidebarFocus();
-      if (!focus) return;
+      if (!focus || focus.section === 'template') return;
 
       if (isSidebarSectionRelevant(focus.section, this.templateContext())) {
         this.expandedSections.update((current) => new Set([...current, focus.section]));
@@ -114,7 +113,7 @@ export class BuilderSidebar {
     });
   }
 
-  toggleSection(section: BuilderSidebarSection) {
+  toggleSection(section: AuthoringSection) {
     const context = this.templateContext();
     if (!isSidebarSectionRelevant(section, context)) return;
 
@@ -130,7 +129,7 @@ export class BuilderSidebar {
     });
   }
 
-  isExpanded(section: BuilderSidebarSection): boolean {
+  isExpanded(section: AuthoringSection): boolean {
     return this.expandedSections().has(section);
   }
 }

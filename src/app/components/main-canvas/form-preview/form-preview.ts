@@ -3,7 +3,7 @@ import { FormService } from '../../../services/form.services';
 import { FieldPreview } from '../field-preview/field-preview';
 import { FormRow } from '../../../models/form';
 import { FormField } from '../../../models/field';
-import { TaskTemplate } from '../../../models/task-template';
+import { TaskTemplate, TaskTemplateLayout } from '../../../models/task-template';
 import { getHiddenFieldHints, isFieldVisible } from '../../../utils/field-visibility';
 import { getAllFields } from '../../../utils/template-readiness';
 import {
@@ -19,19 +19,14 @@ import {
 })
 export class FormPreview {
   templateId = input<string>();
+  layout = input<TaskTemplateLayout>();
   interactive = input(false);
   jobData = input<Record<string, unknown>>({});
   fieldValueChange = output<{ fieldId: string; value: unknown }>();
 
   formService = inject(FormService);
 
-  displayRows = computed<FormRow[]>(() => {
-    const id = this.templateId();
-    if (id) {
-      return this.formService.getTemplate(id)?.layout.rows ?? [];
-    }
-    return this.formService.rows();
-  });
+  displayRows = computed<FormRow[]>(() => this.resolvedLayout()?.rows ?? []);
 
   hiddenFieldHints = computed(() => {
     if (!this.interactive()) return [];
@@ -61,11 +56,23 @@ export class FormPreview {
   }
 
   private workflowRules() {
+    return this.resolvedLayout()?.workflowRules ?? [];
+  }
+
+  private resolvedLayout(): TaskTemplateLayout | undefined {
+    const override = this.layout();
+    if (override) return override;
     const id = this.templateId();
     if (id) {
-      return this.formService.getTemplate(id)?.layout.workflowRules ?? [];
+      return this.formService.getTemplate(id)?.layout;
     }
-    return this.formService.workflowRules();
+    const active = this.formService.activeTemplate();
+    if (!active) return undefined;
+    return {
+      rows: this.formService.rows(),
+      dataBindings: this.formService.dataBindings(),
+      workflowRules: this.formService.workflowRules(),
+    };
   }
 
   private activeTemplate(): TaskTemplate | undefined {

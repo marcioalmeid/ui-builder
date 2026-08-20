@@ -16,7 +16,7 @@ export class DataSourceService {
   private http = inject(HttpClient);
   private cache = new Map<string, RadioOption[]>();
 
-  /** Maps mock API paths to static catalog files when the API server is offline */
+  /** Serves the same catalog JSON the mock API would, so `ng serve` works without :3001 */
   private static readonly API_STATIC_FALLBACK: Record<string, string> = {
     '/api/users': '/catalog/users.json',
     '/api/task-types': '/catalog/task-types.json',
@@ -33,14 +33,10 @@ export class DataSourceService {
       return of({ options: this.cache.get(cacheKey)! });
     }
 
-    return this.requestOptions(source).pipe(
-      catchError(() => {
-        const fallbackUrl = this.getStaticFallbackUrl(source.url);
-        if (!fallbackUrl) {
-          return of({ options: [], error: 'Failed to fetch data from API' });
-        }
-        return this.requestOptions({ ...source, url: fallbackUrl });
-      }),
+    const catalogUrl = this.getStaticFallbackUrl(source.url);
+    const resolved = catalogUrl ? { ...source, url: catalogUrl } : source;
+
+    return this.requestOptions(resolved).pipe(
       catchError((err) =>
         of({
           options: [],

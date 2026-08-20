@@ -1,0 +1,45 @@
+<div class="min-h-screen bg-gray-50 p-6">
+  <div class="max-w-5xl mx-auto">
+    <div class="mb-6">
+      <a mat-stroked-button routerLink="/tasks">
+        <mat-icon>arrow_back</mat-icon> All tasks
+      </a>
+      <h1 class="text-2xl font-medium mt-4">New task</h1>
+      <p class="text-sm text-gray-500 mt-1">
+        Choose a published template to fill out and submit.
+      </p>
+    </div>
+
+    @if (publishedTemplates().length === 0) {
+      <div class="bg-white border rounded-lg p-6 text-sm text-gray-600 space-y-3">
+        <p>No published templates yet.</p>
+        <a mat-flat-button color="primary" routerLink="/templates">
+          <mat-icon>dashboard_customize</mat-icon> Go to Templates
+        </a>
+      </div>
+    } @else {
+      <div class="grid gap-3 sm:grid-cols-2">
+        @for (template of publishedTemplates(); track template.id) {
+          <button
+            type="button"
+            class="task-new__card text-left bg-white border rounded-lg p-4 shadow-sm hover:border-blue-300 hover:shadow transition"
+            (click)="startTask(template.id)"
+          >
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <h2 class="font-medium text-gray-900">{{ template.name }}</h2>
+                <p class="text-sm text-gray-500 mt-1">
+                  {{ contextLabel(template.context) }}
+                  @if (template.version) {
+                    · v{{ template.version }}
+                  }
+                </p>
+              </div>
+              <mat-icon class="text-blue-600 shrink-0">play_arrow</mat-icon>
+            </div>
+          </button>
+        }
+      </div>
+    }
+  </div>
+</div>

@@ -133,7 +133,7 @@ export function evaluateWorkflowRules(
   for (const rule of rules.filter((item) => item.enabled)) {
     const chain = getOrderedChain(rule);
     const trigger = chain.find((node) => node.type === 'trigger');
-    if (!trigger?.data.fieldId) continue;
+    if (!trigger?.data?.fieldId) continue;
 
     const triggerFieldId = trigger.data.fieldId;
     let conditionPassed = true;

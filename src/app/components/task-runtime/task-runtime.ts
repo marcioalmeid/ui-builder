@@ -11,6 +11,7 @@ import {
 } from '../../utils/job-validation';
 import { FormField } from '../../models/field';
 import { isFieldVisible } from '../../utils/field-visibility';
+import { lastPublishedLayout, lastPublishedVersion } from '../../utils/retroactivity';
 
 @Component({
   selector: 'app-task-runtime',
@@ -26,6 +27,8 @@ export class TaskRuntime {
 
   templateId = this.route.snapshot.paramMap.get('templateId') ?? '';
   template = this.formService.getTemplate(this.templateId);
+  runtimeLayout = this.template ? lastPublishedLayout(this.template) : undefined;
+  publishedVersion = this.template ? lastPublishedVersion(this.template) : 0;
 
   jobData = signal<Record<string, unknown>>({});
   validationErrors = signal<string[]>([]);
@@ -33,7 +36,7 @@ export class TaskRuntime {
   linkCopied = signal(false);
 
   private templateFields: FormField[] =
-    this.template?.layout.rows.flatMap((row) => row.fields) ?? [];
+    this.runtimeLayout?.rows.flatMap((row) => row.fields) ?? [];
 
   requiredFields = computed(() =>
     this.templateFields.filter(
@@ -41,7 +44,7 @@ export class TaskRuntime {
         f.required &&
         f.type !== 'section-header' &&
         f.type !== 'button' &&
-        isFieldVisible(f, this.jobData(), this.template?.layout.workflowRules ?? [])
+        isFieldVisible(f, this.jobData(), this.runtimeLayout?.workflowRules ?? [])
     )
   );
 
@@ -75,7 +78,7 @@ export class TaskRuntime {
     const errors = validateJobData(
       this.templateFields,
       this.jobData(),
-      this.template.layout.workflowRules ?? []
+      this.runtimeLayout?.workflowRules ?? []
     );
     this.validationErrors.set(errors);
 

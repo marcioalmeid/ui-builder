@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createNewTaskDemoTemplate } from '../catalog/demo-templates';
-import { getAllFields } from './template-readiness';
+import { getAllFields, validateTemplateForPublish } from './template-readiness';
 import { buildInitialJobData } from './job-validation';
 import { getWorkflowEmittedEvents } from './workflow-evaluation';
 
@@ -10,6 +10,15 @@ describe('workflow emitted events', () => {
   const rules = template.layout.workflowRules ?? [];
   const taskType = fields.find((field) => field.label === 'Task type')!;
   const requestType = fields.find((field) => field.label === 'Request type')!;
+
+  it('is ready to publish without extra data mapping', () => {
+    const result = validateTemplateForPublish(
+      template.layout.rows,
+      template.layout.dataBindings,
+      rules
+    );
+    expect(result).toEqual({ valid: true, errors: [] });
+  });
 
   it('returns no events on empty job data', () => {
     const data = buildInitialJobData(fields);
@@ -38,7 +47,7 @@ describe('workflow emitted events', () => {
       eventName: 'campaign.type.selected',
       ruleName: 'Show advertising section when Task type is Digital Advertising',
       templateId: template.id,
-      templateVersion: 1,
+      templateVersion: 0,
       trigger: {
         fieldId: taskType.id,
         label: 'Task type',

@@ -1,25 +1,246 @@
 <h2 mat-dialog-title>Publish template?</h2>
 
-<mat-dialog-content>
-  <p class="mb-3">
-    Publish <strong>{{ data.templateName }}</strong> for operators to use?
-  </p>
+<mat-dialog-content class="publish-dialog">
+  <header class="publish-dialog__hero">
+    <p class="publish-dialog__name">{{ data.templateName }}</p>
+    <p class="publish-dialog__meta">
+      <span class="publish-dialog__pill">v{{ data.nextVersion }}</span>
+      @if (data.jobCount === 0) {
+        <span>No existing jobs</span>
+      } @else {
+        <span>{{ data.jobCount }} linked task(s)</span>
+      }
+    </p>
+  </header>
 
-  <ul class="text-sm text-gray-700 space-y-1 mb-3">
-    <li>{{ data.summary.fieldCount }} field(s) in layout</li>
-    <li>
-      {{ data.summary.configuredApiCount }}/{{ data.summary.apiFieldCount }} API dropdowns configured
-    </li>
-    @if (data.summary.hasConditionalFields) {
-      <li>Includes conditional visibility rules</li>
+  <nav class="publish-dialog__steps" aria-label="Publish steps">
+    <button
+      type="button"
+      class="publish-dialog__step"
+      [class.publish-dialog__step--active]="step() === 'review'"
+      [class.publish-dialog__step--done]="step() === 'migrate'"
+      (click)="goBack()"
+    >
+      <span class="publish-dialog__step-num">1</span>
+      <span class="publish-dialog__step-label">
+        <span class="publish-dialog__step-title">Review</span>
+        <span class="publish-dialog__step-hint">Policy + dry-run</span>
+      </span>
+    </button>
+    <span class="publish-dialog__steps-arrow" aria-hidden="true"></span>
+    <button
+      type="button"
+      class="publish-dialog__step"
+      [class.publish-dialog__step--active]="step() === 'migrate'"
+      [class.publish-dialog__step--disabled]="!showMigrateStep()"
+      [disabled]="!showMigrateStep()"
+      (click)="openMigrateStep()"
+    >
+      <span class="publish-dialog__step-num">2</span>
+      <span class="publish-dialog__step-label">
+        <span class="publish-dialog__step-title">Migrate</span>
+        <span class="publish-dialog__step-hint">
+          @if (showMigrateStep()) {
+            {{ migrateNeededCount() }} task(s)
+          } @else {
+            Not needed
+          }
+        </span>
+      </span>
+    </button>
+  </nav>
+
+  @if (step() === 'review') {
+    @if (isFirstPublish) {
+      <p class="publish-dialog__note">First publish freezes snapshot v1. No migration events.</p>
+    } @else if (showMigrateStep()) {
+      <aside class="publish-dialog__migrate" role="status">
+        <p class="publish-dialog__migrate-title">
+          {{ migrateNeededCount() }} job(s) will need a Migrate step
+        </p>
+        <p class="publish-dialog__migrate-body">
+          Dry-run shows what auto-applies now. Next step can catch jobs up through every pending Migrate step.
+        </p>
+      </aside>
+    } @else if (data.jobCount > 0) {
+      <p class="publish-dialog__note">
+        Existing jobs stay in sync for this publish — no Migrate step needed.
+      </p>
     }
-    @if (!data.summary.previewVisited) {
-      <li class="text-amber-700">Preview not reviewed yet</li>
+
+    <section class="publish-dialog__section" aria-label="Template checklist">
+      <h3 class="publish-dialog__section-title">Checklist</h3>
+      <ul class="publish-dialog__checklist">
+        <li>{{ data.summary.fieldCount }} field(s) in layout</li>
+        <li>
+          {{ data.summary.configuredApiCount }}/{{ data.summary.apiFieldCount }} API dropdowns configured
+        </li>
+        @if (data.summary.hasConditionalFields) {
+          <li>Includes conditional visibility rules</li>
+        }
+        @if (!data.summary.previewVisited) {
+          <li class="publish-dialog__warn">Preview not reviewed yet</li>
+        }
+      </ul>
+    </section>
+
+    <section class="publish-dialog__section" aria-label="Existing jobs policy">
+      <h3 class="publish-dialog__section-title">On publish, update existing jobs with</h3>
+      <mat-radio-group
+        class="publish-dialog__policy-options"
+        [ngModel]="policy()"
+        (ngModelChange)="policy.set($event)"
+      >
+        <mat-radio-button class="publish-dialog__policy-option" value="ADDITIVE">
+          <span class="publish-dialog__policy-option-text">
+            <strong>Text + new optional fields</strong>
+            <span class="publish-dialog__policy-option-hint">
+              Rename fields (labels &amp; hints) now, and new optional fields appear empty on old jobs.
+            </span>
+          </span>
+        </mat-radio-button>
+        <mat-radio-button class="publish-dialog__policy-option" value="COSMETIC">
+          <span class="publish-dialog__policy-option-text">
+            <strong>Text only — labels &amp; hints</strong>
+            <span class="publish-dialog__policy-option-hint">
+              Rename fields now. New fields stay hidden until Migrate.
+            </span>
+          </span>
+        </mat-radio-button>
+        <mat-radio-button class="publish-dialog__policy-option" value="NONE">
+          <span class="publish-dialog__policy-option-text">
+            <strong>Nothing (keep old form text)</strong>
+            <span class="publish-dialog__policy-option-hint">
+              Jobs keep current labels, hints, and fields. Everything waits for Migrate.
+            </span>
+          </span>
+        </mat-radio-button>
+      </mat-radio-group>
+      <p class="publish-dialog__policy-footnote">
+        Rule changes (show/hide) never auto-apply here — use the Migrate step.
+      </p>
+    </section>
+
+    @if (hasDryRun()) {
+      <section class="publish-dialog__section" aria-label="Dry-run preview">
+        <div class="publish-dialog__section-head">
+          <h3 class="publish-dialog__section-title">Dry-run</h3>
+          <span class="publish-dialog__section-sub">No writes until Publish</span>
+        </div>
+
+        <ul class="publish-dialog__diff">
+          @for (row of fieldRows(); track row.event.id) {
+            <li class="publish-dialog__diff-row">
+              <div class="publish-dialog__diff-main">
+                <span class="publish-dialog__channel">Layout</span>
+                <span class="publish-dialog__diff-title">{{ row.title }}</span>
+                <span class="publish-dialog__diff-detail">{{ row.detail }}</span>
+              </div>
+              <div class="publish-dialog__diff-tags">
+                <span
+                  class="publish-dialog__tag"
+                  [class.publish-dialog__tag--breaking]="row.event.class === 'BREAKING' || row.event.class === 'STRUCTURAL'"
+                  [class.publish-dialog__tag--safe]="row.event.class === 'COSMETIC' || row.event.class === 'ADDITIVE'"
+                >
+                  {{ row.event.class }}
+                </span>
+                <span
+                  class="publish-dialog__tag"
+                  [class.publish-dialog__tag--auto]="row.auto"
+                  [class.publish-dialog__tag--blocked]="!row.auto"
+                >
+                  {{ row.auto ? 'auto-apply' : 'blocked' }}
+                </span>
+              </div>
+            </li>
+          }
+
+          @if (ruleRow(); as rule) {
+            <li class="publish-dialog__diff-row">
+              <div class="publish-dialog__diff-main">
+                <span class="publish-dialog__channel publish-dialog__channel--behavior">Behavior</span>
+                <span class="publish-dialog__diff-title">{{ rule.title }}</span>
+                <span class="publish-dialog__diff-detail">Visibility / events</span>
+              </div>
+              <div class="publish-dialog__diff-tags">
+                <span
+                  class="publish-dialog__tag"
+                  [class.publish-dialog__tag--breaking]="rule.event.class === 'BREAKING'"
+                  [class.publish-dialog__tag--safe]="rule.event.class === 'SAFE'"
+                >
+                  {{ rule.event.class }}
+                </span>
+                <span
+                  class="publish-dialog__tag"
+                  [class.publish-dialog__tag--auto]="rule.auto && rule.autoJobs === data.jobs.length"
+                  [class.publish-dialog__tag--blocked]="!rule.auto || rule.autoJobs < data.jobs.length"
+                >
+                  {{ rule.tag }}
+                </span>
+              </div>
+            </li>
+          }
+        </ul>
+      </section>
+    } @else if (!isFirstPublish) {
+      <p class="publish-dialog__empty">No layout or rule changes in this publish.</p>
     }
-  </ul>
+  } @else {
+    <section class="publish-dialog__section" aria-label="Migrate existing jobs">
+      <h3 class="publish-dialog__section-title">Existing jobs</h3>
+      <p class="publish-dialog__note publish-dialog__note--flush">
+        Catch-up applies pending layout events and every behavior step in order (pin +1 each time). Breaking versions are never skipped.
+      </p>
+
+      <mat-radio-group
+        class="publish-dialog__migrate-options"
+        [ngModel]="migrateNow()"
+        (ngModelChange)="migrateNow.set($event)"
+      >
+        <mat-radio-button class="publish-dialog__migrate-option" [value]="true">
+          <span class="publish-dialog__migrate-option-text">
+            <strong>Publish + catch up now</strong>
+            <span class="publish-dialog__migrate-option-hint">
+              Bring {{ migrateNeededCount() }} job(s) to the latest published version.
+            </span>
+          </span>
+        </mat-radio-button>
+        <mat-radio-button class="publish-dialog__migrate-option" [value]="false">
+          <span class="publish-dialog__migrate-option-text">
+            <strong>Publish only</strong>
+            <span class="publish-dialog__migrate-option-hint">
+              Jobs stay behind. Migrate later from each job page (one step at a time).
+            </span>
+          </span>
+        </mat-radio-button>
+      </mat-radio-group>
+
+      <ul class="publish-dialog__job-list">
+        @for (job of migrateJobs(); track job.id) {
+          <li class="publish-dialog__job-row">
+            <span class="publish-dialog__job-name">{{ job.label }}</span>
+            <span class="publish-dialog__job-pins">
+              pin {{ job.pinBefore }}
+              →
+              @if (migrateNow()) {
+                {{ job.pinAfterMigrate }}
+              } @else {
+                {{ job.pinAfterPublish }}
+                <span class="publish-dialog__tag publish-dialog__tag--blocked">needs Migrate</span>
+              }
+            </span>
+          </li>
+        }
+      </ul>
+    </section>
+  }
+
+  @if (data.reuseError) {
+    <p class="publish-dialog__alert" role="alert">{{ data.reuseError }}</p>
+  }
 
   @if (data.errors.length) {
-    <ul class="text-sm text-red-700 bg-red-50 border border-red-100 rounded p-3 list-disc pl-5">
+    <ul class="publish-dialog__alert publish-dialog__alert--list" role="alert">
       @for (error of data.errors; track error) {
         <li>{{ error }}</li>
       }
@@ -28,14 +249,18 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-button type="button" (click)="cancel()">Cancel</button>
+  @if (step() === 'migrate') {
+    <button mat-button type="button" (click)="goBack()">Back</button>
+  } @else {
+    <button mat-button type="button" (click)="cancel()">Cancel</button>
+  }
   <button
     mat-flat-button
     color="primary"
     type="button"
-    [disabled]="data.errors.length > 0"
-    (click)="confirm()"
+    [disabled]="data.errors.length > 0 || !!data.reuseError"
+    (click)="goNext()"
   >
-    Publish
+    {{ primaryLabel() }}
   </button>
 </mat-dialog-actions>
