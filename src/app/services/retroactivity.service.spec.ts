@@ -53,6 +53,7 @@ describe('RetroactivityService dry-run vs commit', () => {
       data: { title: 'x' },
       events: [],
       submittedAt: 1,
+      status: 'todo',
       appliedFieldEventIds: [],
       appliedRuleEventIds: [],
     });
@@ -89,6 +90,7 @@ describe('RetroactivityService dry-run vs commit', () => {
       data: { title: 'x' },
       events: [],
       submittedAt: 1,
+      status: 'todo',
       appliedFieldEventIds: [],
       appliedRuleEventIds: [],
     });

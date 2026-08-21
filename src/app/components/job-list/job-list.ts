@@ -1,20 +1,47 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import {
+  CdkDragDrop,
+  DragDropModule,
+} from '@angular/cdk/drag-drop';
 import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { FormField } from '../../models/field';
-import { JobSubmission } from '../../models/job-submission';
+import {
+  JobSubmission,
+  TASK_STATUSES,
+  TaskStatus,
+  normalizeTaskStatus,
+} from '../../models/job-submission';
 import { JobService } from '../../services/job.service';
 import { FormService } from '../../services/form.services';
 import { RetroactivityService } from '../../services/retroactivity.service';
 import { getAllLayoutFields } from '../../utils/retroactivity';
 
 const HIDDEN_FIELD_TYPES = new Set(['section-header', 'button']);
+const VIEW_MODE_KEY = 'tasks-view-mode';
+
+type TasksViewMode = 'list' | 'kanban';
+
+const STATUS_LABELS: Record<TaskStatus, string> = {
+  todo: 'To do',
+  in_progress: 'In progress',
+  done: 'Done',
+};
 
 @Component({
   selector: 'app-job-list',
   standalone: true,
-  imports: [RouterLink, MatButtonModule, MatIconModule],
+  imports: [
+    RouterLink,
+    MatButtonModule,
+    MatButtonToggleModule,
+    MatIconModule,
+    MatMenuModule,
+    DragDropModule,
+  ],
   templateUrl: './job-list.html',
   styleUrl: './job-list.css',
 })
@@ -24,17 +51,64 @@ export class JobList {
   private readonly retroactivity = inject(RetroactivityService);
   private readonly router = inject(Router);
 
+  readonly statuses = TASK_STATUSES;
+  readonly statusLabels = STATUS_LABELS;
+  readonly connectedLists = TASK_STATUSES.map((status) => `kanban-${status}`);
+
+  viewMode = signal<TasksViewMode>(readViewMode());
+
   tasks = computed(() => this.jobService.list());
+
+  tasksByStatus = computed(() => {
+    const groups: Record<TaskStatus, JobSubmission[]> = {
+      todo: [],
+      in_progress: [],
+      done: [],
+    };
+    for (const task of this.tasks()) {
+      groups[normalizeTaskStatus(task.status)].push(task);
+    }
+    return groups;
+  });
 
   private readonly startableTemplates = computed(() =>
     this.formService.templates().filter((t) => t.status === 'published')
   );
+
+  setViewMode(mode: TasksViewMode) {
+    this.viewMode.set(mode);
+    try {
+      localStorage.setItem(VIEW_MODE_KEY, mode);
+    } catch {
+      // ignore quota / private mode failures
+    }
+  }
+
+  onViewModeChange(mode: TasksViewMode | null) {
+    if (mode === 'list' || mode === 'kanban') {
+      this.setViewMode(mode);
+    }
+  }
 
   formatDate(timestamp: number): string {
     return new Date(timestamp).toLocaleString(undefined, {
       dateStyle: 'medium',
       timeStyle: 'short',
     });
+  }
+
+  statusLabel(status: TaskStatus | undefined): string {
+    return STATUS_LABELS[normalizeTaskStatus(status)];
+  }
+
+  taskStatus(task: JobSubmission): TaskStatus {
+    return normalizeTaskStatus(task.status);
+  }
+
+  setTaskStatus(task: JobSubmission, status: TaskStatus, event?: Event) {
+    event?.preventDefault();
+    event?.stopPropagation();
+    this.jobService.updateStatus(task.id, status);
   }
 
   createTask() {
@@ -98,6 +172,18 @@ export class JobList {
     }
   }
 
+  onKanbanDrop(event: CdkDragDrop<JobSubmission[]>, targetStatus: TaskStatus) {
+    if (event.previousContainer === event.container) {
+      return;
+    }
+
+    const task = (event.item.data as JobSubmission | undefined)
+      ?? event.previousContainer.data[event.previousIndex];
+    if (!task) return;
+
+    this.jobService.updateStatus(task.id, targetStatus);
+  }
+
   private titleValue(task: JobSubmission): string {
     const field = this.titleField(this.fieldsFor(task));
     if (!field) return '';
@@ -115,6 +201,16 @@ export class JobList {
     const template = this.formService.getTemplate(task.templateId);
     return template ? getAllLayoutFields(template.layout) : [];
   }
+}
+
+function readViewMode(): TasksViewMode {
+  try {
+    const stored = localStorage.getItem(VIEW_MODE_KEY);
+    if (stored === 'list' || stored === 'kanban') return stored;
+  } catch {
+    // ignore
+  }
+  return 'list';
 }
 
 function formatStoredValue(field: FormField | undefined, value: unknown): string {

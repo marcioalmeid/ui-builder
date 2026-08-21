@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { JobSubmission } from '../models/job-submission';
+import { JobSubmission, normalizeTaskStatus } from '../models/job-submission';
 
 const JOB_KEY_PREFIX = 'job-data-';
 
@@ -38,6 +38,7 @@ export class JobRepository {
           data: parsed.data ?? {},
           events: parsed.events ?? [],
           submittedAt: parsed.submittedAt ?? 0,
+          status: normalizeTaskStatus(parsed.status),
           appliedFieldEventIds: parsed.appliedFieldEventIds ?? [],
           appliedRuleEventIds: parsed.appliedRuleEventIds ?? [],
         });

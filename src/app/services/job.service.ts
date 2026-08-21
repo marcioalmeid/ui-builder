@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { FormField } from '../models/field';
-import { JobSubmission } from '../models/job-submission';
+import { JobSubmission, TaskStatus, normalizeTaskStatus } from '../models/job-submission';
 import { JobRepository } from './job.repository';
 import { FormService } from './form.services';
 import { RetroactivityService } from './retroactivity.service';
@@ -43,6 +43,7 @@ export class JobService {
       data,
       events,
       submittedAt: Date.now(),
+      status: 'todo',
       appliedFieldEventIds: [],
       appliedRuleEventIds: [],
     };
@@ -68,12 +69,23 @@ export class JobService {
       data,
       events: structuredClone(source.events),
       submittedAt: Date.now(),
+      status: 'todo',
       appliedFieldEventIds: [...(source.appliedFieldEventIds ?? [])],
       appliedRuleEventIds: [...(source.appliedRuleEventIds ?? [])],
     };
 
     this.repository.save(clone);
     return clone;
+  }
+
+  updateStatus(taskId: string, status: TaskStatus): JobSubmission | undefined {
+    const job = this.repository.getById(taskId);
+    if (!job) return undefined;
+    const next = normalizeTaskStatus(status);
+    if (job.status === next) return job;
+    const updated = { ...job, status: next };
+    this.repository.save(updated);
+    return updated;
   }
 
   /** Append " (Copy)" to the task title field so clones are recognizable in the list. */

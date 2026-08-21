@@ -7,7 +7,7 @@ import {
   TemplateVersionSnapshot,
 } from '../models/task-template';
 import { WorkflowRule } from '../models/workflow-rule';
-import { JobSubmission } from '../models/job-submission';
+import { JobSubmission, normalizeTaskStatus } from '../models/job-submission';
 
 export type FieldChangeClass = 'COSMETIC' | 'ADDITIVE' | 'STRUCTURAL' | 'BREAKING';
 export type RuleChangeClass = 'SAFE' | 'BREAKING';
@@ -483,6 +483,7 @@ export function canMigrateJob(
 export function normalizeJob(job: JobSubmission): JobSubmission {
   return {
     ...job,
+    status: normalizeTaskStatus(job.status),
     appliedFieldEventIds: job.appliedFieldEventIds ?? [],
     appliedRuleEventIds: job.appliedRuleEventIds ?? [],
   };

@@ -15,29 +15,72 @@
     </button>
   </header>
 
-  <section class="tasks-hub__section" aria-labelledby="my-tasks-heading">
+  <section
+    class="tasks-hub__section"
+    [class.tasks-hub__section--board]="viewMode() === 'kanban'"
+    aria-labelledby="my-tasks-heading"
+  >
     <div class="tasks-hub__section-head">
       <h2 id="my-tasks-heading" class="tasks-hub__section-title">
         Your tasks
         <span class="tasks-hub__count">{{ tasks().length }}</span>
       </h2>
+
+      <mat-button-toggle-group
+        class="tasks-hub__view-toggles"
+        [value]="viewMode()"
+        (valueChange)="onViewModeChange($event)"
+        hideSingleSelectionIndicator="true"
+        aria-label="Tasks view"
+      >
+        <mat-button-toggle value="list">
+          <mat-icon>view_list</mat-icon>
+          List
+        </mat-button-toggle>
+        <mat-button-toggle value="kanban">
+          <mat-icon>view_kanban</mat-icon>
+          Board
+        </mat-button-toggle>
+      </mat-button-toggle-group>
     </div>
 
     @if (tasks().length === 0) {
       <div class="tasks-hub__empty">
         <p>No submissions yet. Use New task to create your first one.</p>
       </div>
-    } @else {
+    } @else if (viewMode() === 'list') {
       <div class="tasks-hub__list">
         @for (task of tasks(); track task.id) {
           <article class="tasks-hub__item">
             <div class="tasks-hub__item-main">
               <h3 class="tasks-hub__item-title">{{ taskTitle(task) }}</h3>
-                @if (showTemplateSubtitle(task)) {
-                  <p class="tasks-hub__item-sub">{{ templateLabel(task) }}</p>
-                }
+              @if (showTemplateSubtitle(task)) {
+                <p class="tasks-hub__item-sub">{{ templateLabel(task) }}</p>
+              }
               <p class="tasks-hub__item-meta">
                 <span>{{ formatDate(task.submittedAt) }}</span>
+                <button
+                  type="button"
+                  class="tasks-hub__status"
+                  [attr.data-status]="task.status"
+                  [matMenuTriggerFor]="statusMenu"
+                  [attr.aria-label]="'Change status, currently ' + statusLabel(task.status)"
+                >
+                  {{ statusLabel(task.status) }}
+                  <mat-icon class="tasks-hub__status-caret">expand_more</mat-icon>
+                </button>
+                <mat-menu #statusMenu="matMenu">
+                  @for (status of statuses; track status) {
+                    <button
+                      mat-menu-item
+                      type="button"
+                      [disabled]="taskStatus(task) === status"
+                      (click)="setTaskStatus(task, status, $event)"
+                    >
+                      {{ statusLabels[status] }}
+                    </button>
+                  }
+                </mat-menu>
                 @if (needsUpdate(task)) {
                   <span class="tasks-hub__badge">Needs update</span>
                 }
@@ -55,6 +98,52 @@
               </button>
             </div>
           </article>
+        }
+      </div>
+    } @else {
+      <div class="tasks-hub__board">
+        @for (status of statuses; track status) {
+          <section class="tasks-hub__column" [attr.aria-label]="statusLabels[status]">
+            <header class="tasks-hub__column-head">
+              <h3 class="tasks-hub__column-title">{{ statusLabels[status] }}</h3>
+              <span class="tasks-hub__count">{{ tasksByStatus()[status].length }}</span>
+            </header>
+
+            <div
+              class="tasks-hub__column-body"
+              cdkDropList
+              [id]="'kanban-' + status"
+              [cdkDropListData]="tasksByStatus()[status]"
+              [cdkDropListConnectedTo]="connectedLists"
+              (cdkDropListDropped)="onKanbanDrop($event, status)"
+            >
+              @for (task of tasksByStatus()[status]; track task.id) {
+                <article class="tasks-hub__card" cdkDrag [cdkDragData]="task">
+                  <div class="tasks-hub__card-main" cdkDragHandle>
+                    <h4 class="tasks-hub__card-title">{{ taskTitle(task) }}</h4>
+                    @if (showTemplateSubtitle(task)) {
+                      <p class="tasks-hub__item-sub">{{ templateLabel(task) }}</p>
+                    }
+                    <p class="tasks-hub__item-meta">
+                      <span>{{ formatDate(task.submittedAt) }}</span>
+                      @if (needsUpdate(task)) {
+                        <span class="tasks-hub__badge">Needs update</span>
+                      }
+                    </p>
+                  </div>
+                  <div class="tasks-hub__item-actions">
+                    <a mat-flat-button color="primary" [routerLink]="['/tasks', task.id]">
+                      Open
+                    </a>
+                    <button mat-stroked-button type="button" (click)="cloneTask(task, $event)">
+                      <mat-icon>content_copy</mat-icon> Clone
+                    </button>
+                  </div>
+                  <div *cdkDragPlaceholder class="tasks-hub__card-placeholder"></div>
+                </article>
+              }
+            </div>
+          </section>
         }
       </div>
     }
