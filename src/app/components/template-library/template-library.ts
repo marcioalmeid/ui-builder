@@ -9,10 +9,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDialog } from '@angular/material/dialog';
 import { FormService } from '../../services/form.services';
 import { JobService } from '../../services/job.service';
-import { ScenarioSeedService } from '../../services/scenario-seed.service';
 import { NewTemplateDialog } from '../new-template-dialog/new-template-dialog';
 import { TASK_TEMPLATE_CONTEXTS, TaskTemplate } from '../../models/task-template';
-import { scenarioGuide } from '../../catalog/scenario-seeds';
 
 type StatusFilter = 'all' | 'draft' | 'published';
 
@@ -34,17 +32,11 @@ type StatusFilter = 'all' | 'draft' | 'published';
 export class TemplateLibrary {
   private readonly formService = inject(FormService);
   private readonly jobService = inject(JobService);
-  private readonly scenarios = inject(ScenarioSeedService);
   private readonly dialog = inject(MatDialog);
   private readonly router = inject(Router);
 
   search = signal('');
   statusFilter = signal<StatusFilter>('all');
-  showDevTools = signal(false);
-  selectedSpikeId = signal('s1-baseline');
-
-  spikePacks = computed(() => this.scenarios.listPacks());
-  loadedSpikeId = computed(() => this.scenarios.currentPackId());
 
   filteredTemplates = computed(() => {
     const q = this.search().trim().toLowerCase();
@@ -107,23 +99,5 @@ export class TemplateLibrary {
     }
     const id = this.formService.activeTemplateId();
     if (id) void this.router.navigate(['/builder', id]);
-  }
-
-  loadSelectedScenario() {
-    const pack = this.scenarios.installScenario(this.selectedSpikeId());
-    if (!pack) {
-      window.alert('Unknown spike scenario.');
-      return;
-    }
-    void this.router.navigate(['/builder', pack.template.id]);
-  }
-
-  guideFor(template: TaskTemplate) {
-    return scenarioGuide(template.name);
-  }
-
-  seedJobId(template: TaskTemplate): string | null {
-    if (template.name.startsWith('[S0]')) return null;
-    return `${template.id}-seed-job`;
   }
 }

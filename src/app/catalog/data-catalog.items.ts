@@ -21,7 +21,7 @@ const ID_NAME: EntityFieldDefinition[] = [
 
 ];
 
-/** Catalog sources for the advertising task template demo (mock API: /api/*) */
+/** Catalog sources available in the data picker (mock API: /api/* → /catalog/*.json). */
 export const DATA_CATALOG: DataCatalogItem[] = [
   {
     id: 'users',

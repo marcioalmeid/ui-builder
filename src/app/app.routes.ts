@@ -39,7 +39,7 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./components/task-runtime/task-runtime').then((m) => m.TaskRuntime),
   },
-  // Legacy aliases — keep spike / bookmarked links working
+  // Legacy aliases — keep bookmarked /jobs links working
   { path: 'jobs', redirectTo: 'tasks', pathMatch: 'full' },
   { path: 'jobs/:taskId', redirectTo: 'tasks/:taskId' },
 ];

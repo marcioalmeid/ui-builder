@@ -33,7 +33,6 @@ export class TaskRuntime {
   jobData = signal<Record<string, unknown>>({});
   validationErrors = signal<string[]>([]);
   submitted = signal(false);
-  linkCopied = signal(false);
 
   private templateFields: FormField[] =
     this.runtimeLayout?.rows.flatMap((row) => row.fields) ?? [];
@@ -92,12 +91,5 @@ export class TaskRuntime {
     this.jobData.set(buildInitialJobData(this.templateFields));
     this.validationErrors.set([]);
     this.submitted.set(false);
-  }
-
-  async copyRunLink() {
-    const url = `${window.location.origin}/run/${this.templateId}`;
-    await navigator.clipboard.writeText(url);
-    this.linkCopied.set(true);
-    setTimeout(() => this.linkCopied.set(false), 2000);
   }
 }

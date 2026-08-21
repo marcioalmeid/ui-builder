@@ -27,7 +27,7 @@
                 <span class="text-amber-700">Update available</span>
               }
             } @else {
-              <span class="text-red-600">Template missing — reopen from Tasks after reloading a scenario</span>
+              <span class="text-red-600">Template missing</span>
             }
           </p>
         } @else {
@@ -74,8 +74,8 @@
 
     @if (job() && !template()) {
       <div class="text-sm text-red-800 bg-red-50 border border-red-100 rounded p-4">
-        This task points to a template that no longer exists (often after loading another spike scenario).
-        Go back to Tasks or load the matching scenario again from Templates → Spike tools.
+        This task points to a template that no longer exists.
+        Go back to Tasks or open Templates to recreate it.
       </div>
     }
 

@@ -49,29 +49,6 @@ export class NewTemplateDialog {
     this.dialogRef.close(this.formService.activeTemplateId());
   }
 
-  startFromDemo() {
-    this.error.set(null);
-    const demo = this.formService
-      .templates()
-      .find(
-        (t) =>
-          t.name.includes('New Task') && !t.name.startsWith('[S')
-      );
-    if (!demo) {
-      this.error.set(
-        'Demo template not found. Create a blank template in a free department instead.'
-      );
-      return;
-    }
-    const result = this.formService.cloneTemplate(demo.id);
-    if (!result.success) {
-      this.error.set(result.error ?? 'Could not duplicate demo.');
-      return;
-    }
-    this.formService.focusSidebarSection('fields');
-    this.dialogRef.close(this.formService.activeTemplateId());
-  }
-
   cancel() {
     this.dialogRef.close(false);
   }

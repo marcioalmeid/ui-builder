@@ -8,7 +8,6 @@ import { JobService } from '../../services/job.service';
 import { FormService } from '../../services/form.services';
 import { RetroactivityService } from '../../services/retroactivity.service';
 import { getAllLayoutFields } from '../../utils/retroactivity';
-import { TASK_TEMPLATE_CONTEXTS } from '../../models/task-template';
 
 const HIDDEN_FIELD_TYPES = new Set(['section-header', 'button']);
 
@@ -27,19 +26,9 @@ export class JobList {
 
   tasks = computed(() => this.jobService.list());
 
-  publishedTemplates = computed(() =>
-    this.formService
-      .templates()
-      .filter((t) => t.status === 'published')
-      .filter((t) => !t.name.startsWith('[S')) // keep spike templates in Templates studio
+  private readonly startableTemplates = computed(() =>
+    this.formService.templates().filter((t) => t.status === 'published')
   );
-
-  /** Include spike published templates so the hub is never empty after seed. */
-  startableTemplates = computed(() => {
-    const preferred = this.publishedTemplates();
-    if (preferred.length > 0) return preferred;
-    return this.formService.templates().filter((t) => t.status === 'published');
-  });
 
   formatDate(timestamp: number): string {
     return new Date(timestamp).toLocaleString(undefined, {
@@ -48,14 +37,13 @@ export class JobList {
     });
   }
 
-  contextLabel(contextId: string): string {
-    return (
-      TASK_TEMPLATE_CONTEXTS.find((c) => c.id === contextId)?.label ?? contextId
-    );
-  }
-
-  startTask(templateId: string) {
-    void this.router.navigate(['/run', templateId]);
+  createTask() {
+    const templates = this.startableTemplates();
+    if (templates.length === 1) {
+      void this.router.navigate(['/run', templates[0].id]);
+      return;
+    }
+    void this.router.navigate(['/tasks/new']);
   }
 
   taskTitle(task: JobSubmission): string {

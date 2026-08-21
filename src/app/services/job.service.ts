@@ -117,7 +117,7 @@ export class JobService {
     );
   }
 
-  /** Drop tasks whose template was removed (e.g. replaced by a spike scenario). */
+  /** Drop tasks whose template was removed. */
   pruneOrphanJobs(): number {
     const jobs = this.repository.list();
     const kept = jobs.filter((job) => Boolean(this.formService.getTemplate(job.templateId)));

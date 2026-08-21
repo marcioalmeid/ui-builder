@@ -6,17 +6,22 @@
       </a>
       <div class="studio-toolbar__identity">
         @if (active.status === 'draft') {
-          <mat-form-field appearance="outline" class="studio-toolbar__name" subscriptSizing="dynamic">
-            <mat-label>Name</mat-label>
-            <input matInput [(ngModel)]="editName" (blur)="saveTemplateSettings()" />
-          </mat-form-field>
-          <mat-form-field appearance="outline" class="studio-toolbar__context" subscriptSizing="dynamic">
+          <mat-form-field
+            appearance="outline"
+            class="studio-toolbar__context"
+            subscriptSizing="dynamic"
+            [style.width]="contextSelectWidth()"
+          >
             <mat-label>Context</mat-label>
             <mat-select [(ngModel)]="editContext" (selectionChange)="saveTemplateSettings()">
               @for (ctx of editableContexts(); track ctx.id) {
                 <mat-option [value]="ctx.id">{{ ctx.label }}</mat-option>
               }
             </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="studio-toolbar__name" subscriptSizing="dynamic">
+            <mat-label>Name</mat-label>
+            <input matInput [(ngModel)]="editName" (blur)="saveTemplateSettings()" />
           </mat-form-field>
         } @else {
           <div>
@@ -99,7 +104,7 @@
         <button mat-button type="button" (click)="dismissPublishSuccess()">Dismiss</button>
       </div>
     } @else {
-      <p>Next: test as an operator or share the run link.</p>
+      <p>Next: test as an operator or open Tasks.</p>
       <div class="studio-toolbar__banner-actions">
         <a mat-flat-button color="primary" [routerLink]="['/run', active.id]">
           <mat-icon>play_arrow</mat-icon> Test as operator

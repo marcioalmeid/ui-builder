@@ -3,53 +3,17 @@
     <div class="tasks-hub__hero-copy">
       <p class="tasks-hub__eyebrow">Operator workspace</p>
       <h1 class="tasks-hub__title">Tasks</h1>
-      <p class="tasks-hub__lede">
-        Start a task from a published template, then open, edit, or clone your submissions.
-      </p>
     </div>
-    <a mat-flat-button color="primary" routerLink="/tasks/new" class="tasks-hub__cta">
+    <button
+      mat-flat-button
+      color="primary"
+      type="button"
+      class="tasks-hub__cta"
+      (click)="createTask()"
+    >
       <mat-icon>add</mat-icon> New task
-    </a>
+    </button>
   </header>
-
-  <section class="tasks-hub__section" aria-labelledby="start-task-heading">
-    <div class="tasks-hub__section-head">
-      <h2 id="start-task-heading" class="tasks-hub__section-title">Start a task</h2>
-      <a mat-button routerLink="/tasks/new">See all templates</a>
-    </div>
-
-    @if (startableTemplates().length === 0) {
-      <div class="tasks-hub__empty">
-        <p>No published templates yet.</p>
-        <a mat-stroked-button routerLink="/templates">
-          <mat-icon>dashboard_customize</mat-icon> Open Templates studio
-        </a>
-      </div>
-    } @else {
-      <div class="tasks-hub__catalog">
-        @for (template of startableTemplates().slice(0, 6); track template.id) {
-          <button
-            type="button"
-            class="tasks-hub__catalog-card"
-            (click)="startTask(template.id)"
-          >
-            <span class="tasks-hub__catalog-icon" aria-hidden="true">
-              <mat-icon>play_circle</mat-icon>
-            </span>
-            <span class="tasks-hub__catalog-body">
-              <span class="tasks-hub__catalog-name">{{ template.name }}</span>
-              <span class="tasks-hub__catalog-meta">
-                {{ contextLabel(template.context) }}
-                @if (template.version) {
-                  · v{{ template.version }}
-                }
-              </span>
-            </span>
-          </button>
-        }
-      </div>
-    }
-  </section>
 
   <section class="tasks-hub__section" aria-labelledby="my-tasks-heading">
     <div class="tasks-hub__section-head">
@@ -61,7 +25,7 @@
 
     @if (tasks().length === 0) {
       <div class="tasks-hub__empty">
-        <p>No submissions yet. Pick a template above to create your first task.</p>
+        <p>No submissions yet. Use New task to create your first one.</p>
       </div>
     } @else {
       <div class="tasks-hub__list">

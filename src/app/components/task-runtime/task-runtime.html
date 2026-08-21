@@ -14,17 +14,9 @@
           <h1 class="text-2xl font-medium mt-4 text-red-600">Template not found</h1>
         }
       </div>
-      <div class="flex flex-wrap gap-2">
-        @if (template) {
-          <button mat-stroked-button type="button" (click)="copyRunLink()">
-            <mat-icon>link</mat-icon>
-            {{ linkCopied() ? 'Link copied' : 'Copy run link' }}
-          </button>
-        }
-        @if (template?.status === 'published' && !submitted()) {
-          <button mat-flat-button color="primary" (click)="submitTask()">Submit task</button>
-        }
-      </div>
+      @if (template?.status === 'published' && !submitted()) {
+        <button mat-flat-button color="primary" (click)="submitTask()">Submit task</button>
+      }
     </div>
 
     @if (template && !submitted() && requiredFields().length) {

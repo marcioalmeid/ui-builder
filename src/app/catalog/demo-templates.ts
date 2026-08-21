@@ -329,5 +329,3 @@ export function createNewTaskDemoTemplate(): TaskTemplate {
 export function createAdvertisingDemoTemplate(): TaskTemplate {
   return createNewTaskDemoTemplate();
 }
-
-export const DEMO_TEMPLATE_SEED_KEY = 'ui-builder-demo-seeded-v9';

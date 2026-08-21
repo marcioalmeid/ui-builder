@@ -22,10 +22,6 @@ import {
   SetupStepId,
   validateTemplateForPublish,
 } from "../utils/template-readiness";
-import {
-  createNewTaskDemoTemplate,
-  DEMO_TEMPLATE_SEED_KEY,
-} from "../catalog/demo-templates";
 
 export type BuilderSidebarSection = "template" | "fields" | "data" | "rules";
 
@@ -103,7 +99,7 @@ export class FormService {
 
   constructor() {
     this.loadState();
-    this.seedDemoTemplateIfNeeded();
+    this.purgeSpikeArtifacts();
 
     if (this._templates().length === 0) {
       const template = createEmptyTemplate("General Task", "general");
@@ -117,16 +113,6 @@ export class FormService {
 
   getTemplate(templateId: string): TaskTemplate | undefined {
     return this._templates().find((t) => t.id === templateId);
-  }
-
-  /** True when more than one template shares any context. */
-  hasDuplicateContexts(): boolean {
-    const seen = new Set<string>();
-    for (const template of this._templates()) {
-      if (seen.has(template.context)) return true;
-      seen.add(template.context);
-    }
-    return false;
   }
 
   findTemplateByContext(context: string): TaskTemplate | undefined {
@@ -910,25 +896,25 @@ export class FormService {
     }
   }
 
-  private seedDemoTemplateIfNeeded() {
-    const currentSeed = localStorage.getItem(DEMO_TEMPLATE_SEED_KEY);
-    if (currentSeed === '1') return;
+  /**
+   * Drop spike scenario templates ([S0]…[S8]) and clear their flags.
+   * Does not touch data catalog sources — only seeded spike templates.
+   */
+  private purgeSpikeArtifacts() {
+    localStorage.removeItem('ui-builder-scenarios-v1');
+    localStorage.removeItem('ui-builder-scenarios-v2');
 
-    const withoutLegacyDemo = this._templates().filter(
-      (t) =>
-        t.name !== 'Digital Advertising Task' &&
-        t.name !== 'New Task (Advertising)'
-    );
+    const before = this._templates();
+    const kept = before.filter((t) => !t.name.startsWith('[S'));
+    if (kept.length === before.length) return;
 
-    const demo = createNewTaskDemoTemplate();
-    this._templates.set([...withoutLegacyDemo, demo]);
-    this.switchTemplate(demo.id, false);
-    localStorage.setItem(DEMO_TEMPLATE_SEED_KEY, '1');
-    localStorage.removeItem('ui-builder-demo-seeded-v1');
-    localStorage.removeItem('ui-builder-demo-seeded-v5');
-    localStorage.removeItem('ui-builder-demo-seeded-v6');
-    localStorage.removeItem('ui-builder-demo-seeded-v7');
-    localStorage.removeItem('ui-builder-demo-seeded-v8');
+    this._templates.set(kept);
+    const activeStillThere = kept.some((t) => t.id === this._activeTemplateId());
+    if (!activeStillThere) {
+      this._activeTemplateId.set(kept[0]?.id ?? '');
+      const active = this.getTemplate(this._activeTemplateId());
+      if (active) this.loadTemplateLayout(active);
+    }
     this.saveState();
   }
 

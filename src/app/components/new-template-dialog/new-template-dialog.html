@@ -26,15 +26,10 @@
   @if (error(); as message) {
     <p class="text-sm text-red-700 bg-red-50 border border-red-100 rounded p-2">{{ message }}</p>
   }
-
-  <p class="text-sm text-gray-600">
-    Or duplicate the pre-built demo into a <strong>free</strong> department.
-  </p>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
   <button mat-button type="button" (click)="cancel()">Cancel</button>
-  <button mat-stroked-button type="button" (click)="startFromDemo()">Duplicate demo</button>
   <button
     mat-flat-button
     color="primary"

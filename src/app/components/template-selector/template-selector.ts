@@ -58,6 +58,15 @@ export class TemplateSelector {
   publishMigrateCount = signal(0);
   publishHighlight = signal(false);
 
+  /** Fit the Context select to the selected label (+ room for arrow / padding). */
+  contextSelectWidth(): string {
+    const label =
+      TASK_TEMPLATE_CONTEXTS.find((c) => c.id === this.editContext)?.label ??
+      this.editContext;
+    const chars = Math.max(label.length, 'Context'.length);
+    return `calc(${chars}ch + 2.75rem)`;
+  }
+
   linkedJobCount = computed(() => {
     const id = this.formService.activeTemplate()?.id;
     return id ? this.jobService.listByTemplate(id).length : 0;
