@@ -1,10 +1,15 @@
 import { Injectable, inject } from '@angular/core';
+import { FormField } from '../models/field';
 import { JobSubmission } from '../models/job-submission';
 import { JobRepository } from './job.repository';
 import { FormService } from './form.services';
 import { RetroactivityService } from './retroactivity.service';
 import { getWorkflowEmittedEvents } from '../utils/workflow-evaluation';
-import { lastPublishedLayout, lastPublishedVersion } from '../utils/retroactivity';
+import {
+  getAllLayoutFields,
+  lastPublishedLayout,
+  lastPublishedVersion,
+} from '../utils/retroactivity';
 
 @Injectable({
   providedIn: 'root',
@@ -51,13 +56,16 @@ export class JobService {
     const source = this.repository.getById(jobId);
     if (!source) return undefined;
 
+    const data = structuredClone(source.data);
+    this.markCloneTitle(source.templateId, data);
+
     const clone: JobSubmission = {
       id: `${source.templateId}-${Date.now()}`,
       templateId: source.templateId,
       templateVersion: source.templateVersion,
       templateName:
         this.formService.getTemplate(source.templateId)?.name ?? source.templateName,
-      data: structuredClone(source.data),
+      data,
       events: structuredClone(source.events),
       submittedAt: Date.now(),
       appliedFieldEventIds: [...(source.appliedFieldEventIds ?? [])],
@@ -66,6 +74,28 @@ export class JobService {
 
     this.repository.save(clone);
     return clone;
+  }
+
+  /** Append " (Copy)" to the task title field so clones are recognizable in the list. */
+  private markCloneTitle(templateId: string, data: Record<string, unknown>): void {
+    const template = this.formService.getTemplate(templateId);
+    if (!template) return;
+
+    const fields = getAllLayoutFields(template.layout);
+    const titleField = this.titleField(fields);
+    if (!titleField) return;
+
+    const current = data[titleField.id];
+    const base =
+      typeof current === 'string' && current.trim() ? current.trim() : 'Untitled';
+    data[titleField.id] = `${base} (Copy)`;
+  }
+
+  private titleField(fields: FormField[]): FormField | undefined {
+    return (
+      fields.find((field) => field.required && field.type === 'text') ??
+      fields.find((field) => field.type === 'text')
+    );
   }
 
   getById(jobId: string): JobSubmission | undefined {
