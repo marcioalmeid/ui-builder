@@ -283,20 +283,83 @@
                           </mat-form-field>
                         }
                         @case ('action-event') {
-                          <mat-form-field
-                            appearance="outline"
-                            class="w-full"
+                          <div
+                            class="workflow-event-config"
                             [class.workflow-node__field--error]="hasNodeIssues(rule.id, node.id)"
                           >
-                            <mat-label>Event name</mat-label>
-                            <input
-                              matInput
-                              [ngModel]="node.data.eventName ?? ''"
-                              (ngModelChange)="updateNode(rule, node.id, { eventName: $event })"
-                              placeholder="campaign.type.selected"
-                              [readonly]="formService.isReadonly()"
+                            <app-event-catalog-picker
+                              [selectedId]="eventCatalogSelectionId(node)"
+                              [context]="templateContext()"
+                              label="Event"
+                              [disabled]="formService.isReadonly()"
+                              [invalid]="hasNodeIssues(rule.id, node.id)"
+                              (selectionChange)="onEventCatalogChange(rule, node.id, $event)"
                             />
-                          </mat-form-field>
+
+                            @if (eventKind(node) === 'email') {
+                              <p class="workflow-node__hint">
+                                Intent: {{ eventKindLabel(node) }} — consumer sends the message
+                              </p>
+                              <mat-form-field appearance="outline" class="w-full">
+                                <mat-label>To</mat-label>
+                                <input
+                                  matInput
+                                  [ngModel]="node.data.eventConfig?.email?.to ?? ''"
+                                  (ngModelChange)="onEventEmailChange(rule, node.id, { to: $event })"
+                                  placeholder="ops@example.com"
+                                  [readonly]="formService.isReadonly()"
+                                />
+                              </mat-form-field>
+                              <mat-form-field appearance="outline" class="w-full">
+                                <mat-label>Subject</mat-label>
+                                <input
+                                  matInput
+                                  [ngModel]="node.data.eventConfig?.email?.subject ?? ''"
+                                  (ngModelChange)="onEventEmailChange(rule, node.id, { subject: $event })"
+                                  placeholder="Workflow match"
+                                  [readonly]="formService.isReadonly()"
+                                />
+                              </mat-form-field>
+                              <mat-form-field appearance="outline" class="w-full">
+                                <mat-label>Body</mat-label>
+                                <textarea
+                                  matInput
+                                  rows="2"
+                                  [ngModel]="node.data.eventConfig?.email?.body ?? ''"
+                                  (ngModelChange)="onEventEmailChange(rule, node.id, { body: $event })"
+                                  [readonly]="formService.isReadonly()"
+                                ></textarea>
+                              </mat-form-field>
+                            }
+
+                            @if (eventKind(node) === 'api') {
+                              <p class="workflow-node__hint">
+                                Intent: {{ eventKindLabel(node) }} — consumer performs the HTTP call
+                              </p>
+                              <mat-form-field appearance="outline" class="w-full">
+                                <mat-label>Method</mat-label>
+                                <mat-select
+                                  [value]="node.data.eventConfig?.api?.method ?? 'POST'"
+                                  (valueChange)="onEventApiChange(rule, node.id, { method: $event })"
+                                  [disabled]="formService.isReadonly()"
+                                >
+                                  @for (method of ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']; track method) {
+                                    <mat-option [value]="method">{{ method }}</mat-option>
+                                  }
+                                </mat-select>
+                              </mat-form-field>
+                              <mat-form-field appearance="outline" class="w-full">
+                                <mat-label>URL</mat-label>
+                                <input
+                                  matInput
+                                  [ngModel]="node.data.eventConfig?.api?.url ?? ''"
+                                  (ngModelChange)="onEventApiChange(rule, node.id, { url: $event })"
+                                  placeholder="/api/integrations/..."
+                                  [readonly]="formService.isReadonly()"
+                                />
+                              </mat-form-field>
+                            }
+                          </div>
                         }
                       }
                       @for (issue of nodeIssues(rule.id, node.id); track issue.message) {

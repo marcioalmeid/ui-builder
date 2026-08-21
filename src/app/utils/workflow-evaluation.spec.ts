@@ -45,6 +45,7 @@ describe('workflow emitted events', () => {
     expect(events).toHaveLength(1);
     expect(events[0]).toMatchObject({
       eventName: 'campaign.type.selected',
+      kind: 'signal',
       ruleName: 'Show advertising section when Task type is Digital Advertising',
       templateId: template.id,
       templateVersion: 0,
@@ -57,7 +58,7 @@ describe('workflow emitted events', () => {
         operator: 'equals',
         value: 'digital-advertising',
       },
-      payload: {},
+      payload: { kind: 'signal' },
     });
     expect(events[0].timestamp).toBe(new Date(1_700_000_000_000).toISOString());
   });
@@ -82,6 +83,65 @@ describe('workflow emitted events', () => {
       fieldId: requestType.id,
       label: 'Request type',
       value: 'budget-change',
+    });
+  });
+
+  it('builds email intent payload from catalog defaults', () => {
+    const emailRule = {
+      id: 'email-rule',
+      name: 'Notify ops',
+      enabled: true,
+      nodes: [
+        {
+          id: 't1',
+          type: 'trigger' as const,
+          position: { x: 0, y: 0 },
+          data: { fieldId: taskType.id },
+        },
+        {
+          id: 'c1',
+          type: 'condition' as const,
+          position: { x: 220, y: 0 },
+          data: { operator: 'equals' as const, value: 'digital-advertising' },
+        },
+        {
+          id: 'e1',
+          type: 'action-event' as const,
+          position: { x: 440, y: 0 },
+          data: {
+            eventCatalogId: 'notify.ops.email',
+            eventName: 'notify.ops.email',
+            eventConfig: {
+              email: {
+                to: 'ops@example.com',
+                subject: 'Workflow match: {{ruleName}}',
+                body: 'Rule matched on field {{triggerLabel}} = {{triggerValue}}',
+              },
+            },
+          },
+        },
+      ],
+      edges: [
+        { id: 'edge1', source: 't1', target: 'c1' },
+        { id: 'edge2', source: 'c1', target: 'e1' },
+      ],
+    };
+
+    const events = getWorkflowEmittedEvents(
+      [emailRule],
+      { ...buildInitialJobData(fields), [taskType.id]: 'digital-advertising' },
+      { fields }
+    );
+
+    expect(events).toHaveLength(1);
+    expect(events[0].kind).toBe('email');
+    expect(events[0].payload).toMatchObject({
+      kind: 'email',
+      email: {
+        to: 'ops@example.com',
+        subject: 'Workflow match: Notify ops',
+        body: 'Rule matched on field Task type = digital-advertising',
+      },
     });
   });
 });

@@ -1,0 +1,17 @@
+:host {
+  display: block;
+}
+
+:host ::ng-deep .event-catalog-picker--invalid .mdc-notched-outline__leading,
+:host ::ng-deep .event-catalog-picker--invalid .mdc-notched-outline__notch,
+:host ::ng-deep .event-catalog-picker--invalid .mdc-notched-outline__trailing {
+  border-color: #ef4444 !important;
+}
+
+.event-catalog-picker__kind {
+  margin-left: auto;
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+}

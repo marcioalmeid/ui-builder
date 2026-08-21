@@ -2,12 +2,15 @@ import { ApiDataSource, FormField, RadioOption } from '../models/field';
 import { TaskTemplate } from '../models/task-template';
 import { WorkflowRule } from '../models/workflow-rule';
 import { DATA_CATALOG } from './data-catalog.items';
+import { EVENT_CATALOG, resolveEventName } from './event-catalog.items';
 import { createShowFieldsWorkflowRule } from '../utils/workflow-migration';
 
-function appendEmitEventToRule(rule: WorkflowRule, eventName: string): WorkflowRule {
+function appendEmitEventToRule(rule: WorkflowRule, eventCatalogId: string): WorkflowRule {
   const lastNode = rule.nodes[rule.nodes.length - 1];
   if (!lastNode) return rule;
 
+  const catalogItem = EVENT_CATALOG.find((entry) => entry.id === eventCatalogId);
+  const eventName = catalogItem ? resolveEventName(catalogItem) : eventCatalogId;
   const eventId = crypto.randomUUID();
   return {
     ...rule,
@@ -17,7 +20,7 @@ function appendEmitEventToRule(rule: WorkflowRule, eventName: string): WorkflowR
         id: eventId,
         type: 'action-event',
         position: { x: (lastNode.position.x ?? 0) + 220, y: 0 },
-        data: { eventName },
+        data: { eventCatalogId, eventName },
       },
     ],
     edges: [

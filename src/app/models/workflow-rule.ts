@@ -28,7 +28,12 @@ export interface WorkflowNodeData {
   operator?: WorkflowConditionOperator;
   value?: string;
   targetFieldId?: string;
+  /** Catalog id from EVENT_CATALOG (preferred over free-text eventName). */
+  eventCatalogId?: string;
+  /** Wire name emitted at runtime (resolved from catalog when eventCatalogId is set). */
   eventName?: string;
+  /** Overrides for email/api catalog defaults. */
+  eventConfig?: import('./workflow-event').WorkflowEventConfig;
 }
 
 export interface WorkflowEdge {

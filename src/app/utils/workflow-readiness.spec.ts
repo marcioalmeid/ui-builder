@@ -61,4 +61,29 @@ describe('workflow-readiness', () => {
     expect(first?.ruleName).toBe('Bad');
     expect(first?.nodeId).toBeTruthy();
   });
+
+  it('requires a catalog event on emit actions', () => {
+    const rule: WorkflowRule = {
+      ...createDefaultWorkflowRule('Emit'),
+      nodes: [
+        {
+          id: 't1',
+          type: 'trigger',
+          position: { x: 0, y: 0 },
+          data: { fieldId: 'f1' },
+        },
+        {
+          id: 'e1',
+          type: 'action-event',
+          position: { x: 220, y: 0 },
+          data: {},
+        },
+      ],
+    };
+
+    const issues = getWorkflowRuleIssues(rule, [textField('f1')]);
+    expect(issues.some((issue) => issue.message === 'Select an event from the catalog')).toBe(
+      true
+    );
+  });
 });

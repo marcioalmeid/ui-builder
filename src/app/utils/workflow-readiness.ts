@@ -1,5 +1,6 @@
 import { FormField } from '../models/field';
 import { WorkflowRule } from '../models/workflow-rule';
+import { EVENT_CATALOG } from '../catalog/event-catalog.items';
 import { operatorNeedsValue } from './workflow-field-profile';
 
 export interface WorkflowRuleIssue {
@@ -8,6 +9,14 @@ export interface WorkflowRuleIssue {
   /** Node that needs attention; omitted for rule-level issues (e.g. missing action). */
   nodeId?: string;
   message: string;
+}
+
+function hasResolvableEvent(node: WorkflowRule['nodes'][number]): boolean {
+  const catalogId = node.data.eventCatalogId?.trim();
+  if (catalogId && EVENT_CATALOG.some((item) => item.id === catalogId)) {
+    return true;
+  }
+  return Boolean(node.data.eventName?.trim());
 }
 
 export function getWorkflowRuleIssues(
@@ -65,12 +74,12 @@ export function getWorkflowRuleIssues(
       }
     }
 
-    if (node.type === 'action-event' && !node.data.eventName?.trim()) {
+    if (node.type === 'action-event' && !hasResolvableEvent(node)) {
       issues.push({
         ruleId: rule.id,
         ruleName: rule.name,
         nodeId: node.id,
-        message: 'Event name is required',
+        message: 'Select an event from the catalog',
       });
     }
   }

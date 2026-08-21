@@ -5,6 +5,13 @@ import {
   WorkflowNode,
   WorkflowRule,
 } from '../models/workflow-rule';
+import {
+  EVENT_CATALOG,
+  EventCatalogItem,
+  EventCatalogKind,
+  resolveEventKind,
+  resolveEventName,
+} from '../catalog/event-catalog.items';
 
 export interface WorkflowEvaluationContext {
   fields?: FormField[];
@@ -17,6 +24,107 @@ export interface WorkflowEvaluationResult {
   shownFieldIds: Set<string>;
   hiddenFieldIds: Set<string>;
   events: WorkflowEmittedEvent[];
+}
+
+function resolveCatalogItem(node: WorkflowNode): EventCatalogItem | undefined {
+  const catalogId = node.data.eventCatalogId?.trim();
+  if (catalogId) {
+    return EVENT_CATALOG.find((entry) => entry.id === catalogId);
+  }
+  const eventName = node.data.eventName?.trim();
+  if (!eventName) return undefined;
+  return EVENT_CATALOG.find(
+    (entry) => resolveEventName(entry) === eventName || entry.id === eventName
+  );
+}
+
+function resolveNodeEventName(node: WorkflowNode): string {
+  const item = resolveCatalogItem(node);
+  if (item) return resolveEventName(item);
+  return node.data.eventName?.trim() ?? '';
+}
+
+function resolveNodeEventKind(node: WorkflowNode): EventCatalogKind {
+  const item = resolveCatalogItem(node);
+  return item ? resolveEventKind(item) : 'signal';
+}
+
+/** Replace `{{token}}` placeholders with values from the template map. */
+function applyTemplate(input: string, vars: Record<string, string>): string {
+  return input.replace(/\{\{\s*([\w.-]+)\s*\}\}/g, (_, key: string) => vars[key] ?? '');
+}
+
+function buildTemplateVars(
+  rule: WorkflowRule,
+  triggerFieldId: string,
+  triggerLabel: string,
+  data: Record<string, unknown>
+): Record<string, string> {
+  const vars: Record<string, string> = {
+    ruleName: rule.name,
+    ruleId: rule.id,
+    triggerFieldId,
+    triggerLabel,
+    triggerValue: String(data[triggerFieldId] ?? ''),
+  };
+  for (const [fieldId, value] of Object.entries(data)) {
+    vars[fieldId] = String(value ?? '');
+  }
+  return vars;
+}
+
+function buildEventPayload(
+  node: WorkflowNode,
+  rule: WorkflowRule,
+  triggerFieldId: string,
+  triggerLabel: string,
+  data: Record<string, unknown>
+): Record<string, unknown> {
+  const item = resolveCatalogItem(node);
+  const kind = item ? resolveEventKind(item) : 'signal';
+  const vars = buildTemplateVars(rule, triggerFieldId, triggerLabel, data);
+  const config = node.data.eventConfig;
+  const payload: Record<string, unknown> = { kind };
+
+  if (item?.includeFieldIds?.length) {
+    const fields: Record<string, unknown> = {};
+    for (const fieldId of item.includeFieldIds) {
+      fields[fieldId] = data[fieldId];
+    }
+    payload['fields'] = fields;
+  }
+
+  if (kind === 'email') {
+    const email = {
+      to: config?.email?.to ?? item?.email?.to ?? '',
+      subject: config?.email?.subject ?? item?.email?.subject ?? '',
+      body: config?.email?.body ?? item?.email?.body ?? '',
+    };
+    payload['email'] = {
+      to: applyTemplate(email.to, vars),
+      subject: applyTemplate(email.subject, vars),
+      body: applyTemplate(email.body, vars),
+    };
+  }
+
+  if (kind === 'api') {
+    const api = {
+      url: config?.api?.url ?? item?.api?.url ?? '',
+      method: config?.api?.method ?? item?.api?.method ?? 'POST',
+      body: { ...(item?.api?.body ?? {}), ...(config?.api?.body ?? {}) },
+    };
+    const body: Record<string, string> = {};
+    for (const [key, value] of Object.entries(api.body)) {
+      body[key] = applyTemplate(value, vars);
+    }
+    payload['api'] = {
+      url: applyTemplate(api.url, vars),
+      method: api.method,
+      body,
+    };
+  }
+
+  return payload;
 }
 
 function isEmptyValue(value: unknown): boolean {
@@ -98,16 +206,18 @@ function buildEmittedEvent(
   const triggerField = context?.fields?.find((field) => field.id === triggerFieldId);
   const conditionNode = chain.find((item) => item.type === 'condition');
   const emittedAt = context?.emittedAt ?? Date.now();
+  const triggerLabel = triggerField?.label ?? triggerFieldId;
 
   return {
-    eventName: node.data.eventName!.trim(),
+    eventName: resolveNodeEventName(node),
+    kind: resolveNodeEventKind(node),
     ruleId: rule.id,
     ruleName: rule.name,
     templateId: context?.templateId,
     templateVersion: context?.templateVersion,
     trigger: {
       fieldId: triggerFieldId,
-      label: triggerField?.label ?? triggerFieldId,
+      label: triggerLabel,
       value: data[triggerFieldId],
     },
     condition: conditionNode
@@ -116,7 +226,7 @@ function buildEmittedEvent(
           value: conditionNode.data.value ?? '',
         }
       : undefined,
-    payload: {},
+    payload: buildEventPayload(node, rule, triggerFieldId, triggerLabel, data),
     timestamp: new Date(emittedAt).toISOString(),
   };
 }
@@ -156,7 +266,7 @@ export function evaluateWorkflowRules(
         shownFieldIds.delete(node.data.targetFieldId);
       }
 
-      if (node.type === 'action-event' && node.data.eventName?.trim()) {
+      if (node.type === 'action-event' && resolveNodeEventName(node)) {
         events.push(
           buildEmittedEvent(rule, triggerFieldId, chain, node, data, context)
         );
@@ -184,7 +294,21 @@ export function formatWorkflowEventSummary(event: WorkflowEmittedEvent): string 
     event.trigger.value === '' || event.trigger.value == null
       ? '(empty)'
       : String(event.trigger.value);
-  return `${event.trigger.label} = ${triggerValue}`;
+  const trigger = `${event.trigger.label} = ${triggerValue}`;
+
+  if (event.kind === 'email') {
+    const to = (event.payload['email'] as { to?: string } | undefined)?.to;
+    return to ? `email → ${to} · ${trigger}` : `email · ${trigger}`;
+  }
+  if (event.kind === 'api') {
+    const api = event.payload['api'] as { method?: string; url?: string } | undefined;
+    if (api?.method && api?.url) {
+      return `${api.method} ${api.url} · ${trigger}`;
+    }
+    return `api · ${trigger}`;
+  }
+
+  return trigger;
 }
 
 export function isShowTargetField(

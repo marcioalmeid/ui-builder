@@ -8,6 +8,13 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { FormService } from '../../services/form.services';
 import { DataCatalogService } from '../../services/data-catalog.service';
+import { EventCatalogService } from '../../services/event-catalog.service';
+import {
+  EventCatalogItem,
+  EVENT_KIND_META,
+  resolveEventKind,
+  resolveEventName,
+} from '../../catalog/event-catalog.items';
 import {
   WORKFLOW_NODE_META,
   WorkflowConditionOperator,
@@ -15,6 +22,7 @@ import {
   WorkflowNodeType,
   WorkflowRule,
 } from '../../models/workflow-rule';
+import { WorkflowEventConfig } from '../../models/workflow-event';
 import { getAllFields } from '../../utils/template-readiness';
 import { evaluateWorkflowRules, formatWorkflowEventSummary } from '../../utils/workflow-evaluation';
 import {
@@ -28,6 +36,7 @@ import {
   getWorkflowRuleIssues,
   WorkflowRuleIssue,
 } from '../../utils/workflow-readiness';
+import { EventCatalogPicker } from '../event-catalog-picker/event-catalog-picker';
 
 @Component({
   selector: 'app-workflow-builder',
@@ -40,6 +49,7 @@ import {
     MatInputModule,
     MatSelectModule,
     MatSlideToggleModule,
+    EventCatalogPicker,
   ],
   templateUrl: './workflow-builder.html',
   styleUrl: './workflow-builder.css',
@@ -47,9 +57,13 @@ import {
 export class WorkflowBuilder {
   formService = inject(FormService);
   private catalogService = inject(DataCatalogService);
+  private eventCatalogService = inject(EventCatalogService);
 
   rules = computed(() => this.formService.workflowRules());
   fields = computed(() => getAllFields(this.formService.rows()));
+  templateContext = computed(
+    () => this.formService.activeTemplate()?.context ?? 'general'
+  );
   triggerFields = computed(() =>
     this.fields().filter((field) => field.type !== 'section-header' && field.type !== 'button')
   );
@@ -207,6 +221,85 @@ export class WorkflowBuilder {
     this.updateNode(rule, nodeId, { value });
   }
 
+  /** Prefer catalog id; fall back to matching free-text eventName for older rules. */
+  eventCatalogSelectionId(node: WorkflowNode): string {
+    if (node.data.eventCatalogId) return node.data.eventCatalogId;
+    const eventName = node.data.eventName?.trim();
+    if (!eventName) return '';
+    return this.eventCatalogService.getByEventName(eventName)?.id ?? '';
+  }
+
+  eventCatalogItem(node: WorkflowNode): EventCatalogItem | undefined {
+    const id = this.eventCatalogSelectionId(node);
+    return id ? this.eventCatalogService.getById(id) : undefined;
+  }
+
+  eventKind(node: WorkflowNode) {
+    const item = this.eventCatalogItem(node);
+    return item ? resolveEventKind(item) : 'signal';
+  }
+
+  eventKindLabel(node: WorkflowNode): string {
+    return EVENT_KIND_META[this.eventKind(node)].label;
+  }
+
+  onEventCatalogChange(rule: WorkflowRule, nodeId: string, item: EventCatalogItem) {
+    const kind = resolveEventKind(item);
+    const eventConfig: WorkflowEventConfig | undefined =
+      kind === 'email'
+        ? { email: { ...(item.email ?? {}) } }
+        : kind === 'api'
+          ? {
+              api: {
+                url: item.api?.url ?? '',
+                method: item.api?.method ?? 'POST',
+                body: item.api?.body ? { ...item.api.body } : undefined,
+              },
+            }
+          : undefined;
+
+    this.updateNode(rule, nodeId, {
+      eventCatalogId: item.id,
+      eventName: resolveEventName(item),
+      eventConfig,
+    });
+  }
+
+  onEventEmailChange(
+    rule: WorkflowRule,
+    nodeId: string,
+    patch: Partial<NonNullable<WorkflowEventConfig['email']>>
+  ) {
+    const node = rule.nodes.find((item) => item.id === nodeId);
+    if (!node) return;
+    this.updateNode(rule, nodeId, {
+      eventConfig: {
+        ...node.data.eventConfig,
+        email: { ...node.data.eventConfig?.email, ...patch },
+      },
+    });
+  }
+
+  onEventApiChange(
+    rule: WorkflowRule,
+    nodeId: string,
+    patch: Partial<NonNullable<WorkflowEventConfig['api']>>
+  ) {
+    const node = rule.nodes.find((item) => item.id === nodeId);
+    if (!node) return;
+    const current = node.data.eventConfig?.api;
+    this.updateNode(rule, nodeId, {
+      eventConfig: {
+        ...node.data.eventConfig,
+        api: {
+          url: patch.url ?? current?.url ?? '',
+          method: patch.method ?? current?.method ?? 'POST',
+          body: patch.body ?? current?.body,
+        },
+      },
+    });
+  }
+
   updateNode(rule: WorkflowRule, nodeId: string, data: WorkflowNode['data']) {
     this.formService.updateWorkflowRule(rule.id, {
       nodes: rule.nodes.map((node) =>
@@ -260,8 +353,31 @@ export class WorkflowBuilder {
       case 'action-show':
       case 'action-hide':
         return { targetFieldId: this.targetFields()[0]?.id ?? '' };
-      case 'action-event':
-        return { eventName: 'field.updated' };
+      case 'action-event': {
+        const fallback =
+          this.eventCatalogService.getById('field.updated') ??
+          this.eventCatalogService.getForContext(this.templateContext())[0];
+        if (!fallback) {
+          return { eventName: 'field.updated' };
+        }
+        const kind = resolveEventKind(fallback);
+        return {
+          eventCatalogId: fallback.id,
+          eventName: resolveEventName(fallback),
+          eventConfig:
+            kind === 'email'
+              ? { email: { ...(fallback.email ?? {}) } }
+              : kind === 'api'
+                ? {
+                    api: {
+                      url: fallback.api?.url ?? '',
+                      method: fallback.api?.method ?? 'POST',
+                      body: fallback.api?.body ? { ...fallback.api.body } : undefined,
+                    },
+                  }
+                : undefined,
+        };
+      }
     }
   }
 }
