@@ -63,7 +63,7 @@ export const DATA_CATALOG: DataCatalogItem[] = [
     description: 'Where the campaign runs',
     icon: 'devices',
     category: 'Advertising',
-    contexts: ['advertising'],
+    contexts: ['general', 'advertising', 'print', 'social'],
     dataSource: {
       url: '/api/platforms',
       method: 'GET',
@@ -78,7 +78,7 @@ export const DATA_CATALOG: DataCatalogItem[] = [
     description: 'What needs to happen on the campaign',
     icon: 'list_alt',
     category: 'Advertising',
-    contexts: ['advertising'],
+    contexts: ['general', 'advertising', 'print', 'social'],
     dataSource: {
       url: '/api/request-types',
       method: 'GET',
@@ -93,7 +93,7 @@ export const DATA_CATALOG: DataCatalogItem[] = [
     description: 'External vendors for media buys',
     icon: 'store',
     category: 'Advertising',
-    contexts: ['advertising'],
+    contexts: ['general', 'advertising', 'print', 'social'],
     dataSource: {
       url: '/api/vendors',
       method: 'GET',
@@ -108,7 +108,7 @@ export const DATA_CATALOG: DataCatalogItem[] = [
     description: 'Budget lines for spend tracking',
     icon: 'payments',
     category: 'Advertising',
-    contexts: ['advertising'],
+    contexts: ['general', 'advertising', 'print', 'social'],
     dataSource: {
       url: '/api/budget-line-items',
       method: 'GET',
