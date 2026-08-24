@@ -11,7 +11,7 @@
   >
     @for (category of categories(); track category) {
       <mat-optgroup [label]="category">
-        @for (item of catalogService.getByCategory(category, context()); track item.id) {
+        @for (item of catalogService.getByCategory(category, department()); track item.id) {
           <mat-option [value]="item.id">
             <span class="flex items-center gap-2">
               <mat-icon class="!text-base !w-4 !h-4">{{ item.icon }}</mat-icon>

@@ -76,8 +76,8 @@ export class DataSourceEditor {
     return this.sharedLists().find((binding) => binding.id === bindingId);
   });
 
-  templateContext = computed(
-    () => this.formService.activeTemplate()?.context ?? 'general'
+  firstDepartment = computed(
+    () => this.formService.activeTemplate()?.departments?.[0] ?? ''
   );
 
   loading = signal(false);

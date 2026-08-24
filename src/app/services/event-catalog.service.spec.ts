@@ -4,8 +4,8 @@ import { EventCatalogService } from './event-catalog.service';
 describe('EventCatalogService', () => {
   const service = new EventCatalogService();
 
-  it('filters by advertising context', () => {
-    const ids = service.getForContext('advertising').map((item) => item.id);
+  it('filters by Digital Ads department', () => {
+    const ids = service.getForContext('Digital Ads').map((item) => item.id);
     expect(ids).toContain('campaign.type.selected');
     expect(ids).toContain('budget.change.requested');
     expect(ids).toContain('field.updated');
@@ -24,8 +24,8 @@ describe('EventCatalogService', () => {
     expect(service.getById('webhook.task.sync')?.api?.method).toBe('POST');
   });
 
-  it('lists categories for a context', () => {
-    const categories = service.getCategories('advertising');
+  it('lists categories for a department', () => {
+    const categories = service.getCategories('Digital Ads');
     expect(categories).toContain('Campaign');
     expect(categories).toContain('Budget');
     expect(categories).toContain('Integrations');

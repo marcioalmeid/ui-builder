@@ -28,22 +28,22 @@ describe('FormService', () => {
     expect(service.activeTemplateId()).toBeTruthy();
   });
 
-  it('allows only one active template per department context', () => {
-    const first = service.createTemplate('Ads A', 'print');
+  it('allows only one active template per department', () => {
+    const first = service.createTemplate('Ads A', ['print']);
     expect(first.success).toBe(true);
 
-    const second = service.createTemplate('Ads B', 'print');
+    const second = service.createTemplate('Ads B', ['print']);
     expect(second.success).toBe(false);
     expect(second.error).toMatch(/one active template/i);
 
     const clone = service.cloneTemplate();
     expect(clone.success).toBe(true);
     const cloned = service.activeTemplate();
-    expect(cloned?.context).not.toBe('print');
+    expect(cloned?.departments).not.toContain('print');
   });
 
   it('adds and looks up a field via the cached index', () => {
-    expect(service.createTemplate('My Form', 'general').success).toBe(true);
+    expect(service.createTemplate('My Form', ['general']).success).toBe(true);
     const rowId = service.rows()[0].id;
     const field = makeTextField(crypto.randomUUID(), 'Title');
     service.addField(field, rowId);
@@ -55,7 +55,7 @@ describe('FormService', () => {
   });
 
   it('updateField is undoable (regression #1)', () => {
-    expect(service.createTemplate('My Form', 'general').success).toBe(true);
+    expect(service.createTemplate('My Form', ['general']).success).toBe(true);
     const rowId = service.rows()[0].id;
     const field = makeTextField(crypto.randomUUID(), 'Original');
     service.addField(field, rowId);
@@ -69,7 +69,7 @@ describe('FormService', () => {
   });
 
   it('updateWorkflowRule is undoable (regression #1)', () => {
-    expect(service.createTemplate('My Form', 'general').success).toBe(true);
+    expect(service.createTemplate('My Form', ['general']).success).toBe(true);
     const rule = service.addWorkflowRule('My rule');
 
     service.updateWorkflowRule(rule.id, { name: 'Renamed rule' });
@@ -80,7 +80,7 @@ describe('FormService', () => {
   });
 
   it('moveField relocates a field between rows', () => {
-    expect(service.createTemplate('My Form', 'general').success).toBe(true);
+    expect(service.createTemplate('My Form', ['general']).success).toBe(true);
     const rowA = service.rows()[0].id;
 
     service.addRow();
@@ -96,7 +96,7 @@ describe('FormService', () => {
   });
 
   it('generateForm delegates to the extracted code generator', () => {
-    expect(service.createTemplate('My Form', 'general').success).toBe(true);
+    expect(service.createTemplate('My Form', ['general']).success).toBe(true);
     const rowId = service.rows()[0].id;
     service.addField(makeTextField(crypto.randomUUID(), 'Title'), rowId);
 

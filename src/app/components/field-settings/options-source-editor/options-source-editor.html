@@ -84,7 +84,7 @@
   } @else {
     <app-data-catalog-picker
       [selectedId]="selectedCatalogId()"
-      [context]="templateContext()"
+      [department]="firstDepartment()"
       label="Catalog source"
       (selectionChange)="onCatalogSelected($event)"
     />

@@ -14,7 +14,7 @@ import { EventCatalogService } from '../../services/event-catalog.service';
 })
 export class EventCatalogPicker {
   selectedId = input<string>();
-  context = input<string>();
+  department = input<string>();
   label = input('Event');
   disabled = input(false);
   invalid = input(false);
@@ -25,7 +25,7 @@ export class EventCatalogPicker {
   kindMeta = EVENT_KIND_META;
   resolveEventKind = resolveEventKind;
 
-  categories = computed(() => this.catalogService.getCategories(this.context()));
+  categories = computed(() => this.catalogService.getCategories(this.department()));
   selectedItem = computed(() => {
     const id = this.selectedId() ?? this.localSelection();
     return id ? this.catalogService.getById(id) : undefined;

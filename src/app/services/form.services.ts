@@ -116,7 +116,7 @@ export class FormService {
     this.purgeSpikeArtifacts();
 
     if (this._templates().length === 0) {
-      const template = createEmptyTemplate("General Task");
+      const template = createEmptyTemplate("General Task", []);
       this._templates.set([template]);
     }
 
@@ -905,7 +905,7 @@ export class FormService {
 
     try {
       const legacyState = JSON.parse(legacy);
-      const template = createEmptyTemplate("General Task", "general");
+      const template = createEmptyTemplate("General Task", []);
       template.layout.rows = (legacyState.rows ?? []).map((row: FormRow) => ({
         ...row,
         templateId: template.id,

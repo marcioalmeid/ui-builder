@@ -289,7 +289,7 @@
                           >
                             <app-event-catalog-picker
                               [selectedId]="eventCatalogSelectionId(node)"
-                              [context]="templateContext()"
+                              [department]="firstDepartment()"
                               label="Event"
                               [disabled]="formService.isReadonly()"
                               [invalid]="hasNodeIssues(rule.id, node.id)"

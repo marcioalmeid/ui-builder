@@ -19,8 +19,7 @@ function templateWithLayout(label: string, published = false): TaskTemplate {
   return {
     id: 'tpl-1',
     name: 'Spike',
-    context: 'advertising',
-    departments: [],
+    departments: ['Digital Ads'],
     version: published ? 1 : 0,
     status: published ? 'published' : 'draft',
     layout,

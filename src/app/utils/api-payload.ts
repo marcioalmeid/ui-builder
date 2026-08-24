@@ -80,7 +80,7 @@ export interface ApiSubmissionPayload {
     id: string;
     name: string;
     version: number;
-    context: string;
+    departments: string[];
     status: TaskTemplate['status'];
   };
   dataBindings: ApiPayloadDataBinding[];
@@ -398,7 +398,7 @@ export function buildApiSubmissionPayload(
       id: template.id,
       name: template.name,
       version: template.version,
-      context: template.context,
+      departments: template.departments ?? [],
       status: template.status,
     },
     dataBindings: payloadBindings,

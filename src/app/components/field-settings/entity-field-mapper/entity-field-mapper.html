@@ -19,7 +19,7 @@
   @if (enabled()) {
     <app-data-catalog-picker
       [selectedId]="selectedCatalogId()"
-      [context]="templateContext()"
+      [department]="firstDepartment()"
       label="Entity"
       (selectionChange)="onCatalogSelected($event)"
     />

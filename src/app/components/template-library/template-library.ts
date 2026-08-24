@@ -71,7 +71,7 @@ export class TemplateLibrary {
     const jobCount = this.jobService.listByTemplate(template.id).length;
     const confirmed = window.confirm(
       [
-        `Clone creates a NEW template in a free department (one template per context).`,
+        `Clone creates a NEW template in a free department (one template per department)`,
         jobCount > 0
           ? `The ${jobCount} existing task(s) stay on "${template.name}".`
           : '',

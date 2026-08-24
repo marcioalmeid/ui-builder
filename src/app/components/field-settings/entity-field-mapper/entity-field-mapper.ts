@@ -41,8 +41,8 @@ export class EntityFieldMapper {
   selectedEntityFieldKey = signal('');
   private lastSyncedFieldId = '';
 
-  templateContext = computed(
-    () => this.formService.activeTemplate()?.context ?? 'general'
+  firstDepartment = computed(
+    () => this.formService.activeTemplate()?.departments?.[0] ?? ''
   );
 
   selectedCatalog = computed(() => {

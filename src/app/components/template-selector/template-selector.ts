@@ -56,7 +56,7 @@ export class TemplateSelector {
   cloneHint = computed(() => {
     const count = this.linkedJobCount();
     if (count === 0) {
-      return 'Creates a copy in a free department (one template per context).';
+      return 'Creates a copy in a free department (one template per department).';
     }
     return `Creates a copy in a free department. ${count} existing task(s) stay on the original.`;
   });
@@ -89,10 +89,8 @@ export class TemplateSelector {
 
   saveTemplateSettings() {
     const active = this.formService.activeTemplate();
-    const context = active?.context ?? 'general';
     const result = this.formService.updateTemplateMeta(
       this.editName,
-      context,
       this.editDepartment ? [this.editDepartment] : []
     );
     if (!result.success) {
@@ -114,7 +112,7 @@ export class TemplateSelector {
 
     const confirmed = window.confirm(
       [
-        `Clone creates a NEW template in a free department (one template per context).`,
+        `Clone creates a NEW template in a free department (one template per department)`,
         jobCount > 0
           ? `The ${jobCount} existing task(s) stay on "${active?.name}".`
           : '',

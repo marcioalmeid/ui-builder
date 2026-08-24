@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -33,18 +33,27 @@ export class NewTemplateDialog {
     )
   );
 
-  selectedDepartment = this.availableDepartments()[0] ?? '';
+  selectedDepartment = signal<string>('');
+
+  constructor() {
+    effect(() => {
+      const depts = this.availableDepartments();
+      if (depts.length > 0 && !this.selectedDepartment()) {
+        this.selectedDepartment.set(depts[0]);
+      }
+    });
+  }
 
   createBlank() {
     this.error.set(null);
-    if (!this.selectedDepartment) {
+    if (!this.selectedDepartment()) {
       this.error.set('No free department available.');
       return;
     }
     const templateName = this.name.trim() || 'New Task Template';
     const result = this.formService.createTemplate(
       templateName,
-      [this.selectedDepartment]
+      [this.selectedDepartment()]
     );
     if (!result.success) {
       this.error.set(result.error ?? 'Could not create template.');

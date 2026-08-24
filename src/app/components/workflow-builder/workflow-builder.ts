@@ -61,8 +61,8 @@ export class WorkflowBuilder {
 
   rules = computed(() => this.formService.workflowRules());
   fields = computed(() => getAllFields(this.formService.rows()));
-  templateContext = computed(
-    () => this.formService.activeTemplate()?.context ?? 'general'
+  firstDepartment = computed(
+    () => this.formService.activeTemplate()?.departments?.[0] ?? ''
   );
   triggerFields = computed(() =>
     this.fields().filter((field) => field.type !== 'section-header' && field.type !== 'button')
@@ -356,7 +356,7 @@ export class WorkflowBuilder {
       case 'action-event': {
         const fallback =
           this.eventCatalogService.getById('field.updated') ??
-          this.eventCatalogService.getForContext(this.templateContext())[0];
+          this.eventCatalogService.getForContext(this.firstDepartment())[0];
         if (!fallback) {
           return { eventName: 'field.updated' };
         }

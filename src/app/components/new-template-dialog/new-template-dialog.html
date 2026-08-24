@@ -14,7 +14,7 @@
   } @else {
     <mat-form-field appearance="outline" class="w-full">
       <mat-label>Department</mat-label>
-      <mat-select [(ngModel)]="selectedDepartment">
+      <mat-select [ngModel]="selectedDepartment()" (ngModelChange)="selectedDepartment.set($event)" >
         @for (dept of availableDepartments(); track dept) {
           <mat-option [value]="dept">{{ dept }}</mat-option>
         }
