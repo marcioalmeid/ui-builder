@@ -6,16 +6,14 @@
       </a>
       <div class="studio-toolbar__identity">
         @if (active.status === 'draft') {
-          <mat-form-field
-            appearance="outline"
-            class="studio-toolbar__context"
-            subscriptSizing="dynamic"
-            [style.width]="contextSelectWidth()"
-          >
-            <mat-label>Context</mat-label>
-            <mat-select [(ngModel)]="editContext" (selectionChange)="saveTemplateSettings()">
-              @for (ctx of editableContexts(); track ctx.id) {
-                <mat-option [value]="ctx.id">{{ ctx.label }}</mat-option>
+          <mat-form-field appearance="outline" class="studio-toolbar__departments-select" subscriptSizing="dynamic">
+            <mat-label>Department</mat-label>
+            <mat-select
+              [(ngModel)]="editDepartment"
+              (selectionChange)="saveTemplateSettings()"
+            >
+              @for (dept of formService.availableDepartments(); track dept) {
+                <mat-option [value]="dept">{{ dept }}</mat-option>
               }
             </mat-select>
           </mat-form-field>

@@ -20,6 +20,7 @@ export interface TaskTemplate {
   id: string;
   name: string;
   context: string;
+  departments: string[];
   version: number;
   status: TemplateStatus;
   layout: TaskTemplateLayout;
@@ -62,5 +63,6 @@ export function createEmptyTemplate(
       dataBindings: [],
       workflowRules: [],
     },
+    departments: [],
   };
 }

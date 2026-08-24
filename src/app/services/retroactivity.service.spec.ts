@@ -20,6 +20,7 @@ function templateWithLayout(label: string, published = false): TaskTemplate {
     id: 'tpl-1',
     name: 'Spike',
     context: 'advertising',
+    departments: [],
     version: published ? 1 : 0,
     status: published ? 'published' : 'draft',
     layout,

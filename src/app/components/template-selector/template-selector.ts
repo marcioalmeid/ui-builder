@@ -10,7 +10,6 @@ import { Router, RouterLink } from '@angular/router';
 import { FormService } from '../../services/form.services';
 import { JobService } from '../../services/job.service';
 import { RetroactivityService } from '../../services/retroactivity.service';
-import { TASK_TEMPLATE_CONTEXTS } from '../../models/task-template';
 import { PublishConfirmDialog, PublishConfirmResult } from '../publish-confirm-dialog/publish-confirm-dialog';
 import { buildPublishSummary } from '../../utils/publish-summary';
 import { getAllFields, validateTemplateForPublish } from '../../utils/template-readiness';
@@ -41,31 +40,13 @@ export class TemplateSelector {
   private ledger = inject(MigrationLedgerService);
   private router = inject(Router);
   private publishBtn = viewChild<ElementRef<HTMLButtonElement>>('publishBtn');
-  contexts = TASK_TEMPLATE_CONTEXTS;
-
-  /** Current context + free departments (cannot steal another template's context). */
-  editableContexts = computed(() => {
-    const activeId = this.formService.activeTemplateId();
-    return TASK_TEMPLATE_CONTEXTS.filter(
-      (ctx) => !this.formService.isContextTaken(ctx.id, activeId)
-    );
-  });
 
   editName = '';
-  editContext = 'general';
+  editDepartment = '';
   publishErrors = signal<string[]>([]);
   showPublishSuccess = signal(false);
   publishMigrateCount = signal(0);
   publishHighlight = signal(false);
-
-  /** Fit the Context select to the selected label (+ room for arrow / padding). */
-  contextSelectWidth(): string {
-    const label =
-      TASK_TEMPLATE_CONTEXTS.find((c) => c.id === this.editContext)?.label ??
-      this.editContext;
-    const chars = Math.max(label.length, 'Context'.length);
-    return `calc(${chars}ch + 2.75rem)`;
-  }
 
   linkedJobCount = computed(() => {
     const id = this.formService.activeTemplate()?.id;
@@ -85,7 +66,7 @@ export class TemplateSelector {
       const active = this.formService.activeTemplate();
       if (active) {
         this.editName = active.name;
-        this.editContext = active.context;
+        this.editDepartment = (active.departments?.[0] ?? '');
       }
     });
 
@@ -107,17 +88,21 @@ export class TemplateSelector {
   }
 
   saveTemplateSettings() {
-    const result = this.formService.updateTemplateMeta(this.editName, this.editContext);
+    const active = this.formService.activeTemplate();
+    const context = active?.context ?? 'general';
+    const result = this.formService.updateTemplateMeta(
+      this.editName,
+      context,
+      this.editDepartment ? [this.editDepartment] : []
+    );
     if (!result.success) {
       window.alert(result.error ?? 'Could not save template settings.');
-      const active = this.formService.activeTemplate();
       if (active) {
         this.editName = active.name;
-        this.editContext = active.context;
+        this.editDepartment = (active.departments?.[0] ?? '');
       }
       return;
     }
-    const active = this.formService.activeTemplate();
     if (active) {
       this.jobService.syncTemplateName(active.id, active.name);
     }

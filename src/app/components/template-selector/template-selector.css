@@ -141,3 +141,17 @@
     box-shadow: 0 0 0 6px rgba(22, 163, 74, 0);
   }
 }
+
+/* Department selector in draft mode */
+.studio-toolbar__departments-select {
+  flex: 0 0 9rem;
+  min-width: 7rem;
+}
+
+.studio-toolbar__departments-select .mat-mdc-form-field-infix {
+  min-height: 0;
+}
+
+.studio-toolbar__departments-select .mat-mdc-select-panel {
+  max-height: 12rem;
+}

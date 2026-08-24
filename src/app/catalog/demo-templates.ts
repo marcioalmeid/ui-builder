@@ -136,6 +136,7 @@ export function createAdvertisingFixture(
     id: templateId,
     name,
     context: 'advertising',
+    departments: [],
     version: 0,
     status: 'draft',
     versions: [],

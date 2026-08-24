@@ -12,6 +12,7 @@ import {
   TemplateStatus,
 } from "../models/task-template";
 import { DataSourceService, FetchOptionsResult } from "./data-source.service";
+import { DepartmentService } from "./department.service";
 import { RetroactivityService } from "./retroactivity.service";
 import { normalizeTemplate } from "../utils/retroactivity";
 import { mergeFieldDataSourceUpdate, mergeFieldUpdate } from "../utils/field-data-source";
@@ -39,7 +40,9 @@ interface PersistedState {
 })
 export class FormService {
   private dataSourceService = inject(DataSourceService);
+  private departmentService = inject(DepartmentService);
   private retroactivity = inject(RetroactivityService);
+
   private _templates = signal<TaskTemplate[]>([]);
   private _activeTemplateId = signal<string>("");
   private _rows = signal<FormRow[]>([]);
@@ -79,6 +82,16 @@ export class FormService {
     this._templates().find((t) => t.id === this._activeTemplateId())
   );
 
+  /** Returns the departments for the active template, or empty array. */
+  public readonly activeTemplateDepartments = computed<string[]>(
+    () => this.activeTemplate()?.departments ?? []
+  );
+
+  /** Global list of valid departments from the API. */
+  public readonly availableDepartments = computed<string[]>(
+    () => this.departmentService.departments()
+  );
+
   public readonly isReadonly = computed(
     () => this.activeTemplate()?.status === "published"
   );
@@ -99,6 +112,8 @@ export class FormService {
 
   constructor() {
     this.loadState();
+    // Load global departments from API on service initialization
+    this.departmentService.loadDepartments();
     this.purgeSpikeArtifacts();
 
     if (this._templates().length === 0) {
@@ -125,20 +140,38 @@ export class FormService {
     );
   }
 
+  /** Check if any department is already used by another template. */
+  isDepartmentTaken(department: string, exceptTemplateId?: string): boolean {
+    return this._templates().some(
+      (t) => t.id !== exceptTemplateId && (t.departments ?? []).includes(department)
+    );
+  }
+
+  /** Find template that uses a specific department. */
+  findTemplateByDepartment(department: string): TaskTemplate | undefined {
+    return this._templates().find(
+      (t) => (t.departments ?? []).includes(department)
+    );
+  }
+
   createTemplate(
     name: string,
-    context: string
+    context: string,
+    departments: string[] = []
   ): { success: boolean; error?: string } {
-    if (this.isContextTaken(context)) {
-      const existing = this.findTemplateByContext(context);
+    // Validate no department conflict
+    const conflicts = departments.filter((dept) => this.isDepartmentTaken(dept));
+    if (conflicts.length > 0) {
+      const existing = this.findTemplateByDepartment(conflicts[0]);
       return {
         success: false,
-        error: `Only one active template per department. "${existing?.name ?? context}" already uses this context.`,
+        error: `Department "${conflicts[0]}" is already used by "${existing?.name}". Only one template per department.`,
       };
     }
 
     this.recordUndo();
     const template = createEmptyTemplate(name, context);
+    template.departments = departments;
     this._templates.set([...this._templates(), template]);
     this.switchTemplate(template.id, false);
     this.focusSidebarSection("fields");
@@ -190,25 +223,27 @@ export class FormService {
       return { success: false, error: 'No template to clone.' };
     }
 
-    const freeContext = TASK_TEMPLATE_CONTEXTS.find(
-      (ctx) => !this.isContextTaken(ctx.id)
+    // Find a free department (not used by any other template)
+    const allDepartments = this.departmentService.departments();
+    const freeDepartments = allDepartments.filter(
+      (dept) => !this.isDepartmentTaken(dept)
     );
-    if (!freeContext) {
+    if (freeDepartments.length === 0) {
       return {
         success: false,
         error:
-          'Every department already has an active template. Free a context before cloning.',
+          'Every department already has an active template. Free a department before cloning.',
       };
     }
 
+    // Use the first free department (or source's departments if any are free)
+    const cloneDepartments = source.departments?.length > 0
+      ? source.departments.filter((dept) => !this.isDepartmentTaken(dept, source.id))
+      : [freeDepartments[0]];
+
     this.recordUndo();
-    const contextLabel =
-      TASK_TEMPLATE_CONTEXTS.find((c) => c.id === freeContext.id)?.label ??
-      freeContext.id;
-    const clone = createEmptyTemplate(
-      `${source.name} (${contextLabel})`,
-      freeContext.id
-    );
+    const clone = createEmptyTemplate(source.name, source.context);
+    clone.departments = cloneDepartments;
     clone.layout = structuredClone(source.layout);
     clone.layout.rows = clone.layout.rows.map((row) => ({
       ...row,
@@ -235,7 +270,8 @@ export class FormService {
 
   updateTemplateMeta(
     name: string,
-    context: string
+    context: string,
+    departments: string[] = []
   ): { success: boolean; error?: string } {
     this.assertEditable();
     const active = this.activeTemplate();
@@ -243,25 +279,31 @@ export class FormService {
       return { success: false, error: 'No active template.' };
     }
 
-    if (this.isContextTaken(context, active.id)) {
-      const existing = this.findTemplateByContext(context);
+    // Validate no department conflict
+    const conflicts = departments.filter(
+      (dept: string) => this.isDepartmentTaken(dept, active.id)
+    );
+    if (conflicts.length > 0) {
+      const existing = this.findTemplateByDepartment(conflicts[0]);
       return {
         success: false,
-        error: `Only one active template per department. "${existing?.name ?? context}" already uses this context.`,
+        error: `Department "${conflicts[0]}" is already used by "${existing?.name}". Only one template per department.`,
       };
     }
 
     const contextChanged = active.context !== context;
+    const departmentsChanged =
+      JSON.stringify(active.departments ?? []) !== JSON.stringify(departments);
 
     this.recordUndo();
     this._templates.set(
       this._templates().map((t) =>
         t.id === active.id
-          ? { ...t, name: name.trim() || t.name, context, updatedAt: Date.now() }
+          ? { ...t, name: name.trim() || t.name, context, departments, updatedAt: Date.now() }
           : t
       )
     );
-    if (contextChanged) {
+    if (contextChanged || departmentsChanged) {
       this.clearSelectedField();
     }
     this.saveState();

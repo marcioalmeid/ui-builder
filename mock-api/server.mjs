@@ -16,6 +16,7 @@ const routes = {
   '/api/request-types': 'request-types.json',
   '/api/vendors': 'vendors.json',
   '/api/budget-line-items': 'budget-line-items.json',
+  '/api/job-departments': 'job_departments.json',
 };
 
 function sendJson(res, status, body) {
