@@ -1,33 +1,43 @@
-<div class="tasks-hub">
-  <header class="tasks-hub__hero">
-    <div class="tasks-hub__hero-copy">
-      <p class="tasks-hub__eyebrow">Operator workspace</p>
-      <h1 class="tasks-hub__title">Tasks</h1>
+<div class="min-h-screen bg-gray-50 p-6">
+  <div class="max-w-5xl mx-auto">
+    <div class="flex items-start justify-between mb-6 gap-4 flex-wrap">
+      <div>
+        <h1 class="text-2xl font-medium">Tasks</h1>
+        <p class="text-sm text-gray-500 mt-1">
+          View and manage your task submissions.
+        </p>
+      </div>
+      <button mat-flat-button color="primary" type="button" (click)="createTask()">
+        <mat-icon>add</mat-icon> New task
+      </button>
     </div>
-    <button
-      mat-flat-button
-      color="primary"
-      type="button"
-      class="tasks-hub__cta"
-      (click)="createTask()"
-    >
-      <mat-icon>add</mat-icon> New task
-    </button>
-  </header>
 
-  <section
-    class="tasks-hub__section"
-    [class.tasks-hub__section--board]="viewMode() === 'kanban'"
-    aria-labelledby="my-tasks-heading"
-  >
-    <div class="tasks-hub__section-head">
-      <h2 id="my-tasks-heading" class="tasks-hub__section-title">
-        Your tasks
-        <span class="tasks-hub__count">{{ tasks().length }}</span>
-      </h2>
+    <div class="flex flex-wrap gap-3 mb-3">
+      <mat-form-field appearance="outline" class="flex-1 min-w-[12rem]">
+        <mat-label>Search</mat-label>
+        <input
+          matInput
+          [ngModel]="search()"
+          (ngModelChange)="search.set($event)"
+          placeholder="Title or template"
+        />
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="w-40">
+        <mat-label>Status</mat-label>
+        <mat-select
+          [ngModel]="statusFilter()"
+          (ngModelChange)="statusFilter.set($event)"
+        >
+          <mat-option value="all">All</mat-option>
+          <mat-option value="todo">To do</mat-option>
+          <mat-option value="in_progress">In progress</mat-option>
+          <mat-option value="done">Done</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
 
+    <div class="flex justify-end mb-4">
       <mat-button-toggle-group
-        class="tasks-hub__view-toggles"
         [value]="viewMode()"
         (valueChange)="onViewModeChange($event)"
         hideSingleSelectionIndicator="true"
@@ -44,80 +54,74 @@
       </mat-button-toggle-group>
     </div>
 
-    @if (tasks().length === 0) {
-      <div class="tasks-hub__empty">
-        <p>No submissions yet. Use New task to create your first one.</p>
-      </div>
-    } @else if (viewMode() === 'list') {
-      <div class="tasks-hub__list">
-        @for (task of tasks(); track task.id) {
-          <article class="tasks-hub__item">
-            <div class="tasks-hub__item-main">
-              <h3 class="tasks-hub__item-title">{{ taskTitle(task) }}</h3>
-              @if (showTemplateSubtitle(task)) {
-                <p class="tasks-hub__item-sub">{{ templateLabel(task) }}</p>
-              }
-              <p class="tasks-hub__item-meta">
-                <span>{{ formatDate(task.submittedAt) }}</span>
-                <button
-                  type="button"
-                  class="tasks-hub__status"
-                  [attr.data-status]="task.status"
-                  [matMenuTriggerFor]="statusMenu"
-                  [attr.aria-label]="'Change status, currently ' + statusLabel(task.status)"
-                >
-                  {{ statusLabel(task.status) }}
-                  <mat-icon class="tasks-hub__status-caret">expand_more</mat-icon>
-                </button>
-                <mat-menu #statusMenu="matMenu">
-                  @for (status of statuses; track status) {
-                    <button
-                      mat-menu-item
-                      type="button"
-                      [disabled]="taskStatus(task) === status"
-                      (click)="setTaskStatus(task, status, $event)"
+    @if (viewMode() === 'list') {
+      @if (filteredTasks().length === 0) {
+        <div class="bg-white border rounded-lg p-6 text-sm text-gray-600">
+          No tasks match these filters.
+        </div>
+      } @else {
+        <div class="flex flex-col gap-3">
+          @for (task of filteredTasks(); track task.id) {
+            <article class="bg-white border rounded-lg p-4 shadow-sm">
+              <div class="flex items-start justify-between gap-4 flex-wrap">
+                <div class="min-w-0 flex-1">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <h2 class="font-medium">{{ taskTitle(task) }}</h2>
+                    <span
+                      class="text-[11px] font-medium uppercase tracking-wide px-2 py-0.5 rounded-full"
+                      [class.bg-gray-100]="taskStatus(task) === 'todo'"
+                      [class.text-gray-700]="taskStatus(task) === 'todo'"
+                      [class.bg-blue-100]="taskStatus(task) === 'in_progress'"
+                      [class.text-blue-800]="taskStatus(task) === 'in_progress'"
+                      [class.bg-green-100]="taskStatus(task) === 'done'"
+                      [class.text-green-800]="taskStatus(task) === 'done'"
                     >
-                      {{ statusLabels[status] }}
-                    </button>
+                      {{ statusLabel(task.status) }}
+                    </span>
+                    @if (needsUpdate(task)) {
+                      <span class="text-[11px] font-medium uppercase tracking-wide px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                        Needs update
+                      </span>
+                    }
+                  </div>
+                  <p class="text-sm text-gray-500 mt-1">
+                    {{ templateLabel(task) }} · {{ formatDate(task.submittedAt) }}
+                  </p>
+                  @if (fieldSummary(task); as summary) {
+                    <p class="text-sm text-gray-600 mt-1">{{ summary }}</p>
                   }
-                </mat-menu>
-                @if (needsUpdate(task)) {
-                  <span class="tasks-hub__badge">Needs update</span>
-                }
-              </p>
-              @if (fieldSummary(task); as summary) {
-                <p class="tasks-hub__item-summary">{{ summary }}</p>
-              }
-            </div>
-            <div class="tasks-hub__item-actions">
-              <a mat-flat-button color="primary" [routerLink]="['/tasks', task.id]">
-                Open
-              </a>
-              <button mat-stroked-button type="button" (click)="cloneTask(task, $event)">
-                <mat-icon>content_copy</mat-icon> Clone
-              </button>
-            </div>
-          </article>
-        }
-      </div>
+                </div>
+                <div class="flex flex-wrap gap-2 shrink-0">
+                  <a mat-flat-button color="primary" [routerLink]="['/tasks', task.id]">
+                    <mat-icon>open_in_new</mat-icon> Open
+                  </a>
+                  <button mat-stroked-button type="button" (click)="cloneTask(task, $event)">
+                    <mat-icon>content_copy</mat-icon> Clone
+                  </button>
+                </div>
+              </div>
+            </article>
+          }
+        </div>
+      }
     } @else {
       <div class="tasks-hub__board">
         @for (status of statuses; track status) {
           <section class="tasks-hub__column" [attr.aria-label]="statusLabels[status]">
             <header class="tasks-hub__column-head">
               <h3 class="tasks-hub__column-title">{{ statusLabels[status] }}</h3>
-              <span class="tasks-hub__count">{{ tasksByStatus()[status].length }}</span>
+              <span class="tasks-hub__count">{{ filteredTasksByStatus()[status].length }}</span>
             </header>
 
             <div
               class="tasks-hub__column-body"
               cdkDropList
               [id]="'kanban-' + status"
-              [cdkDropListData]="tasksByStatus()[status]"
+              [cdkDropListData]="filteredTasksByStatus()[status]"
               [cdkDropListConnectedTo]="connectedLists"
               (cdkDropListDropped)="onKanbanDrop($event, status)"
             >
-              @for (task of tasksByStatus()[status]; track task.id) {
+              @for (task of filteredTasksByStatus()[status]; track task.id) {
                 <article class="tasks-hub__card" cdkDrag [cdkDragData]="task">
                   <div class="tasks-hub__card-main" cdkDragHandle>
                     <h4 class="tasks-hub__card-title">{{ taskTitle(task) }}</h4>
@@ -147,5 +151,5 @@
         }
       </div>
     }
-  </section>
+  </div>
 </div>

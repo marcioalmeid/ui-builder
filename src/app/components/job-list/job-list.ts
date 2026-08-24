@@ -6,8 +6,12 @@ import {
 } from '@angular/cdk/drag-drop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatSelectModule } from '@angular/material/select';
+import { FormsModule } from '@angular/forms';
 import { FormField } from '../../models/field';
 import {
   JobSubmission,
@@ -24,6 +28,7 @@ const HIDDEN_FIELD_TYPES = new Set(['section-header', 'button']);
 const VIEW_MODE_KEY = 'tasks-view-mode';
 
 type TasksViewMode = 'list' | 'kanban';
+type StatusFilter = 'all' | TaskStatus;
 
 const STATUS_LABELS: Record<TaskStatus, string> = {
   todo: 'To do',
@@ -35,11 +40,15 @@ const STATUS_LABELS: Record<TaskStatus, string> = {
   selector: 'app-job-list',
   standalone: true,
   imports: [
+    FormsModule,
     RouterLink,
     MatButtonModule,
     MatButtonToggleModule,
+    MatFormFieldModule,
     MatIconModule,
+    MatInputModule,
     MatMenuModule,
+    MatSelectModule,
     DragDropModule,
   ],
   templateUrl: './job-list.html',
@@ -56,6 +65,29 @@ export class JobList {
   readonly connectedLists = TASK_STATUSES.map((status) => `kanban-${status}`);
 
   viewMode = signal<TasksViewMode>(readViewMode());
+  search = signal('');
+  statusFilter = signal<StatusFilter>('all');
+
+  filteredTasks = computed(() => {
+    const q = this.search().trim().toLowerCase();
+    const sf = this.statusFilter();
+    const all = this.tasks();
+    if (sf !== 'all') {
+      const filtered = all.filter((t) => normalizeTaskStatus(t.status) === sf);
+      if (!q) return filtered;
+      return filtered.filter((t) => {
+        const title = this.taskTitle(t).toLowerCase();
+        const template = this.jobService.displayTemplateName(t).toLowerCase();
+        return title.includes(q) || template.includes(q);
+      });
+    }
+    if (!q) return all;
+    return all.filter((t) => {
+      const title = this.taskTitle(t).toLowerCase();
+      const template = this.jobService.displayTemplateName(t).toLowerCase();
+      return title.includes(q) || template.includes(q);
+    });
+  });
 
   tasks = computed(() => this.jobService.list());
 
@@ -66,6 +98,20 @@ export class JobList {
       done: [],
     };
     for (const task of this.tasks()) {
+      groups[normalizeTaskStatus(task.status)].push(task);
+    }
+    return groups;
+  });
+
+  filteredTasksByStatus = computed(() => {
+    const sf = this.statusFilter();
+    const q = this.search().trim().toLowerCase();
+    const groups: Record<TaskStatus, JobSubmission[]> = {
+      todo: [],
+      in_progress: [],
+      done: [],
+    };
+    for (const task of this.filteredTasks()) {
       groups[normalizeTaskStatus(task.status)].push(task);
     }
     return groups;
@@ -178,7 +224,7 @@ export class JobList {
     }
 
     const task = (event.item.data as JobSubmission | undefined)
-      ?? event.previousContainer.data[event.previousIndex];
+    ?? event.previousContainer.data[event.previousIndex];
     if (!task) return;
 
     this.jobService.updateStatus(task.id, targetStatus);
@@ -199,8 +245,22 @@ export class JobList {
 
   private fieldsFor(task: JobSubmission): FormField[] {
     const template = this.formService.getTemplate(task.templateId);
-    return template ? getAllLayoutFields(template.layout) : [];
+    if (!template) return [];
+    return getAllLayoutFields(template.layout);
   }
+}
+
+function formatStoredValue(field: FormField | undefined, raw: unknown): string {
+  if (raw === null || raw === undefined) return '';
+  if (field?.type === 'date' && typeof raw === 'string') {
+    const d = new Date(raw);
+    if (isNaN(d.getTime())) return String(raw);
+    return d.toLocaleDateString(undefined, { dateStyle: 'medium' });
+  }
+  if (Array.isArray(raw)) {
+    return raw.map(String).join(', ');
+  }
+  return String(raw);
 }
 
 function readViewMode(): TasksViewMode {
@@ -211,30 +271,4 @@ function readViewMode(): TasksViewMode {
     // ignore
   }
   return 'list';
-}
-
-function formatStoredValue(field: FormField | undefined, value: unknown): string {
-  if (value == null || value === '') return '';
-  if (typeof value !== 'string' && typeof value !== 'number' && typeof value !== 'boolean') {
-    return '';
-  }
-  const text = String(value);
-  const option = field?.options?.find((item) => item.value === text);
-  return option?.label ?? humanizeToken(text);
-}
-
-function humanizeToken(value: string): string {
-  if (looksLikeUuid(value)) return '';
-  if (!value.includes('-') && !value.includes('_')) return value;
-  return value
-    .split(/[-_]/g)
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ');
-}
-
-function looksLikeUuid(value: string): boolean {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-    value
-  );
 }
