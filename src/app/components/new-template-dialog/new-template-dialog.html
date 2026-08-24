@@ -6,17 +6,17 @@
     <input matInput [(ngModel)]="name" placeholder="Digital Advertising Task" />
   </mat-form-field>
 
-  @if (availableContexts().length === 0) {
+  @if (availableDepartments().length === 0) {
     <p class="text-sm text-amber-800 bg-amber-50 border border-amber-100 rounded p-3">
-      Every department already has an active template. Delete or change a template’s
-      context before creating another.
+      Every department already has an active template. Delete or change a template's
+      department before creating another.
     </p>
   } @else {
     <mat-form-field appearance="outline" class="w-full">
-      <mat-label>Department / context</mat-label>
-      <mat-select [(ngModel)]="context">
-        @for (ctx of availableContexts(); track ctx.id) {
-          <mat-option [value]="ctx.id">{{ ctx.label }}</mat-option>
+      <mat-label>Department</mat-label>
+      <mat-select [(ngModel)]="selectedDepartment">
+        @for (dept of availableDepartments(); track dept) {
+          <mat-option [value]="dept">{{ dept }}</mat-option>
         }
       </mat-select>
       <mat-hint>Only one active template per department</mat-hint>
@@ -34,7 +34,7 @@
     mat-flat-button
     color="primary"
     type="button"
-    [disabled]="availableContexts().length === 0"
+    [disabled]="availableDepartments().length === 0"
     (click)="createBlank()"
   >
     Create blank

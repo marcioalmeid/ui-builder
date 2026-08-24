@@ -5,7 +5,6 @@ import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { TASK_TEMPLATE_CONTEXTS } from '../../models/task-template';
 import { FormService } from '../../services/form.services';
 
 @Component({
@@ -28,20 +27,26 @@ export class NewTemplateDialog {
   name = '';
   error = signal<string | null>(null);
 
-  availableContexts = computed(() =>
-    TASK_TEMPLATE_CONTEXTS.filter((ctx) => !this.formService.isContextTaken(ctx.id))
+  availableDepartments = computed(() =>
+    this.formService.availableDepartments().filter(
+      (dept) => !this.formService.isDepartmentTaken(dept)
+    )
   );
 
-  context = this.availableContexts()[0]?.id ?? '';
+  selectedDepartment = this.availableDepartments()[0] ?? '';
 
   createBlank() {
     this.error.set(null);
-    if (!this.context) {
+    if (!this.selectedDepartment) {
       this.error.set('No free department available.');
       return;
     }
     const templateName = this.name.trim() || 'New Task Template';
-    const result = this.formService.createTemplate(templateName, this.context);
+    const result = this.formService.createTemplate(
+      templateName,
+      'general',
+      [this.selectedDepartment]
+    );
     if (!result.success) {
       this.error.set(result.error ?? 'Could not create template.');
       return;
