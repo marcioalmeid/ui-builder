@@ -53,6 +53,15 @@ export class TemplateSelector {
     return id ? this.jobService.listByTemplate(id).length : 0;
   });
 
+  // Filter out departments already used by other templates (keep current one always visible)
+  availableDepartments = computed(() => {
+    const active = this.formService.activeTemplate();
+    const activeId = active?.id ?? '';
+    return this.formService.availableDepartments().filter(
+      (dept) => !this.formService.isDepartmentTaken(dept, activeId)
+    );
+  });
+
   cloneHint = computed(() => {
     const count = this.linkedJobCount();
     if (count === 0) {

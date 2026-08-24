@@ -6,13 +6,15 @@
     <input matInput [(ngModel)]="name" placeholder="Digital Advertising Task" />
   </mat-form-field>
 
-  @if (availableDepartments().length === 0) {
+  @if (!departmentsLoaded()) {
+    <p class="text-sm text-gray-500">Loading departments...</p>
+  } @else if (availableDepartments().length === 0) {
     <p class="text-sm text-amber-800 bg-amber-50 border border-amber-100 rounded p-3">
       Every department already has an active template. Delete or change a template's
       department before creating another.
     </p>
   } @else {
-    <mat-form-field appearance="outline" class="w-full">
+    <mat-form-field appearance="outline" class="!max-w-[14rem]">
       <mat-label>Department</mat-label>
       <mat-select [ngModel]="selectedDepartment()" (ngModelChange)="selectedDepartment.set($event)" >
         @for (dept of availableDepartments(); track dept) {
@@ -34,7 +36,7 @@
     mat-flat-button
     color="primary"
     type="button"
-    [disabled]="availableDepartments().length === 0"
+    [disabled]="!departmentsLoaded() || availableDepartments().length === 0"
     (click)="createBlank()"
   >
     Create blank

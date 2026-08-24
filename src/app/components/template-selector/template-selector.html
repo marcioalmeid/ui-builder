@@ -12,7 +12,7 @@
               [(ngModel)]="editDepartment"
               (selectionChange)="saveTemplateSettings()"
             >
-              @for (dept of formService.availableDepartments(); track dept) {
+              @for (dept of availableDepartments(); track dept) {
                 <mat-option [value]="dept">{{ dept }}</mat-option>
               }
             </mat-select>

@@ -27,10 +27,16 @@ export class NewTemplateDialog {
   name = '';
   error = signal<string | null>(null);
 
+  // Filter out departments already used by existing templates
   availableDepartments = computed(() =>
     this.formService.availableDepartments().filter(
       (dept) => !this.formService.isDepartmentTaken(dept)
     )
+  );
+
+  // Track whether departments have been loaded from API (not just empty)
+  departmentsLoaded = computed(
+    () => this.formService.availableDepartments().length > 0
   );
 
   selectedDepartment = signal<string>('');
