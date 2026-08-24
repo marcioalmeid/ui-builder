@@ -43,8 +43,8 @@ export class DataBindingsPanel {
       .filter((field) => field.type === 'dropdown' || field.type === 'radio')
   );
 
-  templateContext = computed(
-    () => this.formService.activeTemplate()?.context ?? 'general'
+  templateDepartment = computed(
+    () => this.formService.activeTemplateDepartments()[0] ?? ''
   );
 
   selectedCatalogItem = computed(() => {

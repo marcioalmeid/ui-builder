@@ -61,7 +61,7 @@
                   </span>
                 </div>
                 <p class="text-sm text-gray-500 mt-1">
-                  {{ contextLabel(template.context) }}
+                  {{ template.departments?.[0] || 'None' }}
                   · {{ linkedTaskCount(template.id) }} linked task(s)
                 </p>
               </div>
@@ -76,6 +76,11 @@
                   <a mat-button [routerLink]="['/run', template.id]">
                     <mat-icon>play_arrow</mat-icon> Run
                   </a>
+                }
+                @if (linkedTaskCount(template.id) === 0) {
+                  <button mat-stroked-button color="warn" type="button" (click)="deleteTemplate(template, $event)">
+                    <mat-icon>delete</mat-icon> Delete
+                  </button>
                 }
               </div>
             </div>

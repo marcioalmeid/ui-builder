@@ -8,7 +8,7 @@
         @if (template) {
           <h1 class="text-2xl font-medium mt-4">{{ template.name }}</h1>
           <p class="text-sm text-gray-500">
-            Context: {{ template.context }} · Published v{{ publishedVersion }} · {{ template.status }}
+            {{ template.departments?.[0] || 'Task' }} · Published v{{ publishedVersion }} · {{ template.status }}
           </p>
         } @else {
           <h1 class="text-2xl font-medium mt-4 text-red-600">Template not found</h1>

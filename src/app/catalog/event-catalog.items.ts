@@ -67,7 +67,7 @@ export const EVENT_CATALOG: EventCatalogItem[] = [
     description: 'Generic signal that a watched field changed and matched a rule',
     icon: 'edit_note',
     category: 'General',
-    contexts: ['general', 'advertising', 'print', 'social'],
+    contexts: ['Accounts', 'A/V', 'Design', 'Digital Ads', 'Media', 'Organic Social', 'SEO'],
     kind: 'signal',
   },
   {
@@ -76,7 +76,7 @@ export const EVENT_CATALOG: EventCatalogItem[] = [
     description: 'Task met the conditions to move forward in the workflow',
     icon: 'task_alt',
     category: 'Tasks',
-    contexts: ['general', 'advertising', 'print', 'social'],
+    contexts: ['Accounts', 'A/V', 'Design', 'Digital Ads', 'Media', 'Organic Social', 'SEO'],
     kind: 'signal',
   },
   {
@@ -85,7 +85,7 @@ export const EVENT_CATALOG: EventCatalogItem[] = [
     description: 'Operator chose a digital advertising / campaign task type',
     icon: 'campaign',
     category: 'Campaign',
-    contexts: ['advertising'],
+    contexts: ['Digital Ads'],
     kind: 'signal',
   },
   {
@@ -94,7 +94,7 @@ export const EVENT_CATALOG: EventCatalogItem[] = [
     description: 'Operator requested a budget change on the campaign',
     icon: 'payments',
     category: 'Budget',
-    contexts: ['advertising'],
+    contexts: ['Digital Ads'],
     kind: 'signal',
   },
   {
@@ -103,7 +103,7 @@ export const EVENT_CATALOG: EventCatalogItem[] = [
     description: 'An external vendor was selected for the media buy',
     icon: 'store',
     category: 'Vendors',
-    contexts: ['advertising'],
+    contexts: ['Digital Ads'],
     kind: 'signal',
   },
   {
@@ -112,7 +112,7 @@ export const EVENT_CATALOG: EventCatalogItem[] = [
     description: 'Campaign platform(s) were chosen',
     icon: 'devices',
     category: 'Campaign',
-    contexts: ['advertising'],
+    contexts: ['Digital Ads'],
     kind: 'signal',
   },
   {
@@ -121,7 +121,7 @@ export const EVENT_CATALOG: EventCatalogItem[] = [
     description: 'Ask the backend to email the ops team about this match',
     icon: 'mail',
     category: 'Integrations',
-    contexts: ['general', 'advertising', 'print', 'social'],
+    contexts: ['Accounts', 'A/V', 'Design', 'Digital Ads', 'Media', 'Organic Social', 'SEO'],
     kind: 'email',
     email: {
       to: 'ops@example.com',
@@ -135,7 +135,7 @@ export const EVENT_CATALOG: EventCatalogItem[] = [
     description: 'Ask the backend to POST this match to an integration webhook',
     icon: 'api',
     category: 'Integrations',
-    contexts: ['general', 'advertising', 'print', 'social'],
+    contexts: ['Accounts', 'A/V', 'Design', 'Digital Ads', 'Media', 'Organic Social', 'SEO'],
     kind: 'api',
     api: {
       url: '/api/integrations/task-sync',

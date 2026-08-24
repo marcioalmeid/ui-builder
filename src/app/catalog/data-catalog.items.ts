@@ -29,7 +29,7 @@ export const DATA_CATALOG: DataCatalogItem[] = [
     description: 'Operators assigned to the task',
     icon: 'people',
     category: 'People',
-    contexts: ['general', 'advertising', 'print', 'social'],
+    contexts: ['Accounts', 'A/V', 'Design', 'Digital Ads', 'Media', 'Organic Social', 'SEO'],
     dataSource: { 
       url: '/api/users',
       method: 'GET',
@@ -48,7 +48,7 @@ export const DATA_CATALOG: DataCatalogItem[] = [
     description: 'Digital Advertising, Print, Social, General',
     icon: 'assignment',
     category: 'Tasks',
-    contexts: ['general', 'advertising', 'print', 'social'],
+    contexts: ['Accounts', 'A/V', 'Design', 'Digital Ads', 'Media', 'Organic Social', 'SEO'],
     dataSource: {
       url: '/api/task-types',
       method: 'GET',
@@ -63,7 +63,7 @@ export const DATA_CATALOG: DataCatalogItem[] = [
     description: 'Where the campaign runs',
     icon: 'devices',
     category: 'Advertising',
-    contexts: ['general', 'advertising', 'print', 'social'],
+    contexts: ['Digital Ads'],
     dataSource: {
       url: '/api/platforms',
       method: 'GET',
@@ -78,7 +78,7 @@ export const DATA_CATALOG: DataCatalogItem[] = [
     description: 'What needs to happen on the campaign',
     icon: 'list_alt',
     category: 'Advertising',
-    contexts: ['general', 'advertising', 'print', 'social'],
+    contexts: ['Digital Ads'],
     dataSource: {
       url: '/api/request-types',
       method: 'GET',
@@ -93,7 +93,7 @@ export const DATA_CATALOG: DataCatalogItem[] = [
     description: 'External vendors for media buys',
     icon: 'store',
     category: 'Advertising',
-    contexts: ['general', 'advertising', 'print', 'social'],
+    contexts: ['Digital Ads'],
     dataSource: {
       url: '/api/vendors',
       method: 'GET',
@@ -108,7 +108,7 @@ export const DATA_CATALOG: DataCatalogItem[] = [
     description: 'Budget lines for spend tracking',
     icon: 'payments',
     category: 'Advertising',
-    contexts: ['general', 'advertising', 'print', 'social'],
+    contexts: ['Digital Ads'],
     dataSource: {
       url: '/api/budget-line-items',
       method: 'GET',

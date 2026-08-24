@@ -19,7 +19,6 @@ export interface TemplateVersionSnapshot {
 export interface TaskTemplate {
   id: string;
   name: string;
-  context: string;
   departments: string[];
   version: number;
   status: TemplateStatus;
@@ -30,22 +29,15 @@ export interface TaskTemplate {
   updatedAt: number;
 }
 
-export const TASK_TEMPLATE_CONTEXTS = [
-  { id: 'general', label: 'General Task' },
-  { id: 'advertising', label: 'Digital Advertising' },
-  { id: 'print', label: 'Print Media' },
-  { id: 'social', label: 'Social Media' },
-] as const;
-
 export function createEmptyTemplate(
   name: string,
-  context = 'general'
+  departments: string[] = []
 ): TaskTemplate {
   const id = crypto.randomUUID();
   return {
     id,
     name,
-    context,
+    departments,
     version: 0,
     status: 'draft',
     versions: [],
@@ -63,6 +55,5 @@ export function createEmptyTemplate(
       dataBindings: [],
       workflowRules: [],
     },
-    departments: [],
   };
 }

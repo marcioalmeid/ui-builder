@@ -44,7 +44,6 @@ export class NewTemplateDialog {
     const templateName = this.name.trim() || 'New Task Template';
     const result = this.formService.createTemplate(
       templateName,
-      'general',
       [this.selectedDepartment]
     );
     if (!result.success) {

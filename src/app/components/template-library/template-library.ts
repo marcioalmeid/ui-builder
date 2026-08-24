@@ -10,7 +10,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { FormService } from '../../services/form.services';
 import { JobService } from '../../services/job.service';
 import { NewTemplateDialog } from '../new-template-dialog/new-template-dialog';
-import { TASK_TEMPLATE_CONTEXTS, TaskTemplate } from '../../models/task-template';
+import { TaskTemplate } from '../../models/task-template';
 
 type StatusFilter = 'all' | 'draft' | 'published';
 
@@ -44,18 +44,9 @@ export class TemplateLibrary {
     return this.formService.templates().filter((template) => {
       if (status !== 'all' && template.status !== status) return false;
       if (!q) return true;
-      return (
-        template.name.toLowerCase().includes(q) ||
-        template.context.toLowerCase().includes(q)
-      );
+      return template.name.toLowerCase().includes(q);
     });
   });
-
-  contextLabel(contextId: string): string {
-    return (
-      TASK_TEMPLATE_CONTEXTS.find((c) => c.id === contextId)?.label ?? contextId
-    );
-  }
 
   linkedTaskCount(templateId: string): number {
     return this.jobService.listByTemplate(templateId).length;
@@ -99,5 +90,22 @@ export class TemplateLibrary {
     }
     const id = this.formService.activeTemplateId();
     if (id) void this.router.navigate(['/builder', id]);
+  }
+
+  deleteTemplate(template: TaskTemplate, event: Event) {
+    event.stopPropagation();
+    const jobCount = this.jobService.listByTemplate(template.id).length;
+    if (jobCount > 0) {
+      window.alert(
+        `Cannot delete: ${jobCount} task(s) are linked to this template.`
+      );
+      return;
+    }
+    const confirmed = window.confirm(
+      `Delete "${template.name}"? This cannot be undone.`
+    );
+    if (!confirmed) return;
+
+    this.formService.deleteTemplate(template.id);
   }
 }

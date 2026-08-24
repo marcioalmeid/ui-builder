@@ -5,7 +5,6 @@ import { DataBindingsPanel } from '../data-bindings-panel/data-bindings-panel';
 import { DataChecklist } from '../data-checklist/data-checklist';
 import { WorkflowRulesPanel } from '../workflow-rules-panel/workflow-rules-panel';
 import { FormService, BuilderSidebarSection } from '../../services/form.services';
-import { TASK_TEMPLATE_CONTEXTS } from '../../models/task-template';
 import {
   getDefaultExpandedSections,
   getSectionUnavailableHint,
@@ -42,19 +41,18 @@ export class BuilderSidebar {
   focusedSection = signal<BuilderSidebarSection | null>(null);
   expandedSections = signal<Set<BuilderSidebarSection>>(new Set(['fields']));
 
-  templateContext = computed(() => this.formService.activeTemplate()?.context ?? 'general');
+  firstDepartment = computed(() => {
+    const depts = this.formService.activeTemplate()?.departments ?? [];
+    return depts.length > 0 ? depts[0] : '';
+  });
 
-  contextLabel = computed(() => {
-    const contextId = this.templateContext();
-    return (
-      TASK_TEMPLATE_CONTEXTS.find((item) => item.id === contextId)?.label ??
-      contextId ??
-      'Task'
-    );
+  departmentLabel = computed(() => {
+    const dept = this.firstDepartment();
+    return dept || 'Task';
   });
 
   sections = computed((): SidebarSectionView[] => {
-    const context = this.templateContext();
+    const dept = this.firstDepartment();
     const expanded = this.expandedSections();
 
     const defs: Array<{ id: AuthoringSection; title: string; hint: string }> = [
@@ -73,16 +71,16 @@ export class BuilderSidebar {
 
     return defs.map((def) => ({
       ...def,
-      relevant: isSidebarSectionRelevant(def.id, context),
-      unavailableHint: getSectionUnavailableHint(def.id, context),
+      relevant: isSidebarSectionRelevant(def.id, dept),
+      unavailableHint: getSectionUnavailableHint(def.id, dept),
       expanded: expanded.has(def.id),
     }));
   });
 
   constructor() {
     effect(() => {
-      const context = this.templateContext();
-      this.expandedSections.set(getDefaultExpandedSections(context));
+      const dept = this.firstDepartment();
+      this.expandedSections.set(getDefaultExpandedSections(dept));
     });
 
     effect(() => {
@@ -100,7 +98,7 @@ export class BuilderSidebar {
       const focus = this.formService.sidebarFocus();
       if (!focus || focus.section === 'template') return;
 
-      if (isSidebarSectionRelevant(focus.section, this.templateContext())) {
+      if (isSidebarSectionRelevant(focus.section, this.firstDepartment())) {
         this.expandedSections.update((current) => new Set([...current, focus.section]));
       }
 
@@ -114,8 +112,7 @@ export class BuilderSidebar {
   }
 
   toggleSection(section: AuthoringSection) {
-    const context = this.templateContext();
-    if (!isSidebarSectionRelevant(section, context)) return;
+    if (!isSidebarSectionRelevant(section, this.firstDepartment())) return;
 
     this.expandedSections.update((current) => {
       const next = new Set(current);

@@ -7,7 +7,6 @@ import { WorkflowRule, createDefaultWorkflowRule } from "../models/workflow-rule
 import {
   createEmptyTemplate,
   RiskPolicy,
-  TASK_TEMPLATE_CONTEXTS,
   TaskTemplate,
   TemplateStatus,
 } from "../models/task-template";
@@ -117,7 +116,7 @@ export class FormService {
     this.purgeSpikeArtifacts();
 
     if (this._templates().length === 0) {
-      const template = createEmptyTemplate("General Task", "general");
+      const template = createEmptyTemplate("General Task");
       this._templates.set([template]);
     }
 
@@ -128,16 +127,6 @@ export class FormService {
 
   getTemplate(templateId: string): TaskTemplate | undefined {
     return this._templates().find((t) => t.id === templateId);
-  }
-
-  findTemplateByContext(context: string): TaskTemplate | undefined {
-    return this._templates().find((t) => t.context === context);
-  }
-
-  isContextTaken(context: string, exceptTemplateId?: string): boolean {
-    return this._templates().some(
-      (t) => t.context === context && t.id !== exceptTemplateId
-    );
   }
 
   /** Check if any department is already used by another template. */
@@ -156,7 +145,6 @@ export class FormService {
 
   createTemplate(
     name: string,
-    context: string,
     departments: string[] = []
   ): { success: boolean; error?: string } {
     // Validate no department conflict
@@ -170,7 +158,7 @@ export class FormService {
     }
 
     this.recordUndo();
-    const template = createEmptyTemplate(name, context);
+    const template = createEmptyTemplate(name, departments);
     template.departments = departments;
     this._templates.set([...this._templates(), template]);
     this.switchTemplate(template.id, false);
@@ -242,8 +230,7 @@ export class FormService {
       : [freeDepartments[0]];
 
     this.recordUndo();
-    const clone = createEmptyTemplate(source.name, source.context);
-    clone.departments = cloneDepartments;
+    const clone = createEmptyTemplate(source.name, cloneDepartments);
     clone.layout = structuredClone(source.layout);
     clone.layout.rows = clone.layout.rows.map((row) => ({
       ...row,
@@ -270,7 +257,6 @@ export class FormService {
 
   updateTemplateMeta(
     name: string,
-    context: string,
     departments: string[] = []
   ): { success: boolean; error?: string } {
     this.assertEditable();
@@ -291,7 +277,6 @@ export class FormService {
       };
     }
 
-    const contextChanged = active.context !== context;
     const departmentsChanged =
       JSON.stringify(active.departments ?? []) !== JSON.stringify(departments);
 
@@ -299,11 +284,11 @@ export class FormService {
     this._templates.set(
       this._templates().map((t) =>
         t.id === active.id
-          ? { ...t, name: name.trim() || t.name, context, departments, updatedAt: Date.now() }
+          ? { ...t, name: name.trim() || t.name, departments, updatedAt: Date.now() }
           : t
       )
     );
-    if (contextChanged || departmentsChanged) {
+    if (departmentsChanged) {
       this.clearSelectedField();
     }
     this.saveState();

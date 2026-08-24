@@ -189,7 +189,7 @@ export function buildSetupSteps(
       label: 'Template',
       complete: templateComplete,
       hint: template
-        ? `${template.name} (${template.context})`
+        ? `${template.name} (${(template.departments?.[0] || 'None')})`
         : 'Select or create a template',
     },
     {

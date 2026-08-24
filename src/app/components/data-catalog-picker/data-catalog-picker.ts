@@ -14,14 +14,14 @@ import { DataCatalogService } from '../../services/data-catalog.service';
 })
 export class DataCatalogPicker {
   selectedId = input<string>();
-  context = input<string>();
+  department = input<string>();
   label = input('Data source');
 
   selectionChange = output<DataCatalogItem>();
 
   catalogService = inject(DataCatalogService);
 
-  categories = computed(() => this.catalogService.getCategories(this.context()));
+  categories = computed(() => this.catalogService.getCategories(this.department()));
   selectedItem = computed(() => {
     const id = this.selectedId() ?? this.localSelection();
     return id ? this.catalogService.getById(id) : undefined;

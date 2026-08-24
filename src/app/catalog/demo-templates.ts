@@ -135,8 +135,7 @@ export function createAdvertisingFixture(
   const template: TaskTemplate = {
     id: templateId,
     name,
-    context: 'advertising',
-    departments: [],
+    departments: ['Digital Ads'],
     version: 0,
     status: 'draft',
     versions: [],

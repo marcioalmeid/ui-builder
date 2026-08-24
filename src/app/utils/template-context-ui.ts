@@ -1,37 +1,38 @@
 import { BuilderSidebarSection } from '../services/form.services';
 
-/** null = available in every template context */
-const SECTION_CONTEXTS: Record<BuilderSidebarSection, string[] | null> = {
+/** null = available in every department */
+const SECTION_DEPARTMENTS: Record<BuilderSidebarSection, string[] | null> = {
   template: null,
   fields: null,
-  data: ['general', 'advertising', 'print', 'social'],
-  rules: ['advertising', 'general'],
+  data: ['Accounts', 'A/V', 'Design', 'Digital Ads', 'Media', 'Organic Social', 'SEO'],
+  rules: ['Digital Ads', 'Design'],
 };
 
-const DEFAULT_EXPANDED: Record<BuilderSidebarSection, boolean | ((context: string) => boolean)> = {
+const DEFAULT_EXPANDED: Record<BuilderSidebarSection, boolean | ((dept: string) => boolean)> = {
   template: false,
   fields: true,
-  data: (context) => context === 'advertising',
-  rules: (context) => context === 'advertising',
+  data: (dept) => dept !== '',
+  rules: (dept) => dept === 'Digital Ads' || dept === 'Design',
 };
 
 export function isSidebarSectionRelevant(
   section: BuilderSidebarSection,
-  context: string
+  department: string
 ): boolean {
-  const allowed = SECTION_CONTEXTS[section];
+  const allowed = SECTION_DEPARTMENTS[section];
   if (!allowed) return true;
-  return allowed.includes(context);
+  if (department === '') return false;
+  return allowed.includes(department);
 }
 
-export function getDefaultExpandedSections(context: string): Set<BuilderSidebarSection> {
+export function getDefaultExpandedSections(department: string): Set<BuilderSidebarSection> {
   const expanded = new Set<BuilderSidebarSection>();
 
-  (Object.keys(SECTION_CONTEXTS) as BuilderSidebarSection[]).forEach((section) => {
-    if (!isSidebarSectionRelevant(section, context)) return;
+  (Object.keys(SECTION_DEPARTMENTS) as BuilderSidebarSection[]).forEach((section) => {
+    if (!isSidebarSectionRelevant(section, department)) return;
 
     const rule = DEFAULT_EXPANDED[section];
-    const shouldExpand = typeof rule === 'function' ? rule(context) : rule;
+    const shouldExpand = typeof rule === 'function' ? rule(department) : rule;
     if (shouldExpand) expanded.add(section);
   });
 
@@ -42,54 +43,45 @@ export function getDefaultExpandedSections(context: string): Set<BuilderSidebarS
   return expanded;
 }
 
-export function getContextLabel(contextId: string): string {
-  const labels: Record<string, string> = {
-    general: 'General Task',
-    advertising: 'Digital Advertising',
-    print: 'Print Media',
-    social: 'Social Media',
-  };
-  return labels[contextId] ?? contextId;
-}
-
 export function getSectionUnavailableHint(
   section: BuilderSidebarSection,
-  context: string
+  department: string
 ): string | null {
-  if (isSidebarSectionRelevant(section, context)) return null;
+  if (isSidebarSectionRelevant(section, department)) return null;
 
+  const label = department || 'Task';
   switch (section) {
     case 'rules':
-      return `Rules are not used in ${getContextLabel(context)} templates. Switch context to configure automations.`;
+      return `Rules are not used in ${label} templates. Switch department to configure automations.`;
     case 'data':
-      return `Data connections are not available for ${getContextLabel(context)}.`;
+      return `Data connections are not available for ${label}.`;
     default:
-      return `Not available in ${getContextLabel(context)}.`;
+      return `Not available in ${label}.`;
   }
 }
 
 export type FieldSettingsGroupId = 'general' | 'data' | 'advanced';
 
-const FIELD_GROUP_CONTEXTS: Record<FieldSettingsGroupId, string[] | null> = {
+const FIELD_GROUP_DEPARTMENTS: Record<FieldSettingsGroupId, string[] | null> = {
   general: null,
-  data: ['general', 'advertising', 'print', 'social'],
+  data: ['Accounts', 'A/V', 'Design', 'Digital Ads', 'Media', 'Organic Social', 'SEO'],
   advanced: null,
 };
 
 export function isFieldSettingsGroupRelevant(
   group: FieldSettingsGroupId,
-  context: string
+  department: string
 ): boolean {
-  const allowed = FIELD_GROUP_CONTEXTS[group];
-  if (allowed && !allowed.includes(context)) return false;
+  const allowed = FIELD_GROUP_DEPARTMENTS[group];
+  if (allowed && !allowed.includes(department)) return false;
   return true;
 }
 
-export function getDefaultExpandedFieldGroups(context: string): Set<FieldSettingsGroupId> {
+export function getDefaultExpandedFieldGroups(department: string): Set<FieldSettingsGroupId> {
   const expanded = new Set<FieldSettingsGroupId>(['general']);
 
-  if (isFieldSettingsGroupRelevant('data', context)) {
-    if (context === 'advertising') expanded.add('data');
+  if (isFieldSettingsGroupRelevant('data', department)) {
+    if (department === 'Digital Ads' || department === 'Design') expanded.add('data');
   }
 
   return expanded;

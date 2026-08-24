@@ -64,7 +64,8 @@ export class FieldSettings {
 
   expandedGroups = signal<Set<FieldSettingsGroupId>>(new Set(['general']));
 
-  templateContext = computed(() => this.formService.activeTemplate()?.context ?? 'general');
+  templateDepartments = computed(() => this.formService.activeTemplateDepartments());
+  templateDepartment = computed(() => this.templateDepartments()[0] ?? '');
 
   selectedField = computed(() => this.formService.selectedField());
 
@@ -77,9 +78,9 @@ export class FieldSettings {
   });
 
   settingGroups = computed((): FieldSettingsGroupView[] => {
-    const context = this.templateContext();
+    const dept = this.templateDepartment();
     const expanded = this.expandedGroups();
-    const rulesSupported = isSidebarSectionRelevant('rules', context);
+    const rulesSupported = isSidebarSectionRelevant('rules', dept);
     const allSettings = this.fieldSettings();
 
     const grouped: Record<FieldSettingsGroupId, FieldSettingsDefinition[]> = {
@@ -101,7 +102,7 @@ export class FieldSettings {
     return defs
       .map((def) => ({ ...def, settings: grouped[def.id] }))
       .filter((def) => def.settings.length > 0)
-      .filter((def) => isFieldSettingsGroupRelevant(def.id, context))
+      .filter((def) => isFieldSettingsGroupRelevant(def.id, dept))
       .map((def) => ({
         id: def.id,
         title: def.title,
@@ -125,19 +126,19 @@ export class FieldSettings {
 
   constructor() {
     effect(() => {
-      const context = this.templateContext();
-      this.expandedGroups.set(getDefaultExpandedFieldGroups(context));
+      const dept = this.templateDepartment();
+      this.expandedGroups.set(getDefaultExpandedFieldGroups(dept));
     });
 
     effect(() => {
       const field = this.selectedField();
       if (!field) return;
 
-      const context = this.templateContext();
-      const next = getDefaultExpandedFieldGroups(context);
+      const dept = this.templateDepartment();
+      const next = getDefaultExpandedFieldGroups(dept);
       if (
         this.fieldSettings().some((setting) => DATA_SETTING_TYPES.has(setting.type)) &&
-        isFieldSettingsGroupRelevant('data', context)
+        isFieldSettingsGroupRelevant('data', dept)
       ) {
         next.add('data');
       }
