@@ -8,7 +8,7 @@
         @if (template(); as tmpl) {
           <h1 class="text-2xl font-medium mt-4">{{ tmpl.name }}</h1>
           <p class="text-sm text-gray-500">
-            {{ tmpl.departments?.[0] || 'Task' }} · Published v{{ publishedVersion() }} · {{ tmpl.status }}
+            {{ tmpl.departments[0] || 'Task' }} · Published v{{ publishedVersion() }} · {{ tmpl.status }}
           </p>
         } @else {
           <h1 class="text-2xl font-medium mt-4 text-red-600">Template not found</h1>
