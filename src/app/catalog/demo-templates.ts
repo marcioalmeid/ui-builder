@@ -15,7 +15,7 @@ function appendEmitEventToRule(rule: WorkflowRule, eventCatalogId: string): Work
   return {
     ...rule,
     nodes: [
-      ...rule.nodes,
+      ...structuredClone(rule.nodes),
       {
         id: eventId,
         type: 'action-event',
@@ -24,7 +24,7 @@ function appendEmitEventToRule(rule: WorkflowRule, eventCatalogId: string): Work
       },
     ],
     edges: [
-      ...rule.edges,
+      ...structuredClone(rule.edges),
       { id: crypto.randomUUID(), source: lastNode.id, target: eventId },
     ],
   };

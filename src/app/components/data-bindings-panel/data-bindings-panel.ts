@@ -1,10 +1,11 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
+import { Subscription } from 'rxjs';
 import { DataBinding } from '../../models/data-binding';
 import { DataCatalogItem } from '../../catalog/data-catalog.items';
 import { FormService } from '../../services/form.services';
@@ -120,7 +121,7 @@ export class DataBindingsPanel {
         dataSource: catalogItem.dataSource,
         targetFieldIds: this.formTargetIds(),
       });
-      this.formService.refreshDataBinding(binding.id, true).subscribe((result) => {
+      this.trackSubscription(this.formService.refreshDataBinding(binding.id, true).subscribe((result) => {
         if (result.error) {
           this.setStatus(result.error, true);
           return;
@@ -130,7 +131,7 @@ export class DataBindingsPanel {
           false
         );
         this.editingId.set(null);
-      });
+      }));
       return;
     }
 
@@ -145,24 +146,24 @@ export class DataBindingsPanel {
       targetFieldIds: this.formTargetIds(),
     });
 
-    this.formService.refreshDataBinding(editingId, true).subscribe((result) => {
+    this.trackSubscription(this.formService.refreshDataBinding(editingId, true).subscribe((result) => {
       if (result.error) {
         this.setStatus(result.error, true);
         return;
       }
       this.setStatus(`Shared list "${catalogItem.name}" updated.`, false);
       this.editingId.set(null);
-    });
+    }));
   }
 
   refreshBinding(bindingId: string) {
-    this.formService.refreshDataBinding(bindingId, true).subscribe((result) => {
+    this.trackSubscription(this.formService.refreshDataBinding(bindingId, true).subscribe((result) => {
       if (result.error) {
         this.setStatus(result.error, true);
         return;
       }
       this.setStatus(`Reloaded ${result.options.length} option(s).`, false);
-    });
+    }));
   }
 
   deleteBinding(bindingId: string) {
@@ -175,5 +176,19 @@ export class DataBindingsPanel {
   private setStatus(message: string, isError: boolean) {
     this.statusMessage.set(message);
     this.statusError.set(isError);
+  }
+
+  private subscriptions = new Set<Subscription>();
+
+  private trackSubscription(sub: Subscription) {
+    this.subscriptions.add(sub);
+    sub.add(() => this.subscriptions.delete(sub));
+  }
+
+  ngOnDestroy() {
+    for (const sub of this.subscriptions) {
+      sub.unsubscribe();
+    }
+    this.subscriptions.clear();
   }
 }

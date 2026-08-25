@@ -18,7 +18,6 @@ import { JobService } from './services/job.service';
   styleUrls: ['./app.css'],
 })
 export class App implements OnInit {
-  protected readonly title = signal('ui-builder');
   private readonly jobs = inject(JobService);
 
   ngOnInit() {

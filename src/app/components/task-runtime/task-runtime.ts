@@ -1,5 +1,7 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { map } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { FormService } from '../../services/form.services';
@@ -12,6 +14,8 @@ import {
 import { FormField } from '../../models/field';
 import { isFieldVisible } from '../../utils/field-visibility';
 import { lastPublishedLayout, lastPublishedVersion } from '../../utils/retroactivity';
+import { TaskTemplate, TaskTemplateLayout } from '../../models/task-template';
+import { FormRow } from '../../models/form';
 
 @Component({
   selector: 'app-task-runtime',
@@ -25,25 +29,38 @@ export class TaskRuntime {
   formService = inject(FormService);
   private jobService = inject(JobService);
 
-  templateId = this.route.snapshot.paramMap.get('templateId') ?? '';
-  template = this.formService.getTemplate(this.templateId);
-  runtimeLayout = this.template ? lastPublishedLayout(this.template) : undefined;
-  publishedVersion = this.template ? lastPublishedVersion(this.template) : 0;
+  templateId = toSignal(
+    this.route.paramMap.pipe(map((params) => params.get('templateId') ?? '')),
+    { initialValue: '' }
+  );
+  template = computed<TaskTemplate | undefined>(() =>
+    this.formService.getTemplate(this.templateId())
+  );
+  runtimeLayout = computed<TaskTemplateLayout | undefined>(() => {
+    const tmpl = this.template();
+    return tmpl ? lastPublishedLayout(tmpl) : undefined;
+  });
+
+  publishedVersion = computed(() => {
+    const tmpl = this.template();
+    return tmpl ? lastPublishedVersion(tmpl) : 0;
+  });
 
   jobData = signal<Record<string, unknown>>({});
   validationErrors = signal<string[]>([]);
   submitted = signal(false);
 
-  private templateFields: FormField[] =
-    this.runtimeLayout?.rows.flatMap((row) => row.fields) ?? [];
+  private templateFields = computed(() =>
+    this.runtimeLayout()?.rows.flatMap((row) => row.fields) ?? []
+  );
 
   requiredFields = computed(() =>
-    this.templateFields.filter(
+    this.templateFields().filter(
       (f) =>
         f.required &&
         f.type !== 'section-header' &&
         f.type !== 'button' &&
-        isFieldVisible(f, this.jobData(), this.runtimeLayout?.workflowRules ?? [])
+        isFieldVisible(f, this.jobData(), this.runtimeLayout()?.workflowRules ?? [])
     )
   );
 
@@ -61,9 +78,13 @@ export class TaskRuntime {
   });
 
   constructor() {
-    if (this.template) {
-      this.jobData.set(buildInitialJobData(this.templateFields));
-    }
+    effect(() => {
+      const tmpl = this.template();
+      if (!tmpl) return;
+      this.jobData.set(buildInitialJobData(this.templateFields()));
+      this.validationErrors.set([]);
+      this.submitted.set(false);
+    });
   }
 
   updateField(fieldId: string, value: unknown) {
@@ -72,23 +93,36 @@ export class TaskRuntime {
   }
 
   submitTask() {
-    if (!this.template) return;
+    const tpl = this.template();
+    if (!tpl) {
+      this.validationErrors.set(['Template not found.']);
+      return;
+    }
 
-    const errors = validateJobData(
-      this.templateFields,
-      this.jobData(),
-      this.runtimeLayout?.workflowRules ?? []
-    );
-    this.validationErrors.set(errors);
+    queueMicrotask(() => {
+      try {
+        const errors = validateJobData(
+          this.templateFields(),
+          this.jobData(),
+          this.runtimeLayout()?.workflowRules ?? []
+        );
+        this.validationErrors.set(errors);
 
-    if (errors.length) return;
+        if (errors.length) return;
 
-    this.jobService.submit(this.templateId, this.jobData());
-    this.submitted.set(true);
+        this.jobService.submit(this.templateId()!, this.jobData());
+        this.submitted.set(true);
+      } catch (error) {
+        console.error('[TaskRuntime] submitTask failed:', error);
+        const msg = error instanceof Error ? error.message : 'Unknown error';
+        this.validationErrors.set([`Submission failed: ${msg}`]);
+        this.submitted.set(false);
+      }
+    });
   }
 
   submitAnother() {
-    this.jobData.set(buildInitialJobData(this.templateFields));
+    this.jobData.set(buildInitialJobData(this.templateFields()));
     this.validationErrors.set([]);
     this.submitted.set(false);
   }

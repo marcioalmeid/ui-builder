@@ -3,7 +3,7 @@
     <input
       type="checkbox"
       [checked]="enabled()"
-      (change)="onToggle($any($event.target).checked)"
+      (change)="onToggle($event)"
     />
     Show only when another field matches
   </label>

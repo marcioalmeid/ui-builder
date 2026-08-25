@@ -55,7 +55,7 @@ export const DATA_CATALOG: DataCatalogItem[] = [
       labelKey: 'name',
       valueKey: 'id',
     },
-    entityFields: ID_NAME,
+    entityFields: [...ID_NAME],
   },
   {
     id: 'platforms',
@@ -70,7 +70,7 @@ export const DATA_CATALOG: DataCatalogItem[] = [
       labelKey: 'name',
       valueKey: 'id',
     },
-    entityFields: ID_NAME,
+    entityFields: [...ID_NAME],
   },
   {
     id: 'request-types',
@@ -85,7 +85,7 @@ export const DATA_CATALOG: DataCatalogItem[] = [
       labelKey: 'name',
       valueKey: 'id',
     },
-    entityFields: ID_NAME,
+    entityFields: [...ID_NAME],
   },
   {
     id: 'vendors',
@@ -100,7 +100,7 @@ export const DATA_CATALOG: DataCatalogItem[] = [
       labelKey: 'name',
       valueKey: 'id',
     },
-    entityFields: ID_NAME,
+    entityFields: [...ID_NAME],
   },
   {
     id: 'budget-line-items',

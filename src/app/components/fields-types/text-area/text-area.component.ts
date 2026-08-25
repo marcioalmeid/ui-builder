@@ -2,6 +2,7 @@ import { Component, input, output } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { FormField } from '../../../models/field';
+import { getBorderStyle } from '../../../utils/border-style';
 
 @Component({
   selector: 'app-text-area',
@@ -22,11 +23,6 @@ export class TextAreaComponent {
   }
 
   getBorderStyle(): string {
-    const border = this.field().border;
-    if (!border || border.style === 'none') {
-      return 'none';
-    }
-
-    return `${border.width} ${border.style} ${border.color}`;
+    return getBorderStyle(this.field().border);
   }
 }

@@ -5,6 +5,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { bindFieldOptions } from '../../../utils/data-bound-options';
+import { getBorderStyle } from '../../../utils/border-style';
 
 @Component({
   selector: 'app-dropdown-list',
@@ -29,11 +30,6 @@ export class DropdownList {
   error = this.boundOptions.error;
 
   getBorderStyle(): string {
-    const border = this.field().border;
-    if (!border || border.style === 'none') {
-      return 'none';
-    }
-
-    return `${border.width} ${border.style} ${border.color}`;
+    return getBorderStyle(this.field().border);
   }
 }

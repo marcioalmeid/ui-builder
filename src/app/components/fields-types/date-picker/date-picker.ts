@@ -7,6 +7,7 @@ import {
 } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
 import { MatNativeDateModule } from '@angular/material/core';
+import { getBorderStyle } from '../../../utils/border-style';
 
 @Component({
   selector: 'app-date-picker',
@@ -39,11 +40,6 @@ export class DatePicker {
   }
 
   getBorderStyle(): string {
-    const border = this.field().border;
-    if (!border || border.style === 'none') {
-      return 'none';
-    }
-
-    return `${border.width} ${border.style} ${border.color}`;
+    return getBorderStyle(this.field().border);
   }
 }

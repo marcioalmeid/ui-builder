@@ -31,7 +31,11 @@ export class DataCatalogPicker {
 
   constructor() {
     effect(() => {
-      this.localSelection.set(this.selectedId() ?? '');
+      // Only sync from input when localSelection hasn't been set by user yet.
+      // This prevents the effect from overwriting user choices on remount.
+      if (!this.localSelection()) {
+        this.localSelection.set(this.selectedId() ?? '');
+      }
     });
   }
 

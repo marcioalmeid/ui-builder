@@ -15,17 +15,25 @@ import {
   providedIn: 'root',
 })
 export class JobService {
-  private repository = inject(JobRepository);
-  private formService = inject(FormService);
-  private retroactivity = inject(RetroactivityService);
+  private readonly repository = inject(JobRepository);
+  private readonly formService = inject(FormService);
+  private readonly retroactivity = inject(RetroactivityService);
 
   submit(templateId: string, data: Record<string, unknown>): JobSubmission {
     const template = this.formService.getTemplate(templateId);
-    const layout = template ? lastPublishedLayout(template) : undefined;
-    const fields = layout?.rows.flatMap((row) => row.fields) ?? [];
-    const pin = template ? lastPublishedVersion(template) : undefined;
+    if (!template) {
+      throw new Error(`Template "${templateId}" not found.`);
+    }
+    const hasPublishedVersion = (template.versions?.length ?? 0) > 0;
+    if (template.status !== 'published' && !hasPublishedVersion) {
+      throw new Error(`Template "${template.name}" is not published.`);
+    }
+
+    const layout = lastPublishedLayout(template);
+    const fields = layout.rows.flatMap((row) => row.fields);
+    const pin = lastPublishedVersion(template);
     const events = getWorkflowEmittedEvents(
-      layout?.workflowRules ?? [],
+      layout.workflowRules ?? [],
       data,
       {
         fields,
@@ -39,8 +47,8 @@ export class JobService {
       id: `${templateId}-${Date.now()}`,
       templateId,
       templateVersion: pin,
-      templateName: template?.name,
-      friendlyId: this.nextFriendlyId(templateId),
+      templateName: template.name,
+      friendlyId: this.nextUniqueFriendlyId(templateId),
       data,
       events,
       submittedAt: Date.now(),
@@ -67,7 +75,7 @@ export class JobService {
       templateVersion: source.templateVersion,
       templateName:
         this.formService.getTemplate(source.templateId)?.name ?? source.templateName,
-      friendlyId: this.nextFriendlyId(source.templateId),
+      friendlyId: this.nextUniqueFriendlyId(source.templateId),
       data,
       events: structuredClone(source.events),
       submittedAt: Date.now(),
@@ -89,15 +97,30 @@ export class JobService {
       const seq = this.parseFriendlySeq(job.friendlyId);
       if (seq > maxSeq) maxSeq = seq;
     }
-    const nextSeq = maxSeq + 1;
-    return `TASK-${String(nextSeq).padStart(3, '0')}`;
+    return this.formatFriendlyId(maxSeq + 1);
+  }
+
+  /** Generate a unique friendly ID avoiding collisions with existing jobs. */
+  private nextUniqueFriendlyId(templateId: string): string {
+    let seq = this.parseFriendlySeq(this.nextFriendlyId(templateId));
+    let friendlyId = this.formatFriendlyId(seq);
+    // Bump until globally unique (IDs are shared across templates).
+    while (this.repository.list().some((j) => j.friendlyId === friendlyId)) {
+      seq += 1;
+      friendlyId = this.formatFriendlyId(seq);
+    }
+    return friendlyId;
+  }
+
+  private formatFriendlyId(seq: number): string {
+    return `TASK-${String(seq).padStart(3, '0')}`;
   }
 
   /** Extract the sequence number from a friendly ID like "TASK-001". */
   private parseFriendlySeq(friendlyId?: string): number {
     if (!friendlyId) return 0;
-    const match = friendlyId.match(/TASK-(\d+)/);
-    return match ? parseInt(match[1], 10) : 0;
+    const match = /TASK-(\d+)/.exec(friendlyId);
+    return match ? Number.parseInt(match[1], 10) : 0;
   }
 
   updateStatus(taskId: string, status: TaskStatus): JobSubmission | undefined {

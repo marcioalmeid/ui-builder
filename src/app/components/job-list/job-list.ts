@@ -246,7 +246,8 @@ export class JobList {
   private fieldsFor(task: JobSubmission): FormField[] {
     const template = this.formService.getTemplate(task.templateId);
     if (!template) return [];
-    return getAllLayoutFields(template.layout);
+    const layout = this.retroactivity.resolveJob(task, template);
+    return getAllLayoutFields(layout);
   }
 }
 

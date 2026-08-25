@@ -28,14 +28,16 @@ export class FormPreview {
 
   displayRows = computed<FormRow[]>(() => this.resolvedLayout()?.rows ?? []);
 
+  private hasExplicitLayout = computed(() => this.layout() !== undefined);
+
   hiddenFieldHints = computed(() => {
-    if (!this.interactive()) return [];
+    if (!this.interactive() || this.hasExplicitLayout()) return [];
     const fields = getAllFields(this.displayRows());
     return getHiddenFieldHints(fields, this.jobData(), this.workflowRules());
   });
 
   emittedEvents = computed(() => {
-    if (!this.interactive()) return [];
+    if (!this.interactive() || this.hasExplicitLayout()) return [];
     const template = this.activeTemplate();
     const fields = getAllFields(this.displayRows());
     return getWorkflowEmittedEvents(this.workflowRules(), this.jobData(), {

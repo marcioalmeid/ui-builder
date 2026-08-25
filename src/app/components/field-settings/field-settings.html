@@ -58,7 +58,7 @@
                   }
                   @case ('options-list') {
                     <app-options-list-editor
-                      [options]="$any(fieldValues()[setting.key] || [])"
+                      [options]="fieldOptions()"
                       (optionsChange)="updateField(selectedField.id, setting.key, $event)"
                     />
                   }
@@ -97,7 +97,7 @@
                   }
                   @case ('border') {
                     <app-border-config
-                      [border]="$any(fieldValues().border)"
+                      [border]="fieldValues().border ?? { style: 'none', width: '', color: '#000000' }"
                       (borderChange)="updateField(selectedField.id, setting.key, $event)"
                     />
                   }

@@ -1,7 +1,7 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormService } from '../../services/form.services';
 import { FieldTypeService } from '../../services/field-types.service';
-import { FormField, FieldSettingsDefinition } from '../../models/field';
+import { FormField, FieldSettingsDefinition, RadioOption } from '../../models/field';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { MatInput } from '@angular/material/input';
@@ -122,6 +122,11 @@ export class FieldSettings {
       fieldCopy.border = { style: 'none', width: '', color: '#000000' };
     }
     return fieldCopy as FormField & Record<string, unknown>;
+  });
+
+  fieldOptions = computed((): RadioOption[] => {
+    const fv = this.fieldValues();
+    return (fv['options'] as RadioOption[]) ?? [];
   });
 
   constructor() {

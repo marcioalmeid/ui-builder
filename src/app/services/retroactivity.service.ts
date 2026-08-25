@@ -104,8 +104,6 @@ export class RetroactivityService {
     const pin = job.templateVersion ?? 0;
     const snapshots = template.versions ?? [];
     if (!snapshots.length) return lastPublishedLayout(template);
-    const snapshot = snapshots.find((item) => item.version === pin);
-    if (!snapshot) return lastPublishedLayout(template);
 
     const ledger = this.ledger.get(template.id);
     return resolveLayout(

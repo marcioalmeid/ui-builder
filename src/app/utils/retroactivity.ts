@@ -56,7 +56,7 @@ function nextId(factory?: () => string): string {
   return factory?.() ?? crypto.randomUUID();
 }
 
-function isRestricted(field: FormField): boolean {
+function isRestricted(field: FormField): field is RestrictedField {
   return Boolean((field as RestrictedField).restricted);
 }
 
@@ -162,6 +162,75 @@ function classifyRules(prev: WorkflowRule[], next: WorkflowRule[]): RuleChangeCl
   return addedOnly ? 'SAFE' : 'BREAKING';
 }
 
+function makeFieldEvent(
+  fieldId: string,
+  fromVersion: number,
+  toVersion: number,
+  className: FieldChangeClass,
+  patch: FieldEventPatch,
+  idFactory?: () => string
+): FieldDiffEvent {
+  return {
+    id: nextId(idFactory),
+    fieldId,
+    fromVersion,
+    toVersion,
+    class: className,
+    patch,
+  };
+}
+
+function addedFieldEvents(
+  prevFields: Map<string, FormField>,
+  next: TaskTemplateLayout,
+  nextFields: Map<string, FormField>,
+  ctx: { fromVersion: number; toVersion: number; idFactory?: () => string }
+): FieldDiffEvent[] {
+  return [...nextFields]
+    .filter(([id]) => !prevFields.has(id))
+    .map(([id, field]) =>
+      makeFieldEvent(id, ctx.fromVersion, ctx.toVersion, 'ADDITIVE', {
+        kind: 'add',
+        field: structuredClone(field),
+        rowId: rowIdForField(next, id),
+      }, ctx.idFactory)
+    );
+}
+
+function existingFieldEvents(
+  prev: TaskTemplateLayout,
+  next: TaskTemplateLayout,
+  prevFields: Map<string, FormField>,
+  nextFields: Map<string, FormField>,
+  referenced: Set<string>,
+  retired: string[],
+  ctx: { fromVersion: number; toVersion: number; idFactory?: () => string }
+): { events: FieldDiffEvent[]; triggerRuleChange: boolean } {
+  const events: FieldDiffEvent[] = [];
+  let triggerRuleChange = false;
+
+  for (const [id, prevField] of prevFields) {
+    const nextField = nextFields.get(id);
+    if (!nextField) {
+      events.push(makeFieldEvent(id, ctx.fromVersion, ctx.toVersion, 'BREAKING', { kind: 'remove' }, ctx.idFactory));
+      if (!retired.includes(id)) retired.push(id);
+      continue;
+    }
+
+    const changeClass = classifyExistingField(prevField, nextField);
+    if (!changeClass) continue;
+    if (changeClass === 'COSMETIC' && referenced.has(id)) {
+      triggerRuleChange = true;
+      continue;
+    }
+    const changes = changeClass === 'COSMETIC'
+      ? cosmeticChanges(prevField, nextField)
+      : ({ ...nextField } satisfies Partial<FormField>);
+    events.push(makeFieldEvent(id, ctx.fromVersion, ctx.toVersion, changeClass, { kind: 'upsert', changes }, ctx.idFactory));
+  }
+  return { events, triggerRuleChange };
+}
+
 export function diffPublish(
   prev: TaskTemplateLayout | null,
   next: TaskTemplateLayout,
@@ -187,72 +256,19 @@ export function diffPublish(
 
   const prevFields = fieldById(prev);
   const nextFields = fieldById(next);
-  const fieldEvents: FieldDiffEvent[] = [];
-  let triggerFieldCosmetic = false;
 
-  for (const [id, nextField] of nextFields) {
+  for (const id of nextFields.keys()) {
     if (!prevFields.has(id) && retired.includes(id)) {
       return { ok: false, error: 'FIELD_ID_REUSED', fieldId: id };
     }
   }
 
-  for (const [id, nextField] of nextFields) {
-    if (prevFields.has(id)) continue;
-    fieldEvents.push({
-      id: nextId(ctx.idFactory),
-      fieldId: id,
-      fromVersion: ctx.fromVersion,
-      toVersion: ctx.toVersion,
-      class: 'ADDITIVE',
-      patch: {
-        kind: 'add',
-        field: structuredClone(nextField),
-        rowId: rowIdForField(next, id),
-      },
-    });
-  }
-
-  for (const [id, prevField] of prevFields) {
-    const nextField = nextFields.get(id);
-    if (!nextField) {
-      fieldEvents.push({
-        id: nextId(ctx.idFactory),
-        fieldId: id,
-        fromVersion: ctx.fromVersion,
-        toVersion: ctx.toVersion,
-        class: 'BREAKING',
-        patch: { kind: 'remove' },
-      });
-      if (!retired.includes(id)) retired.push(id);
-      continue;
-    }
-
-    const changeClass = classifyExistingField(prevField, nextField);
-    if (!changeClass) continue;
-
-    const cosmeticOnly = changeClass === 'COSMETIC';
-    if (cosmeticOnly && referenced.has(id)) {
-      triggerFieldCosmetic = true;
-      continue;
-    }
-
-    const changes =
-      changeClass === 'COSMETIC'
-        ? cosmeticChanges(prevField, nextField)
-        : ({ ...nextField } satisfies Partial<FormField>);
-
-    fieldEvents.push({
-      id: nextId(ctx.idFactory),
-      fieldId: id,
-      fromVersion: ctx.fromVersion,
-      toVersion: ctx.toVersion,
-      class: changeClass,
-      patch: { kind: 'upsert', changes },
-    });
-  }
+  const fieldEvents = addedFieldEvents(prevFields, next, nextFields, ctx);
+  const existing = existingFieldEvents(prev, next, prevFields, nextFields, referenced, retired, ctx);
+  fieldEvents.push(...existing.events);
 
   let ruleClass = classifyRules(prevRules, nextRules);
-  if (triggerFieldCosmetic) {
+  if (existing.triggerRuleChange) {
     ruleClass = 'BREAKING';
   }
 
@@ -268,7 +284,7 @@ export function diffPublish(
   return {
     ok: true,
     diff: { fieldEvents, ruleEvent },
-    retiredFieldIds: retired,
+    retiredFieldIds: [...retired],
   };
 }
 
@@ -421,13 +437,27 @@ function applyPatchToLayout(layout: TaskTemplateLayout, event: FieldDiffEvent): 
   }
 }
 
+export function findSnapshotForPin(
+  snapshots: TemplateVersionSnapshot[],
+  pin: number
+): TemplateVersionSnapshot | undefined {
+  const exact = snapshots.find((item) => item.version === pin);
+  if (exact) return exact;
+  if (pin <= 0) return snapshots[0];
+  return (
+    snapshots
+      .filter((item) => item.version <= pin)
+      .sort((a, b) => b.version - a.version)[0] ?? snapshots[0]
+  );
+}
+
 export function resolveLayout(
   snapshots: TemplateVersionSnapshot[],
   pin: number,
   fieldEvents: FieldDiffEvent[],
   appliedFieldEventIds: string[] = []
 ): TaskTemplateLayout {
-  const snapshot = snapshots.find((item) => item.version === pin);
+  const snapshot = findSnapshotForPin(snapshots, pin);
   if (!snapshot) {
     throw new Error(`No snapshot for pin ${pin}`);
   }
@@ -453,7 +483,7 @@ export function latestSnapshotVersion(template: Pick<TaskTemplate, 'versions'>):
 export function lastPublishedLayout(template: TaskTemplate): TaskTemplateLayout {
   const versions = template.versions ?? [];
   if (!versions.length) return template.layout;
-  return versions[versions.length - 1].layout;
+  return versions.at(-1)!.layout;
 }
 
 export function lastPublishedVersion(template: TaskTemplate): number {
@@ -463,7 +493,7 @@ export function lastPublishedVersion(template: TaskTemplate): number {
   if (template.status === 'published') {
     return template.version > 0 ? template.version : 1;
   }
-  return template.version > 0 ? template.version : 0;
+  return Math.max(template.version, 0);
 }
 
 export function canMigrateJob(

@@ -3,6 +3,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormField } from '../../../models/field';
 import { bindFieldOptions } from '../../../utils/data-bound-options';
+import { getBorderStyle } from '../../../utils/border-style';
 
 @Component({
   selector: 'app-radio-field',
@@ -27,11 +28,6 @@ export class RadioField {
   error = this.boundOptions.error;
 
   getBorderStyle(): string {
-    const border = this.field().border;
-    if (!border || border.style === 'none') {
-      return 'none';
-    }
-
-    return `${border.width} ${border.style} ${border.color}`;
+    return getBorderStyle(this.field().border);
   }
 }

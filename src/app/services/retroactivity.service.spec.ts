@@ -131,4 +131,41 @@ describe('RetroactivityService dry-run vs commit', () => {
     expect(ledger.get(draft.id).fieldEvents).toHaveLength(0);
     expect(ledger.get(draft.id).ruleEvents).toHaveLength(0);
   });
+
+  it('resolveJob uses earliest snapshot when pin is 0', () => {
+    const published = templateWithLayout('Title v1', true);
+    const committed = service.commit(
+      {
+        ...published,
+        status: 'draft' as const,
+        layout: {
+          ...published.layout,
+          rows: [
+            {
+              id: 'row-1',
+              templateId: 'tpl-1',
+              fields: [text('title', 'Title v2')],
+            },
+          ],
+        },
+      },
+      'ADDITIVE'
+    );
+
+    const job = {
+      id: 'job-pin-0',
+      templateId: published.id,
+      templateVersion: 0,
+      templateName: published.name,
+      data: { title: 'x' },
+      events: [],
+      submittedAt: 1,
+      status: 'todo' as const,
+      appliedFieldEventIds: [] as string[],
+      appliedRuleEventIds: [] as string[],
+    };
+
+    const resolved = service.resolveJob(job, committed.template);
+    expect(resolved.rows[0].fields[0].label).toBe('Title v1');
+  });
 });

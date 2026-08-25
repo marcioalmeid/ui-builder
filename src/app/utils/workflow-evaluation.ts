@@ -181,6 +181,7 @@ function getOrderedChain(rule: WorkflowRule): WorkflowNode[] {
   if (!trigger) return [];
 
   const chain: WorkflowNode[] = [trigger];
+  const visited = new Set<string>([trigger.id]);
   let currentId = trigger.id;
 
   while (true) {
@@ -188,6 +189,8 @@ function getOrderedChain(rule: WorkflowRule): WorkflowNode[] {
     if (!edge) break;
     const next = rule.nodes.find((node) => node.id === edge.target);
     if (!next) break;
+    if (visited.has(next.id)) break; // cycle detection
+    visited.add(next.id);
     chain.push(next);
     currentId = next.id;
   }

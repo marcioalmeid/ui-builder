@@ -1,5 +1,7 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { map } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { FormPreview } from '../main-canvas/form-preview/form-preview';
@@ -22,13 +24,27 @@ export class JobDetail {
   private formService = inject(FormService);
   private retroactivity = inject(RetroactivityService);
 
-  taskId =
-    this.route.snapshot.paramMap.get('taskId') ??
-    this.route.snapshot.paramMap.get('jobId') ??
-    '';
-  job = signal<JobSubmission | undefined>(this.jobService.getById(this.taskId));
+  private taskId = toSignal(
+    this.route.paramMap.pipe(
+      map(
+        (params) => params.get('taskId') ?? params.get('jobId') ?? ''
+      )
+    ),
+    { initialValue: '' }
+  );
+
+  job = signal<JobSubmission | undefined>(undefined);
   saved = signal(false);
   showAdvanced = signal(false);
+
+  constructor() {
+    effect(() => {
+      const id = this.taskId();
+      this.job.set(id ? this.jobService.getById(id) : undefined);
+      this.saved.set(false);
+      this.showAdvanced.set(false);
+    });
+  }
 
   template = computed(() => {
     const job = this.job();
@@ -87,7 +103,9 @@ export class JobDetail {
   }
 
   migrate() {
-    const updated = this.jobService.migrate(this.taskId);
+    const id = this.taskId();
+    if (!id) return;
+    const updated = this.jobService.migrate(id);
     if (updated) {
       this.job.set(updated);
       this.saved.set(false);

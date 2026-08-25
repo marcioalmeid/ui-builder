@@ -29,17 +29,26 @@ describe('FormService', () => {
   });
 
   it('allows only one active template per department', () => {
-    const first = service.createTemplate('Ads A', ['print']);
-    expect(first.success).toBe(true);
+    // Mock departments so cloneTemplate can find a free one
+    const deptService = (service as any).departmentService;
+    const originalDepartments = deptService.departments();
+    deptService._departments.set(['print', 'marketing', 'sales', 'engineering']);
 
-    const second = service.createTemplate('Ads B', ['print']);
-    expect(second.success).toBe(false);
-    expect(second.error).toMatch(/one active template/i);
+    try {
+      const first = service.createTemplate('Ads A', ['print']);
+      expect(first.success).toBe(true);
 
-    const clone = service.cloneTemplate();
-    expect(clone.success).toBe(true);
-    const cloned = service.activeTemplate();
-    expect(cloned?.departments).not.toContain('print');
+      const second = service.createTemplate('Ads B', ['print']);
+      expect(second.success).toBe(false);
+      expect(second.error).toMatch(/Only one template per department/);
+
+      const clone = service.cloneTemplate();
+      expect(clone.success).toBe(true);
+      const cloned = service.activeTemplate();
+      expect(cloned?.departments).not.toContain('print');
+    } finally {
+      deptService._departments.set(originalDepartments);
+    }
   });
 
   it('adds and looks up a field via the cached index', () => {
@@ -93,6 +102,17 @@ describe('FormService', () => {
     service.moveField(field.id, rowA, rowB);
     expect(service.findRowByFieldId(field.id)?.id).toBe(rowB);
     expect(service.rows()[0].fields).toHaveLength(0);
+  });
+
+  it('moveField keeps the field when target row is invalid', () => {
+    expect(service.createTemplate('My Form', ['general']).success).toBe(true);
+    const rowA = service.rows()[0].id;
+    const field = makeTextField(crypto.randomUUID(), 'Stay put');
+    service.addField(field, rowA);
+
+    service.moveField(field.id, rowA, 'missing-row');
+    expect(service.findRowByFieldId(field.id)?.id).toBe(rowA);
+    expect(service.rows()[0].fields).toHaveLength(1);
   });
 
   it('generateForm delegates to the extracted code generator', () => {

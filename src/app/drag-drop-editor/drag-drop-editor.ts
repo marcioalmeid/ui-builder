@@ -47,26 +47,29 @@ export class DragDropEditorComponent implements OnInit {
   );
 
   ngOnInit() {
-    this.route.paramMap.subscribe((params) => {
-      const templateId = params.get('templateId');
-      if (!templateId) {
-        const activeId = this.formService.activeTemplateId();
-        if (activeId) {
-          void this.router.navigate(['/builder', activeId], { replaceUrl: true });
-        } else {
-          void this.router.navigate(['/templates']);
-        }
-        return;
-      }
+    this.route.paramMap.subscribe({
+        next: (params) => {
+          const templateId = params.get('templateId');
+          if (!templateId) {
+            const activeId = this.formService.activeTemplateId();
+            if (activeId) {
+              void this.router.navigate(['/builder', activeId], { replaceUrl: true });
+            } else {
+              void this.router.navigate(['/templates']);
+            }
+            return;
+          }
 
-      if (this.formService.getTemplate(templateId)) {
-        if (this.formService.activeTemplateId() !== templateId) {
-          this.formService.switchTemplate(templateId);
-        }
-      } else {
-        void this.router.navigate(['/templates']);
-      }
-    });
+          if (this.formService.getTemplate(templateId)) {
+            if (this.formService.activeTemplateId() !== templateId) {
+              this.formService.switchTemplate(templateId);
+            }
+          } else {
+            void this.router.navigate(['/templates']);
+          }
+        },
+        error: (err) => console.error('[DragDropEditor] Route subscription error:', err),
+      });
 
     if (!localStorage.getItem(WELCOME_KEY)) {
       this.dialog.open(WelcomeDialog, { width: '480px' });

@@ -84,24 +84,28 @@ export class CostBreakdown {
     this.onValueChange()?.(next);
   }
 
-  onGrossChange(raw: string) {
+  onGrossChange(event: Event) {
+    const raw = (event.target as HTMLInputElement).value;
     const grossBudget = raw === '' ? '' : Number(raw);
     this.emit({ ...this.state(), grossBudget });
   }
 
-  onFeePercentChange(raw: string) {
+  onFeePercentChange(event: Event) {
+    const raw = (event.target as HTMLInputElement).value;
     const managementFeePercent = Number(raw) || 0;
     this.emit({ ...this.state(), managementFeePercent });
   }
 
-  onFeeLabelChange(index: number, label: string) {
+  onFeeLabelChange(index: number, event: Event) {
+    const label = (event.target as HTMLInputElement).value;
     const additionalFees = this.state().additionalFees.map((fee, i) =>
       i === index ? { ...fee, label } : fee
     );
     this.emit({ ...this.state(), additionalFees });
   }
 
-  onFeeAmountChange(index: number, raw: string) {
+  onFeeAmountChange(index: number, event: Event) {
+    const raw = (event.target as HTMLInputElement).value;
     const amount = Number(raw) || 0;
     const additionalFees = this.state().additionalFees.map((fee, i) =>
       i === index ? { ...fee, amount } : fee

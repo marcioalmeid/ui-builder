@@ -13,7 +13,7 @@
         type="number"
         min="0"
         [value]="state().grossBudget"
-        (input)="onGrossChange($any($event.target).value)"
+        (input)="onGrossChange($event)"
       />
     </mat-form-field>
 
@@ -25,7 +25,7 @@
         min="0"
         max="100"
         [value]="state().managementFeePercent"
-        (input)="onFeePercentChange($any($event.target).value)"
+        (input)="onFeePercentChange($event)"
       />
       <span matTextSuffix>%</span>
       <mat-hint>{{ formatCurrency(managementFeeAmount()) }}</mat-hint>
@@ -47,7 +47,7 @@
           <input
             matInput
             [value]="fee.label"
-            (input)="onFeeLabelChange($index, $any($event.target).value)"
+            (input)="onFeeLabelChange($index, $event)"
           />
         </mat-form-field>
         <mat-form-field appearance="outline" class="w-36">
@@ -58,7 +58,7 @@
             type="number"
             min="0"
             [value]="fee.amount"
-            (input)="onFeeAmountChange($index, $any($event.target).value)"
+            (input)="onFeeAmountChange($index, $event)"
           />
         </mat-form-field>
         <button

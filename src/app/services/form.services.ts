@@ -1,4 +1,4 @@
-import { Injectable, signal, computed, inject } from "@angular/core";
+import { Injectable, signal, computed, inject, Injector } from "@angular/core";
 import { Observable, of } from "rxjs";
 import { FormRow } from "../models/form";
 import { ApiDataSource, FormField, RadioOption } from "../models/field";
@@ -22,6 +22,7 @@ import {
   SetupStepId,
   validateTemplateForPublish,
 } from "../utils/template-readiness";
+import { JobService } from "./job.service";
 
 export type BuilderSidebarSection = "template" | "fields" | "data" | "rules";
 
@@ -41,6 +42,7 @@ export class FormService {
   private dataSourceService = inject(DataSourceService);
   private departmentService = inject(DepartmentService);
   private retroactivity = inject(RetroactivityService);
+  private injector = inject(Injector);
 
   private _templates = signal<TaskTemplate[]>([]);
   private _activeTemplateId = signal<string>("");
@@ -216,7 +218,12 @@ export class FormService {
     const freeDepartments = allDepartments.filter(
       (dept) => !this.isDepartmentTaken(dept)
     );
-    if (freeDepartments.length === 0) {
+    // Exclude the source's own departments so the clone gets a new one
+    const sourceDeptSet = new Set(source.departments ?? []);
+    const trulyFreeDepartments = freeDepartments.filter(
+      (dept) => !sourceDeptSet.has(dept)
+    );
+    if (trulyFreeDepartments.length === 0) {
       return {
         success: false,
         error:
@@ -224,10 +231,8 @@ export class FormService {
       };
     }
 
-    // Use the first free department (or source's departments if any are free)
-    const cloneDepartments = source.departments?.length > 0
-      ? source.departments.filter((dept) => !this.isDepartmentTaken(dept, source.id))
-      : [freeDepartments[0]];
+    // Use the first truly free department (not source's)
+    const cloneDepartments = [trulyFreeDepartments[0]];
 
     this.recordUndo();
     const clone = createEmptyTemplate(source.name, cloneDepartments);
@@ -494,16 +499,16 @@ export class FormService {
 
     if (!fieldToMove) return;
 
+    const targetRowIndex = rows.findIndex((row) => row.id === targetRowId);
+    if (targetRowIndex < 0) return;
+
     const newRows = [...rows];
     newRows[sourceRowIndex].fields = newRows[sourceRowIndex].fields.filter(
       (f) => f.id !== fieldId
     );
-    const targetRowIndex = newRows.findIndex((row) => row.id === targetRowId);
-    if (targetRowIndex >= 0) {
-      const targetFields = [...newRows[targetRowIndex].fields];
-      targetFields.splice(targetIndex, 0, fieldToMove);
-      newRows[targetRowIndex].fields = targetFields;
-    }
+    const targetFields = [...newRows[targetRowIndex].fields];
+    targetFields.splice(targetIndex, 0, fieldToMove);
+    newRows[targetRowIndex].fields = targetFields;
     this._rows.set(newRows);
     this.saveState();
   }
@@ -874,7 +879,8 @@ export class FormService {
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     } catch (error) {
-      console.error("Failed to save state:", error);
+      // localStorage quota exceeded or private browsing — log but do not crash.
+      console.warn("Failed to persist state to localStorage:", error);
     }
   }
 
@@ -943,6 +949,7 @@ export class FormService {
       if (active) this.loadTemplateLayout(active);
     }
     this.saveState();
+    this.injector.get(JobService).pruneOrphanJobs();
   }
 
   exportForm() {

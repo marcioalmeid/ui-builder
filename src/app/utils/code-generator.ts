@@ -2,6 +2,16 @@ import { FormRow } from '../models/form';
 import { FormField } from '../models/field';
 import { nestedValueToExportExpression } from './nested-value';
 
+/** Escape HTML special characters to prevent XSS in generated templates. */
+function sanitizeHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function sanitizeFieldKey(fieldId: string): string {
   return fieldId.replace(/-/g, '_');
 }
@@ -183,30 +193,30 @@ function generateTemplate(rows: FormRow[], hasApiFields: boolean): string {
     for (const field of row.fields) {
       if (field.type === 'section-header') {
         template += `      <div class="basis-full pt-2 pb-1">\n`;
-        template += `        <h3 class="text-xs font-bold tracking-wide uppercase text-gray-500 border-t border-gray-200 pt-4">${field.label}</h3>\n`;
+        template += `        <h3 class="text-xs font-bold tracking-wide uppercase text-gray-500 border-t border-gray-200 pt-4">${sanitizeHtml(field.label)}</h3>\n`;
         if (field.hint) {
-          template += `        <p class="text-xs text-gray-400 mt-1">${field.hint}</p>\n`;
+          template += `        <p class="text-xs text-gray-400 mt-1">${sanitizeHtml(field.hint)}</p>\n`;
         }
         template += `      </div>\n`;
         continue;
       }
       if (field.type === 'button') {
         template += `      <div class="shrink-0">\n`;
-        template += `        <button type="button" class="px-4 py-2 bg-blue-600 text-white rounded shadow-sm">${field.label}</button>\n`;
+        template += `        <button type="button" class="px-4 py-2 bg-blue-600 text-white rounded shadow-sm">${sanitizeHtml(field.label)}</button>\n`;
         if (field.hint) {
-          template += `        <p class="text-xs text-gray-500 mt-1">${field.hint}</p>\n`;
+          template += `        <p class="text-xs text-gray-500 mt-1">${sanitizeHtml(field.hint)}</p>\n`;
         }
         template += `      </div>\n`;
         continue;
       }
 
       const hintHtml = field.hint
-        ? `        <p class="text-xs text-gray-500 mb-1">${field.hint}</p>\n`
+        ? `        <p class="text-xs text-gray-500 mb-1">${sanitizeHtml(field.hint)}</p>\n`
         : '';
 
       template += `      <div class="flex-1">\n`;
       if (field.type !== 'cost-breakdown') {
-        template += `        <label class="block text-sm font-medium mb-1" for="${field.id}">${field.label}${field.required ? ' *' : ''}</label>\n`;
+        template += `        <label class="block text-sm font-medium mb-1" for="${field.id}">${sanitizeHtml(field.label)}${field.required ? ' *' : ''}</label>\n`;
         template += hintHtml;
       }
 
@@ -216,8 +226,8 @@ function generateTemplate(rows: FormRow[], hasApiFields: boolean): string {
         template += `        <input ${bindInput(field.id, inputType, field.placeholder || '')}>\n`;
       } else if (field.type === 'cost-breakdown') {
         template += `        <div class="border rounded p-4 bg-gray-50">\n`;
-        template += `          <p class="font-medium mb-2">${field.label}</p>\n`;
-        if (field.hint) template += `          <p class="text-xs text-gray-500 mb-3">${field.hint}</p>\n`;
+        template += `          <p class="font-medium mb-2">${sanitizeHtml(field.label)}</p>\n`;
+        if (field.hint) template += `          <p class="text-xs text-gray-500 mb-3">${sanitizeHtml(field.hint)}</p>\n`;
         template += `          <p class="text-sm text-gray-600">Cost breakdown block — use runtime component in app.</p>\n`;
         template += `        </div>\n`;
       } else if (field.type === 'radio') {
@@ -232,7 +242,7 @@ function generateTemplate(rows: FormRow[], hasApiFields: boolean): string {
         } else {
           for (const option of field.options || []) {
             template += `          <label class="flex items-center gap-2">\n`;
-            template += `              <input type="radio" name="${field.id}" [checked]="jobData()['${field.id}'] === '${option.value}'" (change)="updateField('${field.id}', '${option.value}')"> ${option.label}\n`;
+            template += `              <input type="radio" name="${field.id}" [checked]="jobData()['${field.id}'] === '${option.value}'" (change)="updateField('${field.id}', '${option.value}')"> ${sanitizeHtml(option.label)}\n`;
             template += `          </label>\n`;
           }
         }
@@ -249,7 +259,7 @@ function generateTemplate(rows: FormRow[], hasApiFields: boolean): string {
           template += `          }\n`;
         } else {
           for (const option of field.options || []) {
-            template += `          <option value="${option.value}">${option.label}</option>\n`;
+            template += `          <option value="${option.value}">${sanitizeHtml(option.label)}</option>\n`;
           }
         }
         template += `        </select>\n`;

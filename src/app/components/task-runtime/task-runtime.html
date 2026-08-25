@@ -5,21 +5,21 @@
         <a mat-stroked-button routerLink="/tasks">
           <mat-icon>arrow_back</mat-icon> Back to tasks
         </a>
-        @if (template) {
-          <h1 class="text-2xl font-medium mt-4">{{ template.name }}</h1>
+        @if (template(); as tmpl) {
+          <h1 class="text-2xl font-medium mt-4">{{ tmpl.name }}</h1>
           <p class="text-sm text-gray-500">
-            {{ template.departments?.[0] || 'Task' }} · Published v{{ publishedVersion }} · {{ template.status }}
+            {{ tmpl.departments?.[0] || 'Task' }} · Published v{{ publishedVersion() }} · {{ tmpl.status }}
           </p>
         } @else {
           <h1 class="text-2xl font-medium mt-4 text-red-600">Template not found</h1>
         }
       </div>
-      @if (template?.status === 'published' && !submitted()) {
+      @if (template()?.status === 'published' && !submitted()) {
         <button mat-flat-button color="primary" (click)="submitTask()">Submit task</button>
       }
     </div>
 
-    @if (template && !submitted() && requiredFields().length) {
+    @if (template() && !submitted() && requiredFields().length) {
       <p class="text-sm text-gray-600 bg-white border rounded-lg px-4 py-2 mb-4">
         Required progress: {{ filledRequiredCount() }} / {{ requiredFields().length }}
       </p>
@@ -41,18 +41,20 @@
       </ul>
     }
 
-    @if (template) {
-      @if (template.status !== 'published') {
+    @if (template(); as tmpl) {
+      @if (tmpl.status !== 'published') {
         <p class="text-amber-700 bg-amber-50 border border-amber-100 rounded p-3 mb-4 text-sm">
           This template is still a draft. Publish it in the builder before operators use it.
         </p>
       }
-      <app-form-preview
-        [templateId]="templateId"
-        [layout]="runtimeLayout"
-        [interactive]="true"
-        [jobData]="jobData()"
-        (fieldValueChange)="updateField($event.fieldId, $event.value)" />
+      @if (runtimeLayout()) {
+        <app-form-preview
+          [templateId]="templateId()"
+          [layout]="runtimeLayout()"
+          [interactive]="true"
+          [jobData]="jobData()"
+          (fieldValueChange)="updateField($event.fieldId, $event.value)" />
+      }
     }
   </div>
 </div>

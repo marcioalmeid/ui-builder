@@ -11,6 +11,7 @@ import { FormService } from '../../services/form.services';
 import { JobService } from '../../services/job.service';
 import { NewTemplateDialog } from '../new-template-dialog/new-template-dialog';
 import { TaskTemplate } from '../../models/task-template';
+import { confirmDialog, alertDialog } from '../../utils/confirmation';
 
 type StatusFilter = 'all' | 'draft' | 'published';
 
@@ -69,7 +70,7 @@ export class TemplateLibrary {
   cloneTemplate(template: TaskTemplate, event: Event) {
     event.stopPropagation();
     const jobCount = this.jobService.listByTemplate(template.id).length;
-    const confirmed = window.confirm(
+    const confirmed = confirmDialog(
       [
         `Clone creates a NEW template in a free department (one template per department)`,
         jobCount > 0
@@ -85,7 +86,7 @@ export class TemplateLibrary {
 
     const result = this.formService.cloneTemplate(template.id);
     if (!result.success) {
-      window.alert(result.error ?? 'Could not clone template.');
+      alertDialog(result.error ?? 'Could not clone template.');
       return;
     }
     const id = this.formService.activeTemplateId();
@@ -96,12 +97,12 @@ export class TemplateLibrary {
     event.stopPropagation();
     const jobCount = this.jobService.listByTemplate(template.id).length;
     if (jobCount > 0) {
-      window.alert(
+      alertDialog(
         `Cannot delete: ${jobCount} task(s) are linked to this template.`
       );
       return;
     }
-    const confirmed = window.confirm(
+    const confirmed = confirmDialog(
       `Delete "${template.name}"? This cannot be undone.`
     );
     if (!confirmed) return;

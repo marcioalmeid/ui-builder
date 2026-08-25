@@ -15,6 +15,7 @@ import { buildPublishSummary } from '../../utils/publish-summary';
 import { getAllFields, validateTemplateForPublish } from '../../utils/template-readiness';
 import { MigrationLedgerService } from '../../services/migration-ledger.service';
 import { getAllLayoutFields, normalizeJob } from '../../utils/retroactivity';
+import { confirmDialog, alertDialog } from '../../utils/confirmation';
 
 @Component({
   selector: 'app-template-selector',
@@ -103,7 +104,7 @@ export class TemplateSelector {
       this.editDepartment ? [this.editDepartment] : []
     );
     if (!result.success) {
-      window.alert(result.error ?? 'Could not save template settings.');
+      alertDialog(result.error ?? 'Could not save template settings.');
       if (active) {
         this.editName = active.name;
         this.editDepartment = (active.departments?.[0] ?? '');
@@ -111,7 +112,10 @@ export class TemplateSelector {
       return;
     }
     if (active) {
-      this.jobService.syncTemplateName(active.id, active.name);
+      const updated = this.formService.activeTemplate();
+      if (updated) {
+        this.jobService.syncTemplateName(updated.id, updated.name);
+      }
     }
   }
 
@@ -119,7 +123,7 @@ export class TemplateSelector {
     const active = this.formService.activeTemplate();
     const jobCount = active ? this.jobService.listByTemplate(active.id).length : 0;
 
-    const confirmed = window.confirm(
+    const confirmed = confirmDialog(
       [
         `Clone creates a NEW template in a free department (one template per department)`,
         jobCount > 0
@@ -137,7 +141,7 @@ export class TemplateSelector {
 
     const result = this.formService.cloneTemplate();
     if (!result.success) {
-      window.alert(result.error ?? 'Could not clone template.');
+      alertDialog(result.error ?? 'Could not clone template.');
       return;
     }
     this.publishErrors.set([]);

@@ -2,6 +2,7 @@ import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FormField } from '../../../models/field';
+import { getBorderStyle } from '../../../utils/border-style';
 
 @Component({
   selector: 'app-checkbox-field',
@@ -21,11 +22,6 @@ export class CheckboxField {
   }
 
   getBorderStyle(): string {
-    const border = this.field().border;
-    if (!border || border.style === 'none') {
-      return 'none';
-    }
-
-    return `${border.width} ${border.style} ${border.color}`;
+    return getBorderStyle(this.field().border);
   }
 }

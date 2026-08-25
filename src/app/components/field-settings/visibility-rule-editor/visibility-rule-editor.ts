@@ -29,8 +29,9 @@ export class VisibilityRuleEditor {
 
   enabled = computed(() => Boolean(this.rule()));
 
-  onToggle(enabled: boolean) {
-    if (!enabled) {
+  onToggle(event: Event) {
+    const checked = (event.target as HTMLInputElement).checked;
+    if (!checked) {
       this.ruleChange.emit(undefined);
       return;
     }
