@@ -40,6 +40,7 @@ export class JobService {
       templateId,
       templateVersion: pin,
       templateName: template?.name,
+      friendlyId: this.nextFriendlyId(templateId),
       data,
       events,
       submittedAt: Date.now(),
@@ -66,6 +67,7 @@ export class JobService {
       templateVersion: source.templateVersion,
       templateName:
         this.formService.getTemplate(source.templateId)?.name ?? source.templateName,
+      friendlyId: this.nextFriendlyId(source.templateId),
       data,
       events: structuredClone(source.events),
       submittedAt: Date.now(),
@@ -76,6 +78,26 @@ export class JobService {
 
     this.repository.save(clone);
     return clone;
+  }
+
+  /** Generate the next sequential friendly ID for a template (e.g. TASK-001). */
+  private nextFriendlyId(templateId: string): string {
+    const allJobs = this.repository.list();
+    const templateJobs = allJobs.filter((j) => j.templateId === templateId);
+    let maxSeq = 0;
+    for (const job of templateJobs) {
+      const seq = this.parseFriendlySeq(job.friendlyId);
+      if (seq > maxSeq) maxSeq = seq;
+    }
+    const nextSeq = maxSeq + 1;
+    return `TASK-${String(nextSeq).padStart(3, '0')}`;
+  }
+
+  /** Extract the sequence number from a friendly ID like "TASK-001". */
+  private parseFriendlySeq(friendlyId?: string): number {
+    if (!friendlyId) return 0;
+    const match = friendlyId.match(/TASK-(\d+)/);
+    return match ? parseInt(match[1], 10) : 0;
   }
 
   updateStatus(taskId: string, status: TaskStatus): JobSubmission | undefined {

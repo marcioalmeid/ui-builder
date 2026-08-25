@@ -66,6 +66,7 @@
               <div class="flex items-start justify-between gap-4 flex-wrap">
                 <div class="min-w-0 flex-1">
                   <div class="flex flex-wrap items-center gap-2">
+                    <span class="text-xs font-mono text-gray-400 select-none">{{ task.friendlyId || '' }}</span>
                     <h2 class="font-medium">{{ taskTitle(task) }}</h2>
                     <span
                       class="text-[11px] font-medium uppercase tracking-wide px-2 py-0.5 rounded-full"
@@ -124,7 +125,10 @@
               @for (task of filteredTasksByStatus()[status]; track task.id) {
                 <article class="tasks-hub__card" cdkDrag [cdkDragData]="task">
                   <div class="tasks-hub__card-main" cdkDragHandle>
-                    <h4 class="tasks-hub__card-title">{{ taskTitle(task) }}</h4>
+                    <div class="flex items-center gap-2">
+                      <span class="text-[11px] font-mono text-gray-400 select-none">{{ task.friendlyId || '' }}</span>
+                      <h4 class="tasks-hub__card-title">{{ taskTitle(task) }}</h4>
+                    </div>
                     @if (showTemplateSubtitle(task)) {
                       <p class="tasks-hub__item-sub">{{ templateLabel(task) }}</p>
                     }

@@ -6,7 +6,10 @@
           <mat-icon>arrow_back</mat-icon> All tasks
         </a>
         @if (job(); as current) {
-          <h1 class="text-2xl font-medium mt-4">{{ templateLabel() }}</h1>
+          <div class="flex items-center gap-2 mt-4">
+            <span class="text-xs font-mono text-gray-400 select-none">{{ current.friendlyId || '' }}</span>
+            <h1 class="text-2xl font-medium">{{ templateLabel() }}</h1>
+          </div>
           <p class="text-sm text-gray-500 mt-1 flex flex-wrap gap-2 items-center">
             <span class="inline-flex items-center rounded-full bg-slate-800 text-white text-xs px-2 py-0.5">
               Form v{{ pin() }}

@@ -13,6 +13,7 @@ export interface JobSubmission {
   templateId: string;
   templateVersion?: number;
   templateName?: string;
+  friendlyId?: string;
   data: Record<string, unknown>;
   events: WorkflowEmittedEvent[];
   submittedAt: number;

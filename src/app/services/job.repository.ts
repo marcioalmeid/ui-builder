@@ -35,6 +35,7 @@ export class JobRepository {
           templateId: parsed.templateId ?? '',
           templateVersion: parsed.templateVersion,
           templateName: parsed.templateName,
+          friendlyId: parsed.friendlyId,
           data: parsed.data ?? {},
           events: parsed.events ?? [],
           submittedAt: parsed.submittedAt ?? 0,
