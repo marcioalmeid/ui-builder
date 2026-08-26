@@ -48,7 +48,7 @@ export function buildInitialJobData(fields: FormField[]): Record<string, unknown
     } else if (field.type === 'cost-breakdown') {
       data[field.id] = {
         grossBudget: '',
-        managementFeePercent: field.managementFeePercent ?? 15,
+        managementFeePercent: '',
         additionalFees: [],
       };
     } else {

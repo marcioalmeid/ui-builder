@@ -4,25 +4,113 @@
   border-radius: 0.5rem;
   padding: 1rem;
   background: #fafafa;
+  box-sizing: border-box;
 }
 
 .cost-breakdown__title {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #374151;
+  color: #111827;
   margin: 0 0 0.25rem;
 }
 
 .cost-breakdown__hint {
   font-size: 0.75rem;
   color: #6b7280;
-  margin: 0 0 0.75rem;
+  margin: 0 0 0.875rem;
 }
 
 .cost-breakdown__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .cost-breakdown__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cost-breakdown__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.cost-breakdown__label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.cost-breakdown__input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background: #fff;
+  padding: 0 0.75rem;
+  min-height: 2.5rem;
+}
+
+.cost-breakdown__prefix {
+  color: #9ca3af;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+.cost-breakdown__input {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background: #fff;
+  min-height: 2.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: #111827;
+  box-sizing: border-box;
+}
+
+.cost-breakdown__input-wrap .cost-breakdown__input {
+  border: none;
+  border-radius: 0;
+  padding-left: 0;
+  min-height: 2.25rem;
+  background: transparent;
+}
+
+.cost-breakdown__input:focus {
+  outline: 2px solid #93c5fd;
+  outline-offset: 1px;
+}
+
+.cost-breakdown__input-wrap:focus-within {
+  outline: 2px solid #93c5fd;
+  outline-offset: 1px;
+}
+
+.cost-breakdown__input-wrap .cost-breakdown__input:focus {
+  outline: none;
+}
+
+.cost-breakdown__mgmt {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.cost-breakdown__unit {
+  width: 3.25rem;
+  flex-shrink: 0;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background: #fff;
+  font-size: 0.875rem;
+  color: #374151;
+  padding: 0 0.35rem;
 }
 
 .cost-breakdown__fees {
@@ -32,11 +120,16 @@
   gap: 0.5rem;
 }
 
-.cost-breakdown__fees-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
+.cost-breakdown__fees-title {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.cost-breakdown__fees-empty {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #6b7280;
 }
 
 .cost-breakdown__fee-row {
@@ -45,13 +138,70 @@
   gap: 0.5rem;
 }
 
+.cost-breakdown__fee-name {
+  flex: 1;
+  min-width: 0;
+}
+
+.cost-breakdown__fee-amount {
+  width: 6.5rem;
+  flex-shrink: 0;
+}
+
+.cost-breakdown__remove {
+  border: none;
+  background: transparent;
+  color: #dc2626;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.25rem 0.35rem;
+  flex-shrink: 0;
+}
+
+.cost-breakdown__remove:hover {
+  text-decoration: underline;
+}
+
+.cost-breakdown__add {
+  align-self: flex-start;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background: #fff;
+  color: #374151;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.45rem 0.75rem;
+  cursor: pointer;
+}
+
+.cost-breakdown__add:hover {
+  background: #f9fafb;
+}
+
 .cost-breakdown__summary {
   margin-top: 1rem;
   padding-top: 0.75rem;
   border-top: 1px solid #e5e7eb;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 0.4rem;
   font-size: 0.875rem;
   color: #374151;
+}
+
+.cost-breakdown__summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.cost-breakdown__summary-row--net {
+  margin-top: 0.15rem;
+  color: #111827;
+}
+
+.cost-breakdown__summary-row--net strong {
+  font-weight: 700;
 }

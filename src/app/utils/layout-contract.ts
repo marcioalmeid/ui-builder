@@ -332,7 +332,7 @@ function formatCostBreakdown(raw: unknown): string {
   if (value.grossBudget !== '' && value.grossBudget != null) {
     parts.push(`Budget ${value.grossBudget}`);
   }
-  if (value.managementFeePercent != null) {
+  if (value.managementFeePercent !== '' && value.managementFeePercent != null) {
     parts.push(`Fee ${value.managementFeePercent}%`);
   }
   if (value.additionalFees?.length) {

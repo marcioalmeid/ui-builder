@@ -1,7 +1,9 @@
-
-<div class="p-2">
-<ng-container
-  [ngComponentOutlet]="previewComponent()"
-  [ngComponentOutletInputs]="componentInputs()" />
-
+<div
+  class="field-preview p-2"
+  [class.field-preview--readonly]="!interactive()"
+>
+  <ng-container
+    [ngComponentOutlet]="previewComponent()"
+    [ngComponentOutletInputs]="componentInputs()"
+  />
 </div>

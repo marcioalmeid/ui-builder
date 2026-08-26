@@ -1,0 +1,8 @@
+.field-preview {
+  min-width: 0;
+}
+
+.field-preview--readonly {
+  pointer-events: none;
+  user-select: none;
+}

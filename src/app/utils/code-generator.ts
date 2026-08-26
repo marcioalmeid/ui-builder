@@ -56,8 +56,7 @@ function getInitialFieldValue(field: FormField): string {
     return 'false';
   }
   if (field.type === 'cost-breakdown') {
-    const pct = field.managementFeePercent ?? 15;
-    return `{ grossBudget: '', managementFeePercent: ${pct}, additionalFees: [] }`;
+    return `{ grossBudget: '', managementFeePercent: '', additionalFees: [] }`;
   }
   if (field.type === 'section-header' || field.type === 'button') {
     return 'null';

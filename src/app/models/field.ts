@@ -56,13 +56,15 @@ export interface FieldVisibilityRule {
 }
 
 export interface CostBreakdownFee {
+  id?: string;
   label: string;
   amount: number;
 }
 
 export interface CostBreakdownValue {
   grossBudget: number | '';
-  managementFeePercent: number;
+  /** Empty string = not set (treated as 0 in calculations). */
+  managementFeePercent: number | '';
   additionalFees: CostBreakdownFee[];
 }
 

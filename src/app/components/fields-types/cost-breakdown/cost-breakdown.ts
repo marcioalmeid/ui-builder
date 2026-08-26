@@ -1,25 +1,45 @@
-import { Component, computed, effect, input, output } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatIconModule } from '@angular/material/icon';
+import {
+  Component,
+  computed,
+  input,
+  linkedSignal,
+  output,
+} from '@angular/core';
 import {
   CostBreakdownFee,
   CostBreakdownValue,
   FormField,
 } from '../../../models/field';
-import { bindFieldOptions } from '../../../utils/data-bound-options';
-import { usesApiDataSource } from '../../../utils/field-data-binding';
 
 const EMPTY_VALUE = (): CostBreakdownValue => ({
   grossBudget: '',
-  managementFeePercent: 15,
+  managementFeePercent: '',
   additionalFees: [],
 });
 
+function normalizeValue(
+  value: CostBreakdownValue | null | undefined
+): CostBreakdownValue {
+  if (!value) {
+    return EMPTY_VALUE();
+  }
+  return {
+    grossBudget:
+      value.grossBudget === '' || value.grossBudget == null ? '' : value.grossBudget,
+    managementFeePercent:
+      value.managementFeePercent === '' || value.managementFeePercent == null
+        ? ''
+        : value.managementFeePercent,
+    additionalFees: (value.additionalFees ?? []).map((fee) => ({
+      id: fee.id || crypto.randomUUID(),
+      label: fee.label ?? '',
+      amount: fee.amount ?? 0,
+    })),
+  };
+}
+
 @Component({
   selector: 'app-cost-breakdown',
-  imports: [MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule],
   templateUrl: './cost-breakdown.html',
   styleUrl: './cost-breakdown.css',
 })
@@ -29,59 +49,32 @@ export class CostBreakdown {
   valueChange = output<CostBreakdownValue>();
   onValueChange = input<(value: CostBreakdownValue) => void>();
 
-  usesApi = computed(() => usesApiDataSource(this.field()));
-
-  private boundOptions = bindFieldOptions(this.field);
-  catalogOptions = this.boundOptions.options;
-
-  state = computed(() => {
-    const current = this.value();
-    if (!current) {
-      return {
-        ...EMPTY_VALUE(),
-        managementFeePercent: this.field().managementFeePercent ?? 15,
-      };
-    }
-    return current;
+  /** Local writable state so Add/Remove fees update UI even if the parent binding lags. */
+  state = linkedSignal({
+    source: this.value,
+    computation: (value) => normalizeValue(value),
   });
 
-  constructor() {
-    effect(() => {
-      if (!this.usesApi()) return;
-
-      const options = this.catalogOptions();
-      if (!options.length) return;
-
-      const current = this.state();
-      if (current.additionalFees.length > 0) return;
-
-      this.emit({
-        ...current,
-        additionalFees: options.map((option) => ({
-          label: option.label,
-          amount: 0,
-        })),
-      });
-    });
-  }
+  grossAmount = computed(() => this.toNumber(this.state().grossBudget));
 
   managementFeeAmount = computed(() => {
-    const gross = this.toNumber(this.state().grossBudget);
-    return (gross * this.state().managementFeePercent) / 100;
+    const percent = this.toNumber(this.state().managementFeePercent);
+    return (this.grossAmount() * percent) / 100;
   });
 
-  additionalFeesTotal = computed(() =>
-    this.state().additionalFees.reduce((sum, fee) => sum + (fee.amount || 0), 0)
+  flatFeesTotal = computed(() =>
+    this.state().additionalFees.reduce((sum, fee) => sum + (Number(fee.amount) || 0), 0)
   );
 
-  netAdSpend = computed(() => {
-    const gross = this.toNumber(this.state().grossBudget);
-    return gross - this.managementFeeAmount() - this.additionalFeesTotal();
-  });
+  netAdSpend = computed(
+    () => this.grossAmount() - this.flatFeesTotal() - this.managementFeeAmount()
+  );
 
   emit(next: CostBreakdownValue) {
-    this.valueChange.emit(next);
-    this.onValueChange()?.(next);
+    const normalized = normalizeValue(next);
+    this.state.set(normalized);
+    this.valueChange.emit(normalized);
+    this.onValueChange()?.(normalized);
   }
 
   onGrossChange(event: Event) {
@@ -92,7 +85,7 @@ export class CostBreakdown {
 
   onFeePercentChange(event: Event) {
     const raw = (event.target as HTMLInputElement).value;
-    const managementFeePercent = Number(raw) || 0;
+    const managementFeePercent = raw === '' ? '' : Number(raw);
     this.emit({ ...this.state(), managementFeePercent });
   }
 
@@ -106,7 +99,7 @@ export class CostBreakdown {
 
   onFeeAmountChange(index: number, event: Event) {
     const raw = (event.target as HTMLInputElement).value;
-    const amount = Number(raw) || 0;
+    const amount = raw === '' ? 0 : Number(raw);
     const additionalFees = this.state().additionalFees.map((fee, i) =>
       i === index ? { ...fee, amount } : fee
     );
@@ -114,11 +107,15 @@ export class CostBreakdown {
   }
 
   addFee() {
-    const additionalFees = [
-      ...this.state().additionalFees,
-      { label: 'Additional fee', amount: 0 },
-    ];
-    this.emit({ ...this.state(), additionalFees });
+    const fee: CostBreakdownFee = {
+      id: crypto.randomUUID(),
+      label: '',
+      amount: 0,
+    };
+    this.emit({
+      ...this.state(),
+      additionalFees: [...this.state().additionalFees, fee],
+    });
   }
 
   removeFee(index: number) {
@@ -126,16 +123,31 @@ export class CostBreakdown {
     this.emit({ ...this.state(), additionalFees });
   }
 
-  formatCurrency(amount: number): string {
+  /** Positive currency, e.g. $0 or $5.9 */
+  formatMoney(amount: number): string {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
-      maximumFractionDigits: 0,
+      minimumFractionDigits: Number.isInteger(amount) ? 0 : 1,
+      maximumFractionDigits: 2,
     }).format(amount);
   }
 
+  /** Deduction line, e.g. -$5.9 or -$0 */
+  formatDeduction(amount: number): string {
+    return `-${this.formatMoney(Math.abs(amount))}`;
+  }
+
+  /** Net line — keep sign on the number ($-5.9 style when negative). */
+  formatNet(amount: number): string {
+    if (amount < 0) {
+      return `$-${this.formatMoney(Math.abs(amount)).replace(/^\$/, '')}`;
+    }
+    return this.formatMoney(amount);
+  }
+
   private toNumber(value: number | ''): number {
-    if (value === '') return 0;
+    if (value === '' || value == null) return 0;
     return Number(value) || 0;
   }
 }

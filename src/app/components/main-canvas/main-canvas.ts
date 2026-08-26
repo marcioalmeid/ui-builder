@@ -33,7 +33,8 @@ export type CanvasTab = 'editor' | 'rules' | 'preview' | 'json';
 })
 export class MainCanvas {
   activeTab = signal<CanvasTab>('editor');
-  simulateOperator = signal(false);
+  /** Default on so Preview is interactive for operators immediately. */
+  simulateOperator = signal(true);
   formService = inject(FormService);
 
   isLayoutEmpty = computed(() => getAllFields(this.formService.rows()).length === 0);
@@ -49,7 +50,7 @@ export class MainCanvas {
       this.formService.rulesVisited.set(false);
       this.formService.setActiveSetupStep('layout');
       this.activeTab.set('editor');
-      this.simulateOperator.set(false);
+      this.simulateOperator.set(true);
     });
 
     effect(() => {
@@ -69,6 +70,7 @@ export class MainCanvas {
     if (tab === 'preview') {
       this.formService.previewVisited.set(true);
       this.formService.setActiveSetupStep('preview');
+      this.simulateOperator.set(true);
     } else if (tab === 'rules') {
       this.formService.rulesVisited.set(true);
       this.formService.setActiveSetupStep('rules');

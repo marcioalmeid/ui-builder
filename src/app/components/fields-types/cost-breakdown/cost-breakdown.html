@@ -5,76 +5,107 @@
   }
 
   <div class="cost-breakdown__grid">
-    <mat-form-field appearance="outline" class="w-full">
-      <mat-label>Gross budget</mat-label>
-      <span matTextPrefix>$&nbsp;</span>
-      <input
-        matInput
-        type="number"
-        min="0"
-        [value]="state().grossBudget"
-        (input)="onGrossChange($event)"
-      />
-    </mat-form-field>
+    <div class="cost-breakdown__field">
+      <label class="cost-breakdown__label" for="gross-{{ field().id }}">Gross budget</label>
+      <div class="cost-breakdown__input-wrap">
+        <span class="cost-breakdown__prefix" aria-hidden="true">$</span>
+        <input
+          id="gross-{{ field().id }}"
+          class="cost-breakdown__input"
+          type="number"
+          min="0"
+          step="any"
+          [value]="state().grossBudget"
+          (input)="onGrossChange($event)"
+        />
+      </div>
+    </div>
 
-    <mat-form-field appearance="outline" class="w-full">
-      <mat-label>Management fee</mat-label>
-      <input
-        matInput
-        type="number"
-        min="0"
-        max="100"
-        [value]="state().managementFeePercent"
-        (input)="onFeePercentChange($event)"
-      />
-      <span matTextSuffix>%</span>
-      <mat-hint>{{ formatCurrency(managementFeeAmount()) }}</mat-hint>
-    </mat-form-field>
+    <div class="cost-breakdown__field">
+      <label class="cost-breakdown__label" for="mgmt-{{ field().id }}">Management fee</label>
+      <div class="cost-breakdown__mgmt">
+        <select class="cost-breakdown__unit" aria-label="Management fee unit" disabled>
+          <option value="percent" selected>%</option>
+        </select>
+        <input
+          id="mgmt-{{ field().id }}"
+          class="cost-breakdown__input"
+          type="number"
+          min="0"
+          max="100"
+          step="any"
+          placeholder="e.g. 15"
+          [value]="state().managementFeePercent"
+          (input)="onFeePercentChange($event)"
+        />
+      </div>
+    </div>
   </div>
 
   <div class="cost-breakdown__fees">
-    <div class="cost-breakdown__fees-header">
-      <span class="text-sm font-medium text-gray-700">Additional fees</span>
-      <button mat-stroked-button type="button" (click)="addFee()">
-        <mat-icon>add</mat-icon> Add fee
-      </button>
-    </div>
+    <span class="cost-breakdown__fees-title">Data / flat fees</span>
+    @if (state().additionalFees.length === 0) {
+      <p class="cost-breakdown__fees-empty">
+        No fees. Add data fees or other flat costs that come out of the gross budget.
+      </p>
+    }
 
-    @for (fee of state().additionalFees; track $index) {
+    @for (fee of state().additionalFees; track fee.id || $index) {
       <div class="cost-breakdown__fee-row">
-        <mat-form-field appearance="outline" class="flex-1">
-          <mat-label>Fee name</mat-label>
           <input
-            matInput
+            class="cost-breakdown__input cost-breakdown__fee-name"
+            type="text"
+            [attr.id]="'fee-name-' + field().id + '-' + $index"
+            [attr.aria-label]="'Fee name ' + ($index + 1)"
+            placeholder="Fee name (e.g. Data fee)"
             [value]="fee.label"
             (input)="onFeeLabelChange($index, $event)"
           />
-        </mat-form-field>
-        <mat-form-field appearance="outline" class="w-36">
-          <mat-label>Amount</mat-label>
-          <span matTextPrefix>$&nbsp;</span>
+        <div class="cost-breakdown__input-wrap cost-breakdown__fee-amount">
+          <span class="cost-breakdown__prefix" aria-hidden="true">$</span>
           <input
-            matInput
+            class="cost-breakdown__input"
             type="number"
             min="0"
-            [value]="fee.amount"
+            step="any"
+            [attr.id]="'fee-amount-' + field().id + '-' + $index"
+            [attr.aria-label]="'Fee amount ' + ($index + 1)"
+            placeholder="0"
+            [value]="fee.amount || ''"
             (input)="onFeeAmountChange($index, $event)"
           />
-        </mat-form-field>
+        </div>
         <button
-          mat-icon-button
           type="button"
-          aria-label="Remove fee"
+          class="cost-breakdown__remove"
           (click)="removeFee($index)"
         >
-          <mat-icon>close</mat-icon>
+          Remove
         </button>
       </div>
     }
+
+    <button type="button" class="cost-breakdown__add" (click)="addFee()">
+      + Add fee
+    </button>
   </div>
 
   <div class="cost-breakdown__summary">
-    <span>Net ad spend</span>
-    <strong>{{ formatCurrency(netAdSpend()) }}</strong>
+    <div class="cost-breakdown__summary-row">
+      <span>Gross budget</span>
+      <span>{{ formatMoney(grossAmount()) }}</span>
+    </div>
+    <div class="cost-breakdown__summary-row">
+      <span>Flat fees</span>
+      <span>{{ formatDeduction(flatFeesTotal()) }}</span>
+    </div>
+    <div class="cost-breakdown__summary-row">
+      <span>Management fee</span>
+      <span>{{ formatDeduction(managementFeeAmount()) }}</span>
+    </div>
+    <div class="cost-breakdown__summary-row cost-breakdown__summary-row--net">
+      <span>Net ad spend</span>
+      <strong>{{ formatNet(netAdSpend()) }}</strong>
+    </div>
   </div>
 </div>

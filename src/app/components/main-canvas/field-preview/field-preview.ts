@@ -17,6 +17,11 @@ export class FieldPreview {
 
   fieldTypeService = inject(FieldTypeService);
 
+  /** Stable callback — a new function each CD cycle breaks NgComponentOutlet updates. */
+  private readonly forwardValueChange = (value: unknown) => {
+    this.valueChange.emit(value);
+  };
+
   previewComponent = computed(() => {
     const type = this.fieldTypeService.getFieldType(this.field().type);
     return type?.component ?? null;
@@ -27,7 +32,7 @@ export class FieldPreview {
 
     if (this.interactive()) {
       inputs['value'] = this.value();
-      inputs['onValueChange'] = (value: unknown) => this.valueChange.emit(value);
+      inputs['onValueChange'] = this.forwardValueChange;
     }
 
     return inputs;
