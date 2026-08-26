@@ -27,13 +27,14 @@ export interface SetupStep {
 }
 
 export function setupStepFromSidebarSection(
-  section: 'template' | 'fields' | 'data' | 'rules'
+  section: 'template' | 'fields' | 'data' | 'rules' | 'list'
 ): SetupStepId {
-  const map: Record<'template' | 'fields' | 'data' | 'rules', SetupStepId> = {
+  const map: Record<'template' | 'fields' | 'data' | 'rules' | 'list', SetupStepId> = {
     template: 'template',
     fields: 'layout',
     data: 'data',
     rules: 'rules',
+    list: 'layout',
   };
   return map[section];
 }

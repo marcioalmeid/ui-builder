@@ -64,15 +64,29 @@
           (valueChange)="onSharedListSelected($event)"
         >
           @for (binding of sharedLists(); track binding.id) {
-            <mat-option [value]="binding.id">
+            <mat-option
+              [value]="binding.id"
+              [disabled]="
+                (isAlreadyAttached() && binding.id !== dataBindingId()) ||
+                isSharedListUnavailable(binding.id)
+              "
+            >
               {{ getSharedListLabel(binding.id) }}
-              ({{ binding.targetFieldIds.length }} field(s))
+              @if (binding.targetFieldIds.length) {
+                ({{ formService.getFieldLabel(binding.targetFieldIds[0]) }})
+              } @else {
+                (empty)
+              }
             </mat-option>
           }
         </mat-select>
       </mat-form-field>
 
-      @if (activeSharedList(); as list) {
+      @if (isAlreadyAttached() && activeSharedList(); as list) {
+        <p class="options-source-desc">
+          Already linked to this list. Switch to Static to unlink before attaching another.
+        </p>
+      } @else if (activeSharedList(); as list) {
         <p class="options-source-desc">
           Linked with:
           @for (fieldId of list.targetFieldIds; track fieldId; let last = $last) {

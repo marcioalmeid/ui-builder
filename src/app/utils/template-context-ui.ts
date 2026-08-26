@@ -6,6 +6,7 @@ const SECTION_DEPARTMENTS: Record<BuilderSidebarSection, string[] | null> = {
   fields: null,
   data: ['Accounts', 'A/V', 'Design', 'Digital Ads', 'Media', 'Organic Social', 'SEO'],
   rules: ['Digital Ads', 'Design'],
+  list: null,
 };
 
 const DEFAULT_EXPANDED: Record<BuilderSidebarSection, boolean | ((dept: string) => boolean)> = {
@@ -13,6 +14,7 @@ const DEFAULT_EXPANDED: Record<BuilderSidebarSection, boolean | ((dept: string) 
   fields: true,
   data: (dept) => dept !== '',
   rules: (dept) => dept === 'Digital Ads' || dept === 'Design',
+  list: false,
 };
 
 export function isSidebarSectionRelevant(

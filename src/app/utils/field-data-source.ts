@@ -41,8 +41,11 @@ export function mergeFieldDataSourceUpdate(
 
   if (data.dataBindingId) {
     updated.optionsSource = 'api';
-    updated.dataCatalogId = undefined;
     updated.entityMapping = undefined;
+    // Keep catalog metadata when the shared list provides it.
+    if (!('dataCatalogId' in data)) {
+      updated.dataCatalogId = undefined;
+    }
     return updated;
   }
 

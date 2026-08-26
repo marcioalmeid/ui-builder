@@ -8,6 +8,7 @@ import {
 } from '../models/task-template';
 import { WorkflowRule } from '../models/workflow-rule';
 import { JobSubmission, normalizeTaskStatus } from '../models/job-submission';
+import { ensureListView } from './layout-contract';
 
 export type FieldChangeClass = 'COSMETIC' | 'ADDITIVE' | 'STRUCTURAL' | 'BREAKING';
 export type RuleChangeClass = 'SAFE' | 'BREAKING';
@@ -471,7 +472,8 @@ export function resolveLayout(
   for (const event of replay) {
     applyPatchToLayout(layout, event);
   }
-  return layout;
+
+  return normalizeLayout(layout);
 }
 
 export function latestSnapshotVersion(template: Pick<TaskTemplate, 'versions'>): number {
@@ -519,20 +521,34 @@ export function normalizeJob(job: JobSubmission): JobSubmission {
   };
 }
 
+function normalizeLayout(layout: TaskTemplateLayout): TaskTemplateLayout {
+  const fields = getAllLayoutFields(layout);
+
+  return {
+    ...layout,
+    listView: ensureListView(layout.listView, fields),
+  };
+}
+
 export function normalizeTemplate(template: TaskTemplate): TaskTemplate {
+  const layout = normalizeLayout(template.layout);
   const versions = template.versions ?? [];
   const withSnapshot =
     template.status === 'published' && versions.length === 0
       ? [
           {
             version: template.version || 1,
-            layout: structuredClone(template.layout),
+            layout: structuredClone(layout),
           },
         ]
-      : versions;
+      : versions.map((snapshot) => ({
+          ...snapshot,
+          layout: normalizeLayout(snapshot.layout),
+        }));
 
   return {
     ...template,
+    layout,
     versions: withSnapshot,
     retiredFieldIds: template.retiredFieldIds ?? [],
     riskPolicy: template.riskPolicy ?? 'ADDITIVE',

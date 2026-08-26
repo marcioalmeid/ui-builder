@@ -4,6 +4,7 @@ import { FormElementsMenu } from '../form-elements-menu/form-elements-menu';
 import { DataBindingsPanel } from '../data-bindings-panel/data-bindings-panel';
 import { DataChecklist } from '../data-checklist/data-checklist';
 import { WorkflowRulesPanel } from '../workflow-rules-panel/workflow-rules-panel';
+import { ListViewPanel } from '../list-view-panel/list-view-panel';
 import { FormService, BuilderSidebarSection } from '../../services/form.services';
 import {
   getDefaultExpandedSections,
@@ -32,6 +33,7 @@ interface SidebarSectionView {
     DataBindingsPanel,
     DataChecklist,
     WorkflowRulesPanel,
+    ListViewPanel,
   ],
   templateUrl: './builder-sidebar.html',
   styleUrl: './builder-sidebar.css',
@@ -66,6 +68,11 @@ export class BuilderSidebar {
         id: 'rules',
         title: 'Rules',
         hint: 'Show/hide fields and emit events on conditions',
+      },
+      {
+        id: 'list',
+        title: 'List view',
+        hint: 'Choose title, table columns, and searchable fields for the task hub',
       },
     ];
 

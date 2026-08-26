@@ -119,6 +119,23 @@
   font-size: 0.6875rem;
 }
 
+.shared-lists-panel__field-limit {
+  font-weight: 400;
+  color: #9ca3af;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.shared-lists-panel__field-taken {
+  color: #b45309;
+  font-size: 0.6875rem;
+}
+
+.shared-lists-panel__clear-target {
+  margin-top: 0.25rem;
+  align-self: flex-start;
+}
+
 .shared-lists-panel__editor-actions {
   display: flex;
   gap: 0.5rem;

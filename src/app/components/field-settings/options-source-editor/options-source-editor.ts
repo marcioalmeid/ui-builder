@@ -76,6 +76,19 @@ export class DataSourceEditor {
     return this.sharedLists().find((binding) => binding.id === bindingId);
   });
 
+  /** True when this field is already owned by a shared list. */
+  isAlreadyAttached = computed(() =>
+    Boolean(this.formService.getBindingOwningField(this.fieldId()))
+  );
+
+  isSharedListUnavailable(bindingId: string): boolean {
+    const binding = this.sharedLists().find((item) => item.id === bindingId);
+    if (!binding) return true;
+    if (binding.id === this.dataBindingId()) return false;
+    // List already has another field — cannot attach this one.
+    return binding.targetFieldIds.some((id) => id !== this.fieldId());
+  }
+
   firstDepartment = computed(
     () => this.formService.activeTemplate()?.departments?.[0] ?? ''
   );
@@ -133,7 +146,10 @@ export class DataSourceEditor {
     }
 
     if (mode === 'shared-list' && this.sharedLists().length === 1) {
-      this.onSharedListSelected(this.sharedLists()[0].id);
+      const only = this.sharedLists()[0];
+      if (!this.isSharedListUnavailable(only.id)) {
+        this.onSharedListSelected(only.id);
+      }
     }
   }
 
@@ -179,6 +195,15 @@ export class DataSourceEditor {
 
   onSharedListSelected(bindingId: string) {
     if (!bindingId) return;
+
+    const owner = this.formService.getBindingOwningField(this.fieldId());
+    if (owner && owner.id !== bindingId) {
+      this.statusMessage.set(
+        `Already linked to "${this.catalogService.getDisplayName(owner.dataCatalogId, owner.name)}". Switch to Static or unlink first.`
+      );
+      this.statusError.set(true);
+      return;
+    }
 
     this.loading.set(true);
     this.statusMessage.set(null);

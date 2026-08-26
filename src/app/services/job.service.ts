@@ -1,12 +1,14 @@
 import { Injectable, inject } from '@angular/core';
-import { FormField } from '../models/field';
 import { JobSubmission, TaskStatus, normalizeTaskStatus } from '../models/job-submission';
 import { JobRepository } from './job.repository';
 import { FormService } from './form.services';
 import { RetroactivityService } from './retroactivity.service';
 import { getWorkflowEmittedEvents } from '../utils/workflow-evaluation';
 import {
-  getAllLayoutFields,
+  buildTaskListContext,
+  resolveTitleField,
+} from '../utils/layout-contract';
+import {
   lastPublishedLayout,
   lastPublishedVersion,
 } from '../utils/retroactivity';
@@ -138,21 +140,15 @@ export class JobService {
     const template = this.formService.getTemplate(templateId);
     if (!template) return;
 
-    const fields = getAllLayoutFields(template.layout);
-    const titleField = this.titleField(fields);
+    const layout = lastPublishedLayout(template);
+    const context = buildTaskListContext(layout);
+    const titleField = resolveTitleField(context.fields, context.listView);
     if (!titleField) return;
 
     const current = data[titleField.id];
     const base =
       typeof current === 'string' && current.trim() ? current.trim() : 'Untitled';
     data[titleField.id] = `${base} (Copy)`;
-  }
-
-  private titleField(fields: FormField[]): FormField | undefined {
-    return (
-      fields.find((field) => field.required && field.type === 'text') ??
-      fields.find((field) => field.type === 'text')
-    );
   }
 
   getById(jobId: string): JobSubmission | undefined {
@@ -181,6 +177,11 @@ export class JobService {
 
   list(): JobSubmission[] {
     return this.repository.list();
+  }
+
+  /** Reactive revision counter — read inside computed() to refresh task lists. */
+  revision(): number {
+    return this.repository.revision();
   }
 
   listByTemplate(templateId: string): JobSubmission[] {

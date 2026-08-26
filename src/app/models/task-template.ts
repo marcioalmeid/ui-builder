@@ -1,5 +1,6 @@
 import { DataBinding } from './data-binding';
 import { FormRow } from './form';
+import { ListViewConfig } from './list-view';
 import { WorkflowRule } from './workflow-rule';
 
 export type TemplateStatus = 'draft' | 'published';
@@ -9,6 +10,8 @@ export interface TaskTemplateLayout {
   rows: FormRow[];
   dataBindings: DataBinding[];
   workflowRules?: WorkflowRule[];
+  /** Shared list/detail contract — columns and search index for the task hub. */
+  listView?: ListViewConfig;
 }
 
 export interface TemplateVersionSnapshot {
@@ -54,6 +57,10 @@ export function createEmptyTemplate(
       ],
       dataBindings: [],
       workflowRules: [],
+      listView: {
+        columns: [],
+        searchableFieldIds: [],
+      },
     },
   };
 }

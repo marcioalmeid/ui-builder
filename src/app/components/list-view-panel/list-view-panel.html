@@ -1,0 +1,81 @@
+<div class="list-view-panel">
+  <p class="list-view-panel__intro">
+    Configure how tasks appear in the hub: title field, table columns (max
+    {{ maxColumns }}), and full-text search index.
+  </p>
+
+  @if (listableFields().length === 0) {
+    <p class="list-view-panel__empty">Add fields to the layout first.</p>
+  } @else {
+    <section class="list-view-panel__section">
+      <h4 class="list-view-panel__heading">Title field</h4>
+      <mat-radio-group
+        [ngModel]="titleFieldId()"
+        (ngModelChange)="setTitleField($event)"
+        [disabled]="formService.isReadonly()"
+        class="list-view-panel__title-group"
+      >
+        @for (field of listableFields(); track field.id) {
+          <mat-radio-button [value]="field.id">{{ field.label }}</mat-radio-button>
+        }
+      </mat-radio-group>
+    </section>
+
+    <section class="list-view-panel__section">
+      <div class="list-view-panel__heading-row">
+        <h4 class="list-view-panel__heading">Table columns</h4>
+        <span class="list-view-panel__count">{{ columnCount() }}/{{ maxColumns }}</span>
+      </div>
+
+      <div class="list-view-panel__rows">
+        @for (row of rows(); track row.id) {
+          <article class="list-view-panel__row">
+            <div class="list-view-panel__row-main">
+              <mat-checkbox
+                [checked]="row.inColumns"
+                [disabled]="formService.isReadonly() || row.isTitle || (!row.inColumns && !canAddColumn(row.id))"
+                (change)="toggleColumn(row.id, $event.checked === true)"
+              >
+                {{ row.label }}
+              </mat-checkbox>
+              <span class="list-view-panel__type">{{ row.type }}</span>
+            </div>
+
+            <div class="list-view-panel__row-actions">
+              <mat-checkbox
+                [checked]="row.searchable"
+                [disabled]="formService.isReadonly()"
+                (change)="toggleSearchable(row.id, $event.checked === true)"
+              >
+                Search
+              </mat-checkbox>
+
+              @if (row.inColumns) {
+                <div class="list-view-panel__reorder">
+                  <button
+                    mat-icon-button
+                    type="button"
+                    [disabled]="formService.isReadonly() || row.columnIndex <= 0"
+                    (click)="moveColumn(row.id, 'up')"
+                    aria-label="Move column up"
+                  >
+                    <mat-icon>arrow_upward</mat-icon>
+                  </button>
+                  <button
+                    mat-icon-button
+                    type="button"
+                    [disabled]="formService.isReadonly() || row.columnIndex >= columnCount() - 1"
+                    (click)="moveColumn(row.id, 'down')"
+                    aria-label="Move column down"
+                  >
+                    <mat-icon>arrow_downward</mat-icon>
+                  </button>
+                </div>
+              }
+            </div>
+          </article>
+        }
+      </div>
+    </section>
+  }
+</div>

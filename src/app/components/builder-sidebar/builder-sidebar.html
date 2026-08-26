@@ -54,6 +54,9 @@
               @case ('rules') {
                 <app-workflow-rules-panel />
               }
+              @case ('list') {
+                <app-list-view-panel />
+              }
             }
           </div>
         } @else if (!section.relevant) {

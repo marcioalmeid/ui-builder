@@ -2,7 +2,9 @@
   <div class="shared-lists-panel__header">
     <div>
       <h2 class="shared-lists-panel__title">Shared option lists</h2>
-      <p class="shared-lists-panel__subtitle">Same catalog options on multiple dropdowns/radios</p>
+      <p class="shared-lists-panel__subtitle">
+        One catalog source linked to one dropdown/radio field
+      </p>
     </div>
     <button mat-icon-button aria-label="Create shared list" (click)="startCreate()">
       <mat-icon>add</mat-icon>
@@ -16,7 +18,11 @@
           <div class="min-w-0">
             <p class="shared-lists-panel__card-title">{{ getBindingLabel(binding) }}</p>
             <p class="shared-lists-panel__card-meta">
-              {{ binding.targetFieldIds.length }} linked field(s)
+              @if (binding.targetFieldIds.length) {
+                Linked to {{ getTargetFieldLabels(binding)[0] }}
+              } @else {
+                No field linked
+              }
             </p>
           </div>
           <div class="shared-lists-panel__card-actions">
@@ -31,15 +37,6 @@
             </button>
           </div>
         </div>
-        @if (getTargetFieldLabels(binding); as labels) {
-          @if (labels.length) {
-            <p class="shared-lists-panel__targets">
-              @for (label of labels; track label; let last = $last) {
-                <span class="shared-lists-panel__target">{{ label }}</span>@if (!last) {<span>, </span>}
-              }
-            </p>
-          }
-        }
       </div>
     }
   </div>
@@ -58,21 +55,42 @@
       />
 
       <div>
-        <p class="shared-lists-panel__field-label">Link to fields</p>
+        <p class="shared-lists-panel__field-label">
+          Link to field
+          <span class="shared-lists-panel__field-limit">(max {{ maxFields }})</span>
+        </p>
         @if (bindableFields().length === 0) {
           <p class="shared-lists-panel__field-hint">Add a dropdown or radio field to the canvas first.</p>
         } @else {
-          <div class="shared-lists-panel__field-list">
+          <mat-radio-group
+            class="shared-lists-panel__field-list"
+            [ngModel]="selectedTargetId()"
+            (ngModelChange)="selectTarget($event)"
+          >
             @for (field of bindableFields(); track field.id) {
-              <mat-checkbox
-                [checked]="isTargetSelected(field.id)"
-                (change)="toggleTarget(field.id, $event.checked)"
+              <mat-radio-button
+                [value]="field.id"
+                [disabled]="isFieldDisabled(field.id) && !isTargetSelected(field.id)"
               >
                 {{ field.label }}
                 <span class="shared-lists-panel__field-type">({{ field.type }})</span>
-              </mat-checkbox>
+                @if (attachedElsewhereLabel(field.id); as owner) {
+                  <span class="shared-lists-panel__field-taken"> — already linked to {{ owner }}</span>
+                }
+              </mat-radio-button>
             }
-          </div>
+          </mat-radio-group>
+
+          @if (hasSelectedField()) {
+            <button
+              mat-button
+              type="button"
+              class="shared-lists-panel__clear-target"
+              (click)="clearTarget()"
+            >
+              Clear selection
+            </button>
+          }
         }
       </div>
 

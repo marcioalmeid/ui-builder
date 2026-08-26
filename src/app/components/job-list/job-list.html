@@ -1,10 +1,10 @@
 <div class="min-h-screen bg-gray-50 p-6">
-  <div class="max-w-5xl mx-auto">
+  <div class="mx-auto" [class.max-w-5xl]="viewMode() === 'list'" [class.max-w-[96rem]]="viewMode() !== 'list'">
     <div class="flex items-start justify-between mb-6 gap-4 flex-wrap">
       <div>
         <h1 class="text-2xl font-medium">Tasks</h1>
         <p class="text-sm text-gray-500 mt-1">
-          View and manage your task submissions.
+          List, table, or board — search, filters, and layout contract columns per template.
         </p>
       </div>
       <button mat-flat-button color="primary" type="button" (click)="createTask()">
@@ -13,15 +13,29 @@
     </div>
 
     <div class="flex flex-wrap gap-3 mb-3">
-      <mat-form-field appearance="outline" class="flex-1 min-w-[12rem]">
+      <mat-form-field appearance="outline" class="flex-1 min-w-[14rem]">
         <mat-label>Search</mat-label>
         <input
           matInput
           [ngModel]="search()"
           (ngModelChange)="search.set($event)"
-          placeholder="Title or template"
+          placeholder="Full-text across indexed fields"
         />
       </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-48">
+        <mat-label>Template</mat-label>
+        <mat-select
+          [ngModel]="templateFilter()"
+          (ngModelChange)="onTemplateFilterChange($event)"
+        >
+          <mat-option value="all">All templates</mat-option>
+          @for (template of publishedTemplates(); track template.id) {
+            <mat-option [value]="template.id">{{ template.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
       <mat-form-field appearance="outline" class="w-40">
         <mat-label>Status</mat-label>
         <mat-select
@@ -36,22 +50,43 @@
       </mat-form-field>
     </div>
 
-    <div class="flex justify-end mb-4">
-      <mat-button-toggle-group
-        [value]="viewMode()"
-        (valueChange)="onViewModeChange($event)"
-        hideSingleSelectionIndicator="true"
-        aria-label="Tasks view"
-      >
-        <mat-button-toggle value="list">
-          <mat-icon>view_list</mat-icon>
-          List
-        </mat-button-toggle>
-        <mat-button-toggle value="kanban">
-          <mat-icon>view_kanban</mat-icon>
-          Board
-        </mat-button-toggle>
-      </mat-button-toggle-group>
+    <div class="flex justify-between items-center gap-3 mb-4 flex-wrap">
+      <div class="text-sm text-gray-500">
+        {{ filteredTasks().length }} task(s)
+        @if (templateFilter() !== 'all' && activeTemplateColumns().length) {
+          · {{ activeTemplateColumns().length }} configured column(s)
+        } @else if (columnTemplateId() !== 'all' && activeTemplateColumns().length) {
+          · {{ activeTemplateColumns().length }} column(s) auto-detected
+        }
+      </div>
+
+      <div class="flex items-center gap-2 flex-wrap">
+        @if (viewMode() === 'table' && hasActiveColumnFilters()) {
+          <button mat-stroked-button type="button" (click)="clearColumnFilters()">
+            Clear column filters
+          </button>
+        }
+
+        <mat-button-toggle-group
+          [value]="viewMode()"
+          (valueChange)="onViewModeChange($event)"
+          hideSingleSelectionIndicator="true"
+          aria-label="Tasks view"
+        >
+          <mat-button-toggle value="list">
+            <mat-icon>view_list</mat-icon>
+            List
+          </mat-button-toggle>
+          <mat-button-toggle value="table">
+            <mat-icon>table_rows</mat-icon>
+            Table
+          </mat-button-toggle>
+          <mat-button-toggle value="kanban">
+            <mat-icon>view_kanban</mat-icon>
+            Board
+          </mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
     </div>
 
     @if (viewMode() === 'list') {
@@ -103,6 +138,94 @@
               </div>
             </article>
           }
+        </div>
+      }
+    } @else if (viewMode() === 'table') {
+      @if (filteredTasks().length === 0) {
+        <div class="bg-white border rounded-lg p-6 text-sm text-gray-600">
+          No tasks match these filters.
+        </div>
+      } @else {
+        <div class="tasks-table-wrap">
+          <table class="tasks-table">
+            <thead>
+              <tr>
+                <th class="tasks-table__col tasks-table__col--id">ID</th>
+                <th class="tasks-table__col tasks-table__col--title">Title</th>
+                @if (columnTemplateId() === 'all') {
+                  <th class="tasks-table__col tasks-table__col--template">Template</th>
+                }
+                @for (column of activeTemplateColumns(); track column.fieldId) {
+                  <th class="tasks-table__col" [ngClass]="columnWidthClass(column.width)">
+                    <div class="tasks-table__head">
+                      <span>{{ column.label }}</span>
+                      @if (column.filterable) {
+                        <input
+                          class="tasks-table__filter"
+                          type="search"
+                          [value]="columnFilterValue(column.fieldId)"
+                          (input)="setColumnFilter(column.fieldId, $any($event.target).value)"
+                          [attr.placeholder]="'Filter ' + column.label"
+                          [attr.aria-label]="'Filter ' + column.label"
+                        />
+                      }
+                    </div>
+                  </th>
+                }
+                <th class="tasks-table__col tasks-table__col--status">Status</th>
+                <th class="tasks-table__col tasks-table__col--date">Submitted</th>
+                <th class="tasks-table__col tasks-table__col--actions">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (task of filteredTasks(); track task.id) {
+                <tr class="tasks-table__row">
+                  <td class="tasks-table__cell tasks-table__cell--mono">
+                    {{ task.friendlyId || '—' }}
+                  </td>
+                  <td class="tasks-table__cell">
+                    <div class="tasks-table__title-cell">
+                      <span class="tasks-table__title">{{ taskTitle(task) }}</span>
+                      @if (needsUpdate(task)) {
+                        <span class="tasks-table__badge">Needs update</span>
+                      }
+                    </div>
+                  </td>
+                  @if (columnTemplateId() === 'all') {
+                    <td class="tasks-table__cell">{{ templateLabel(task) }}</td>
+                  }
+                  @for (column of activeTemplateColumns(); track column.fieldId) {
+                    <td class="tasks-table__cell" [ngClass]="columnWidthClass(column.width)">
+                      {{ cellValue(task, column.fieldId) || '—' }}
+                    </td>
+                  }
+                  <td class="tasks-table__cell">
+                    <span
+                      class="tasks-table__status"
+                      [class.tasks-table__status--todo]="taskStatus(task) === 'todo'"
+                      [class.tasks-table__status--progress]="taskStatus(task) === 'in_progress'"
+                      [class.tasks-table__status--done]="taskStatus(task) === 'done'"
+                    >
+                      {{ statusLabel(task.status) }}
+                    </span>
+                  </td>
+                  <td class="tasks-table__cell tasks-table__cell--meta">
+                    {{ formatDate(task.submittedAt) }}
+                  </td>
+                  <td class="tasks-table__cell">
+                    <div class="tasks-table__actions">
+                      <a mat-flat-button color="primary" [routerLink]="['/tasks', task.id]">
+                        Open
+                      </a>
+                      <button mat-stroked-button type="button" (click)="cloneTask(task, $event)">
+                        Clone
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
         </div>
       }
     } @else {

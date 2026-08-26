@@ -10,6 +10,13 @@ import {
   TaskTemplate,
   TemplateStatus,
 } from "../models/task-template";
+import { ListViewConfig, MAX_LIST_COLUMNS } from "../models/list-view";
+import {
+  ensureListView,
+  isListableField,
+  normalizeListView,
+  resolveTitleFieldId,
+} from "../utils/layout-contract";
 import { DataSourceService, FetchOptionsResult } from "./data-source.service";
 import { DepartmentService } from "./department.service";
 import { RetroactivityService } from "./retroactivity.service";
@@ -18,13 +25,17 @@ import { mergeFieldDataSourceUpdate, mergeFieldUpdate } from "../utils/field-dat
 import { migrateLegacyVisibilityRules } from "../utils/workflow-migration";
 import { generateAngularFormCode } from "../utils/code-generator";
 import {
+  getAllFields,
   setupStepFromSidebarSection,
   SetupStepId,
   validateTemplateForPublish,
 } from "../utils/template-readiness";
 import { JobService } from "./job.service";
 
-export type BuilderSidebarSection = "template" | "fields" | "data" | "rules";
+export type BuilderSidebarSection = "template" | "fields" | "data" | "rules" | "list";
+
+/** A shared list can be linked to at most one field. */
+export const MAX_SHARED_LIST_FIELDS = 1;
 
 const STORAGE_KEY = "ui-builder-templates-v1";
 const LEGACY_STORAGE_KEY = "form-builder-state";
@@ -49,6 +60,7 @@ export class FormService {
   private _rows = signal<FormRow[]>([]);
   private _dataBindings = signal<DataBinding[]>([]);
   private _workflowRules = signal<WorkflowRule[]>([]);
+  private _listView = signal<ListViewConfig>({ columns: [], searchableFieldIds: [] });
   private _selectedFieldId = signal<string | null>(null);
   private _selectedWorkflowRuleId = signal<string | null>(null);
   private _focusedWorkflowNodeId = signal<string | null>(null);
@@ -76,6 +88,7 @@ export class FormService {
   public readonly rows = this._rows.asReadonly();
   public readonly dataBindings = this._dataBindings.asReadonly();
   public readonly workflowRules = this._workflowRules.asReadonly();
+  public readonly listView = this._listView.asReadonly();
   public readonly selectedWorkflowRuleId = this._selectedWorkflowRuleId.asReadonly();
   public readonly focusedWorkflowNodeId = this._focusedWorkflowNodeId.asReadonly();
 
@@ -338,6 +351,7 @@ export class FormService {
     }
 
     this.syncActiveTemplateLayout();
+    this.syncListViewFromFields(true);
     const validation = validateTemplateForPublish(
       this._rows(),
       this._dataBindings(),
@@ -401,6 +415,85 @@ export class FormService {
     this.saveState();
   }
 
+  updateListView(data: Partial<ListViewConfig>) {
+    if (this.isReadonly()) return;
+    this.recordUndo();
+    const fields = getAllFields(this._rows());
+    const next = normalizeListView({ ...this._listView(), ...data }, fields);
+    this._listView.set(next);
+    this.saveState();
+  }
+
+  setTitleFieldId(fieldId: string | undefined) {
+    this.updateListView({ titleFieldId: fieldId });
+  }
+
+  toggleListColumn(fieldId: string, enabled: boolean) {
+    if (this.isReadonly()) return;
+    const fields = getAllFields(this._rows());
+    const field = fields.find((item) => item.id === fieldId);
+    if (!field || !isListableField(field)) return;
+
+    const current = this._listView();
+    const titleFieldId = resolveTitleFieldId(fields, current);
+    if (fieldId === titleFieldId) return;
+
+    let columns = [...current.columns];
+    let searchableFieldIds = [...current.searchableFieldIds];
+
+    if (enabled) {
+      if (columns.some((column) => column.fieldId === fieldId)) return;
+      if (columns.length >= MAX_LIST_COLUMNS) return;
+      columns.push({ fieldId, filterable: true });
+      if (!searchableFieldIds.includes(fieldId)) {
+        searchableFieldIds.push(fieldId);
+      }
+    } else {
+      columns = columns.filter((column) => column.fieldId !== fieldId);
+    }
+
+    this.updateListView({ columns, searchableFieldIds });
+  }
+
+  toggleSearchableField(fieldId: string, enabled: boolean) {
+    if (this.isReadonly()) return;
+    const fields = getAllFields(this._rows());
+    const field = fields.find((item) => item.id === fieldId);
+    if (!field || !isListableField(field)) return;
+
+    const current = this._listView();
+    const searchableFieldIds = enabled
+      ? [...new Set([...current.searchableFieldIds, fieldId])]
+      : current.searchableFieldIds.filter((id) => id !== fieldId);
+
+    this.updateListView({ searchableFieldIds });
+  }
+
+  moveListColumn(fieldId: string, direction: 'up' | 'down') {
+    if (this.isReadonly()) return;
+    const columns = [...this._listView().columns];
+    const index = columns.findIndex((column) => column.fieldId === fieldId);
+    if (index < 0) return;
+
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= columns.length) return;
+
+    [columns[index], columns[targetIndex]] = [columns[targetIndex], columns[index]];
+    this.updateListView({ columns });
+  }
+
+  syncListViewFromFields(ensureDefaults = false) {
+    const fields = getAllFields(this._rows());
+    const next = ensureDefaults
+      ? ensureListView(this._listView(), fields)
+      : normalizeListView(this._listView(), fields);
+
+    this._listView.set(next);
+    if (!this.isReadonly()) {
+      this.saveState();
+    }
+  }
+
   private assertEditable() {
     if (this.isReadonly()) {
       throw new Error("Published templates are read-only.");
@@ -425,6 +518,7 @@ export class FormService {
       return row;
     });
     this._rows.set(newRows);
+    this.syncListViewFromFields(true);
     this.saveState();
   }
 
@@ -444,6 +538,7 @@ export class FormService {
     if (this._selectedFieldId() === fieldId) {
       this.clearSelectedField();
     }
+    this.syncListViewFromFields();
     this.saveState();
   }
 
@@ -528,14 +623,63 @@ export class FormService {
     this.saveState();
   }
 
+  /** Binding that currently owns this field, if any. */
+  getBindingOwningField(fieldId: string): DataBinding | undefined {
+    const byTargets = this._dataBindings().find((binding) =>
+      binding.targetFieldIds.includes(fieldId)
+    );
+    if (byTargets) return byTargets;
+
+    const field = this.fieldIndex().get(fieldId);
+    if (!field?.dataBindingId) return undefined;
+    return this._dataBindings().find((binding) => binding.id === field.dataBindingId);
+  }
+
+  /**
+   * Keep only fields not already attached to another shared list.
+   * Each shared list accepts at most one field.
+   * `exceptBindingId` allows the current binding to keep/replace its own target.
+   */
+  filterAvailableTargetFieldIds(
+    fieldIds: string[],
+    exceptBindingId?: string
+  ): { allowed: string[]; rejected: string[] } {
+    const allowed: string[] = [];
+    const rejected: string[] = [];
+
+    for (const fieldId of fieldIds) {
+      const owner = this.getBindingOwningField(fieldId);
+      if (owner && owner.id !== exceptBindingId) {
+        rejected.push(fieldId);
+        continue;
+      }
+      if (!allowed.includes(fieldId)) {
+        allowed.push(fieldId);
+      }
+    }
+
+    if (allowed.length > MAX_SHARED_LIST_FIELDS) {
+      rejected.push(...allowed.slice(MAX_SHARED_LIST_FIELDS));
+      return {
+        allowed: allowed.slice(0, MAX_SHARED_LIST_FIELDS),
+        rejected: [...new Set(rejected)],
+      };
+    }
+
+    return { allowed, rejected };
+  }
+
   addDataBinding(binding: Omit<DataBinding, "id">): DataBinding {
     this.assertEditable();
     this.recordUndo();
+    const { allowed } = this.filterAvailableTargetFieldIds(binding.targetFieldIds);
     const newBinding: DataBinding = {
       id: crypto.randomUUID(),
       ...binding,
+      targetFieldIds: allowed,
     };
     this._dataBindings.set([...this._dataBindings(), newBinding]);
+    this.syncFieldsToBinding(newBinding);
     this.saveState();
     return newBinding;
   }
@@ -543,11 +687,28 @@ export class FormService {
   updateDataBinding(bindingId: string, data: Partial<Omit<DataBinding, "id">>) {
     this.assertEditable();
     this.recordUndo();
+    const previous = this._dataBindings().find((binding) => binding.id === bindingId);
+    const nextTargets =
+      data.targetFieldIds !== undefined
+        ? this.filterAvailableTargetFieldIds(data.targetFieldIds, bindingId).allowed
+        : undefined;
+
     this._dataBindings.set(
       this._dataBindings().map((binding) =>
-        binding.id === bindingId ? { ...binding, ...data } : binding
+        binding.id === bindingId
+          ? {
+              ...binding,
+              ...data,
+              ...(nextTargets !== undefined ? { targetFieldIds: nextTargets } : {}),
+            }
+          : binding
       )
     );
+
+    const updated = this._dataBindings().find((binding) => binding.id === bindingId);
+    if (updated && previous) {
+      this.reconcileBindingFieldMembership(previous, updated);
+    }
     this.saveState();
   }
 
@@ -606,9 +767,25 @@ export class FormService {
       return of({ options: [], error: "Shared list not found." });
     }
 
+    const owner = this.getBindingOwningField(fieldId);
+    if (owner && owner.id !== bindingId) {
+      return of({
+        options: [],
+        error: `Field is already linked to shared list "${owner.name}". Unlink it first.`,
+      });
+    }
+
+    const occupiedByOther = binding.targetFieldIds.find((id) => id !== fieldId);
+    if (occupiedByOther) {
+      return of({
+        options: [],
+        error: `Shared list already linked to "${this.getFieldLabel(occupiedByOther)}". Unlink that field first.`,
+      });
+    }
+
     if (!binding.targetFieldIds.includes(fieldId)) {
       this.updateDataBinding(bindingId, {
-        targetFieldIds: [...binding.targetFieldIds, fieldId],
+        targetFieldIds: [fieldId],
       });
     }
 
@@ -677,7 +854,10 @@ export class FormService {
         .subscribe({
           next: (result) => {
             if (!result.error) {
-              this.applyBindingOptions(binding, result.options);
+              // Re-read binding so targetFieldIds stay current after concurrent edits.
+              const latest =
+                this._dataBindings().find((item) => item.id === bindingId) ?? binding;
+              this.applyBindingOptions(latest, result.options);
             }
             subscriber.next(result);
             subscriber.complete();
@@ -693,23 +873,73 @@ export class FormService {
     });
   }
 
-  private applyBindingOptions(binding: DataBinding, options: RadioOption[]) {
-    const rows = this._rows();
-    const newRows = rows.map((row) => ({
-      ...row,
-      fields: row.fields.map((field) =>
-        binding.targetFieldIds.includes(field.id)
-          ? mergeFieldDataSourceUpdate(field, {
+  /** Attach all current target fields to this shared list (membership + catalog meta). */
+  private syncFieldsToBinding(binding: DataBinding, options?: RadioOption[]) {
+    const targetIds = new Set(binding.targetFieldIds);
+    this._rows.set(
+      this._rows().map((row) => ({
+        ...row,
+        fields: row.fields.map((field) => {
+          if (!targetIds.has(field.id)) return field;
+          return mergeFieldDataSourceUpdate(field, {
+            optionsSource: "api",
+            dataSource: binding.dataSource,
+            dataCatalogId: binding.dataCatalogId,
+            dataBindingId: binding.id,
+            ...(options ? { options } : {}),
+          });
+        }),
+      }))
+    );
+  }
+
+  /** Keep field.dataBindingId in sync when a binding's target list changes. */
+  private reconcileBindingFieldMembership(
+    previous: DataBinding,
+    next: DataBinding
+  ) {
+    const prevTargets = new Set(previous.targetFieldIds);
+    const nextTargets = new Set(next.targetFieldIds);
+
+    const removed = previous.targetFieldIds.filter((id) => !nextTargets.has(id));
+    const addedOrKept = next.targetFieldIds;
+
+    this._rows.set(
+      this._rows().map((row) => ({
+        ...row,
+        fields: row.fields.map((field) => {
+          if (removed.includes(field.id) && field.dataBindingId === previous.id) {
+            return mergeFieldDataSourceUpdate(field, {
+              dataBindingId: undefined,
+              optionsSource: "static",
+            });
+          }
+          if (addedOrKept.includes(field.id)) {
+            return mergeFieldDataSourceUpdate(field, {
               optionsSource: "api",
-              dataSource: binding.dataSource,
-              dataCatalogId: binding.dataCatalogId,
-              dataBindingId: binding.id,
-              options,
-            })
-          : field
-      ),
-    }));
-    this._rows.set(newRows);
+              dataSource: next.dataSource,
+              dataCatalogId: next.dataCatalogId,
+              dataBindingId: next.id,
+            });
+          }
+          // Stale membership: field points at this binding but is no longer a target.
+          if (field.dataBindingId === next.id && !nextTargets.has(field.id)) {
+            return mergeFieldDataSourceUpdate(field, {
+              dataBindingId: undefined,
+              optionsSource: "static",
+            });
+          }
+          if (prevTargets.has(field.id) && !nextTargets.has(field.id)) {
+            return field;
+          }
+          return field;
+        }),
+      }))
+    );
+  }
+
+  private applyBindingOptions(binding: DataBinding, options: RadioOption[]) {
+    this.syncFieldsToBinding(binding, options);
     this.saveState();
   }
 
@@ -791,6 +1021,7 @@ export class FormService {
                 rows: this._rows(),
                 dataBindings: this._dataBindings(),
                 workflowRules: this._workflowRules(),
+                listView: this._listView(),
               },
               updatedAt: Date.now(),
             }
@@ -843,6 +1074,8 @@ export class FormService {
     this._rows.set(migrated.rows);
     this._dataBindings.set(structuredClone(template.layout.dataBindings));
     this._workflowRules.set(migrated.rules);
+    const fields = getAllFields(migrated.rows);
+    this._listView.set(ensureListView(template.layout.listView, fields));
     this._selectedWorkflowRuleId.set(null);
     this._focusedWorkflowNodeId.set(null);
     this.pruneOrphanedDataBindings();
