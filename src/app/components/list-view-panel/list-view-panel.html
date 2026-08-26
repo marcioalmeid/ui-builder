@@ -1,7 +1,7 @@
 <div class="list-view-panel">
   <p class="list-view-panel__intro">
-    Configure how tasks appear in the hub: title field, table columns (max
-    {{ maxColumns }}), and full-text search index.
+    Configure how tasks appear in the hub: title field, which fields show in
+    the list cards and table (max {{ maxColumns }}), and full-text search.
   </p>
 
   @if (listableFields().length === 0) {
@@ -23,7 +23,7 @@
 
     <section class="list-view-panel__section">
       <div class="list-view-panel__heading-row">
-        <h4 class="list-view-panel__heading">Table columns</h4>
+        <h4 class="list-view-panel__heading">Show in list and table</h4>
         <span class="list-view-panel__count">{{ columnCount() }}/{{ maxColumns }}</span>
       </div>
 

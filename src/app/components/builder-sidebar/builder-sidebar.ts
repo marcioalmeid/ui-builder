@@ -70,7 +70,7 @@ export class BuilderSidebar {
       {
         id: 'list',
         title: 'List view',
-        hint: 'Choose title, table columns, and searchable fields for the task hub',
+        hint: 'Choose title, list/table fields, and searchable fields for the task hub',
       },
     ];
 

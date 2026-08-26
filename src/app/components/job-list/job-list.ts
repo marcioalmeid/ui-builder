@@ -27,11 +27,11 @@ import {
   buildTaskListContext,
   matchesColumnFilters,
   matchesFullTextSearch,
+  normalizeListView,
   resolveListColumns,
   taskFieldValue,
   taskTitleValue,
 } from '../../utils/layout-contract';
-import { lastPublishedLayout } from '../../utils/retroactivity';
 
 const VIEW_MODE_KEY = 'tasks-view-mode';
 
@@ -103,8 +103,8 @@ export class JobList {
     const template = this.formService.getTemplate(templateId);
     if (!template) return [];
 
-    const layout = lastPublishedLayout(template);
-    const context = buildTaskListContext(layout);
+    // Hub columns follow the current template listView (including draft edits).
+    const context = buildTaskListContext(template.layout);
     return resolveListColumns(context.listView, context.fields);
   });
 
@@ -313,8 +313,14 @@ export class JobList {
     if (!template) {
       return buildTaskListContext({ rows: [], dataBindings: [], workflowRules: [] });
     }
+    // Field schema/visibility stay version-pinned; title/columns/search follow the
+    // live template listView so Template Studio toggles apply immediately in the hub.
     const layout = this.retroactivity.resolveJob(task, template);
-    return buildTaskListContext(layout);
+    const context = buildTaskListContext(layout);
+    return {
+      ...context,
+      listView: normalizeListView(template.layout.listView, context.fields),
+    };
   }
 }
 

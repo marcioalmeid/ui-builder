@@ -155,4 +155,35 @@ describe('layout-contract', () => {
       workflowRules: [],
     })).toBe('My task');
   });
+
+  it('presentation listView can hide columns that exist on a pinned snapshot', () => {
+    const fields = [
+      text('title', 'Title', true),
+      text('client', 'Client'),
+      text('owner', 'Owner'),
+    ];
+    const pinnedListView = normalizeListView(
+      {
+        titleFieldId: 'title',
+        columns: [{ fieldId: 'client' }, { fieldId: 'owner' }],
+        searchableFieldIds: ['title', 'client', 'owner'],
+      },
+      fields
+    );
+    const presentationListView = normalizeListView(
+      {
+        titleFieldId: 'title',
+        columns: [{ fieldId: 'client' }],
+        searchableFieldIds: ['title', 'client'],
+      },
+      fields
+    );
+
+    const columns = resolveListColumns(presentationListView, fields);
+    expect(columns.map((column) => column.fieldId)).toEqual(['client']);
+    expect(resolveListColumns(pinnedListView, fields).map((c) => c.fieldId)).toEqual([
+      'client',
+      'owner',
+    ]);
+  });
 });

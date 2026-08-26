@@ -341,13 +341,19 @@ export class FormService {
   }
 
   publishTemplate(policy?: RiskPolicy): { success: boolean; errors: string[] } {
-    const active = this.activeTemplate();
-    if (!active || active.status === "published") {
+    const current = this.activeTemplate();
+    if (!current || current.status === "published") {
       return { success: false, errors: ["This template is already published."] };
     }
 
     this.syncActiveTemplateLayout();
     this.syncListViewFromFields(true);
+    // Re-read after flush — commit must use the synced layout/listView, not a stale snapshot.
+    const active = this.activeTemplate();
+    if (!active) {
+      return { success: false, errors: ["No active template."] };
+    }
+
     const validation = validateTemplateForPublish(
       this._rows(),
       this._dataBindings(),
