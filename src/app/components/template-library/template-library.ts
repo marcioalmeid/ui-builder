@@ -6,6 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog } from '@angular/material/dialog';
 import { FormService } from '../../services/form.services';
 import { JobService } from '../../services/job.service';
@@ -26,6 +27,7 @@ type StatusFilter = 'all' | 'draft' | 'published';
     MatIconModule,
     MatInputModule,
     MatSelectModule,
+    MatTooltipModule,
   ],
   templateUrl: './template-library.html',
   styleUrl: './template-library.css',
@@ -50,7 +52,26 @@ export class TemplateLibrary {
   });
 
   linkedTaskCount(templateId: string): number {
+    this.jobService.revision();
     return this.jobService.listByTemplate(templateId).length;
+  }
+
+  canDelete(template: TaskTemplate): boolean {
+    return (
+      this.linkedTaskCount(template.id) === 0 &&
+      this.formService.templates().length > 1
+    );
+  }
+
+  deleteHint(template: TaskTemplate): string {
+    const jobs = this.linkedTaskCount(template.id);
+    if (jobs > 0) {
+      return `Cannot delete: ${jobs} task(s) are linked to this template.`;
+    }
+    if (this.formService.templates().length <= 1) {
+      return 'Cannot delete the only template. Create another first.';
+    }
+    return 'Delete this template';
   }
 
   openNewTemplateDialog() {
@@ -95,11 +116,8 @@ export class TemplateLibrary {
 
   deleteTemplate(template: TaskTemplate, event: Event) {
     event.stopPropagation();
-    const jobCount = this.jobService.listByTemplate(template.id).length;
-    if (jobCount > 0) {
-      alertDialog(
-        `Cannot delete: ${jobCount} task(s) are linked to this template.`
-      );
+    if (!this.canDelete(template)) {
+      alertDialog(this.deleteHint(template));
       return;
     }
     const confirmed = confirmDialog(
@@ -107,6 +125,9 @@ export class TemplateLibrary {
     );
     if (!confirmed) return;
 
-    this.formService.deleteTemplate(template.id);
+    const result = this.formService.deleteTemplate(template.id);
+    if (!result.success) {
+      alertDialog(result.error ?? 'Could not delete template.');
+    }
   }
 }

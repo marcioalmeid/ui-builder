@@ -1,3 +1,9 @@
 :host {
   display: block;
 }
+
+/* M3 ignores mat color="warn"; keep Delete visually distinct when enabled. */
+.template-library__delete:not(:disabled) {
+  color: var(--mat-sys-error, #ba1a1a);
+  border-color: color-mix(in srgb, var(--mat-sys-error, #ba1a1a) 55%, transparent);
+}

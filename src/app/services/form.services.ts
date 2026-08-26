@@ -392,10 +392,29 @@ export class FormService {
     this.saveState();
   }
 
-  deleteTemplate(templateId: string) {
-    if (this._templates().length <= 1) return;
+  deleteTemplate(templateId: string): { success: boolean; error?: string } {
+    if (this._templates().length <= 1) {
+      return {
+        success: false,
+        error: "Cannot delete the only template. Create another first.",
+      };
+    }
+
+    const jobService = this.injector.get(JobService);
+    const linkedJobs = jobService.listByTemplate(templateId).length;
+    if (linkedJobs > 0) {
+      return {
+        success: false,
+        error: `Cannot delete: ${linkedJobs} task(s) are linked to this template.`,
+      };
+    }
 
     const remaining = this._templates().filter((t) => t.id !== templateId);
+    if (remaining.length === this._templates().length) {
+      return { success: false, error: "Template not found." };
+    }
+
+    this.recordUndo();
     this._templates.set(remaining);
 
     if (this._activeTemplateId() === templateId) {
@@ -403,6 +422,8 @@ export class FormService {
     } else {
       this.saveState();
     }
+    jobService.pruneOrphanJobs();
+    return { success: true };
   }
 
   replaceAllTemplates(templates: TaskTemplate[], activeId: string) {

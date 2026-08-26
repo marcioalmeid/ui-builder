@@ -77,11 +77,21 @@
                     <mat-icon>play_arrow</mat-icon> Run
                   </a>
                 }
-                @if (linkedTaskCount(template.id) === 0) {
-                  <button mat-stroked-button color="warn" type="button" (click)="deleteTemplate(template, $event)">
+                <span
+                  class="inline-flex"
+                  [matTooltip]="deleteHint(template)"
+                  matTooltipPosition="above"
+                >
+                  <button
+                    mat-stroked-button
+                    type="button"
+                    class="template-library__delete"
+                    [disabled]="!canDelete(template)"
+                    (click)="deleteTemplate(template, $event)"
+                  >
                     <mat-icon>delete</mat-icon> Delete
                   </button>
-                }
+                </span>
               </div>
             </div>
           </article>
