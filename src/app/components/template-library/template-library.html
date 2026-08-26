@@ -7,9 +7,24 @@
           Design task templates, then publish for operators.
         </p>
       </div>
-      <button mat-flat-button color="primary" type="button" (click)="openNewTemplateDialog()">
-        <mat-icon>add</mat-icon> New template
-      </button>
+      <div class="flex flex-wrap gap-2">
+        <button mat-stroked-button type="button" (click)="exportTemplates()">
+          <mat-icon>download</mat-icon> Export
+        </button>
+        <button mat-stroked-button type="button" (click)="importInput.click()">
+          <mat-icon>upload</mat-icon> Import
+        </button>
+        <input
+          #importInput
+          type="file"
+          accept="application/json,.json"
+          hidden
+          (change)="onImportFile($event)"
+        />
+        <button mat-flat-button color="primary" type="button" (click)="openNewTemplateDialog()">
+          <mat-icon>add</mat-icon> New template
+        </button>
+      </div>
     </div>
 
     <div class="flex flex-wrap gap-3 mb-4">

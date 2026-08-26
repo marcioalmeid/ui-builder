@@ -83,6 +83,42 @@ export class TemplateLibrary {
     });
   }
 
+  exportTemplates() {
+    this.formService.exportTemplates();
+  }
+
+  async onImportFile(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file) return;
+
+    const count = this.formService.templates().length;
+    const confirmed = confirmDialog(
+      [
+        `Import "${file.name}"?`,
+        '',
+        `This replaces all ${count} current template(s) with the file contents.`,
+        'Tasks linked to removed templates will be deleted.',
+        '',
+        'Continue?',
+      ].join('\n')
+    );
+    if (!confirmed) return;
+
+    try {
+      const text = await file.text();
+      const result = this.formService.importTemplates(text);
+      if (!result.success) {
+        alertDialog(result.error ?? 'Could not import templates.');
+        return;
+      }
+      alertDialog(`Imported ${result.count ?? 0} template(s).`);
+    } catch {
+      alertDialog('Could not read the selected file.');
+    }
+  }
+
   openStudio(template: TaskTemplate) {
     this.formService.switchTemplate(template.id);
     void this.router.navigate(['/builder', template.id]);

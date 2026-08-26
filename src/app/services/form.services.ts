@@ -25,6 +25,11 @@ import { migrateSharedListsToFieldCatalog } from "../utils/migrate-shared-lists"
 import { migrateLegacyVisibilityRules } from "../utils/workflow-migration";
 import { generateAngularFormCode } from "../utils/code-generator";
 import {
+  buildTemplateBundle,
+  parseTemplateBundle,
+  serializeTemplateBundle,
+} from "../utils/template-bundle";
+import {
   getAllFields,
   setupStepFromSidebarSection,
   SetupStepId,
@@ -436,6 +441,47 @@ export class FormService {
     this._templates.set(templates.map(normalizeTemplate));
     this.switchTemplate(activeId, false);
     this.saveState();
+    this.injector.get(JobService).pruneOrphanJobs();
+  }
+
+  /** Download all templates as a JSON backup file. */
+  exportTemplates() {
+    this.syncActiveTemplateLayout();
+    const bundle = buildTemplateBundle(
+      this._templates(),
+      this._activeTemplateId()
+    );
+    const blob = new Blob([serializeTemplateBundle(bundle)], {
+      type: "application/json",
+    });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    const stamp = new Date().toISOString().slice(0, 10);
+    link.download = `templates-${stamp}.json`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+  }
+
+  /**
+   * Replace all local templates from an exported JSON bundle.
+   * Tasks linked to removed template ids are pruned.
+   */
+  importTemplates(raw: string): {
+    success: boolean;
+    error?: string;
+    count?: number;
+  } {
+    const parsed = parseTemplateBundle(raw);
+    if (!parsed.success) {
+      return { success: false, error: parsed.error };
+    }
+
+    this.replaceAllTemplates(
+      parsed.bundle.templates,
+      parsed.bundle.activeTemplateId
+    );
+    return { success: true, count: parsed.bundle.templates.length };
   }
 
   updateListView(data: Partial<ListViewConfig>) {
