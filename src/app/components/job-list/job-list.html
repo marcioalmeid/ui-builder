@@ -103,17 +103,29 @@
                   <div class="flex flex-wrap items-center gap-2">
                     <span class="text-xs font-mono text-gray-400 select-none">{{ task.friendlyId || '' }}</span>
                     <h2 class="font-medium">{{ taskTitle(task) }}</h2>
-                    <span
-                      class="text-[11px] font-medium uppercase tracking-wide px-2 py-0.5 rounded-full"
-                      [class.bg-gray-100]="taskStatus(task) === 'todo'"
-                      [class.text-gray-700]="taskStatus(task) === 'todo'"
-                      [class.bg-blue-100]="taskStatus(task) === 'in_progress'"
-                      [class.text-blue-800]="taskStatus(task) === 'in_progress'"
-                      [class.bg-green-100]="taskStatus(task) === 'done'"
-                      [class.text-green-800]="taskStatus(task) === 'done'"
+                    <button
+                      type="button"
+                      class="tasks-status-chip"
+                      [class.tasks-status-chip--todo]="taskStatus(task) === 'todo'"
+                      [class.tasks-status-chip--progress]="taskStatus(task) === 'in_progress'"
+                      [class.tasks-status-chip--done]="taskStatus(task) === 'done'"
+                      [matMenuTriggerFor]="statusMenu"
+                      [attr.aria-label]="'Change status for ' + taskTitle(task)"
                     >
                       {{ statusLabel(task.status) }}
-                    </span>
+                    </button>
+                    <mat-menu #statusMenu="matMenu">
+                      @for (s of statuses; track s) {
+                        <button
+                          mat-menu-item
+                          type="button"
+                          [disabled]="taskStatus(task) === s"
+                          (click)="setTaskStatus(task, s, $event)"
+                        >
+                          {{ statusLabels[s] }}
+                        </button>
+                      }
+                    </mat-menu>
                     @if (needsUpdate(task)) {
                       <span class="text-[11px] font-medium uppercase tracking-wide px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
                         Needs update
@@ -200,14 +212,29 @@
                     </td>
                   }
                   <td class="tasks-table__cell">
-                    <span
-                      class="tasks-table__status"
-                      [class.tasks-table__status--todo]="taskStatus(task) === 'todo'"
-                      [class.tasks-table__status--progress]="taskStatus(task) === 'in_progress'"
-                      [class.tasks-table__status--done]="taskStatus(task) === 'done'"
+                    <button
+                      type="button"
+                      class="tasks-status-chip"
+                      [class.tasks-status-chip--todo]="taskStatus(task) === 'todo'"
+                      [class.tasks-status-chip--progress]="taskStatus(task) === 'in_progress'"
+                      [class.tasks-status-chip--done]="taskStatus(task) === 'done'"
+                      [matMenuTriggerFor]="tableStatusMenu"
+                      [attr.aria-label]="'Change status for ' + taskTitle(task)"
                     >
                       {{ statusLabel(task.status) }}
-                    </span>
+                    </button>
+                    <mat-menu #tableStatusMenu="matMenu">
+                      @for (s of statuses; track s) {
+                        <button
+                          mat-menu-item
+                          type="button"
+                          [disabled]="taskStatus(task) === s"
+                          (click)="setTaskStatus(task, s, $event)"
+                        >
+                          {{ statusLabels[s] }}
+                        </button>
+                      }
+                    </mat-menu>
                   </td>
                   <td class="tasks-table__cell tasks-table__cell--meta">
                     {{ formatDate(task.submittedAt) }}
