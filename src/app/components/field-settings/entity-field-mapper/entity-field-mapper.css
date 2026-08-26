@@ -31,7 +31,18 @@
   border-color: #fde68a;
 }
 
+.entity-mapper__summary--error {
+  color: #991b1b;
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
 .entity-mapper__field-type {
   color: #6b7280;
+  font-size: 0.75rem;
+}
+
+.entity-mapper__field-taken {
+  color: #b45309;
   font-size: 0.75rem;
 }

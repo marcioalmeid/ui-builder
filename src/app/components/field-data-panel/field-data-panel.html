@@ -36,7 +36,6 @@
         [optionsSource]="field.optionsSource || 'static'"
         [dataSource]="field.dataSource"
         [dataCatalogId]="field.dataCatalogId"
-        [dataBindingId]="field.dataBindingId"
         (fieldUpdate)="updateFieldPartial(field.id, $event)" />
     } @else {
       <p class="field-data-panel__empty-text">

@@ -1,7 +1,7 @@
 <div class="entity-mapper">
   <p class="entity-mapper__hint">
     Link this field to a property on an entity. The operator still types the value — this mapping
-    is used when reading or writing task data.
+    is used when reading or writing task data. Each entity property can only be mapped once.
   </p>
 
   <mat-button-toggle-group
@@ -35,9 +35,15 @@
             <mat-option disabled>No compatible fields for this component type</mat-option>
           } @else {
             @for (field of compatibleFields(); track field.key) {
-              <mat-option [value]="field.key">
+              <mat-option
+                [value]="field.key"
+                [disabled]="isEntityFieldTaken(field.key)"
+              >
                 {{ field.label }}
                 <span class="entity-mapper__field-type">({{ field.type }})</span>
+                @if (ownerOfEntityField(field.key); as owner) {
+                  <span class="entity-mapper__field-taken"> — used by {{ owner.label }}</span>
+                }
               </mat-option>
             }
           }
@@ -45,7 +51,9 @@
       </mat-form-field>
     }
 
-    @if (mappingSummary(); as summary) {
+    @if (conflictMessage(); as conflict) {
+      <p class="entity-mapper__summary entity-mapper__summary--error">{{ conflict }}</p>
+    } @else if (mappingSummary(); as summary) {
       <p class="entity-mapper__summary" [class.entity-mapper__summary--pending]="!isPersisted()">
         @if (isReadonly()) {
           Published template — duplicate to edit mappings.

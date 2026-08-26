@@ -10,8 +10,10 @@ import { DataCatalogService } from '../../../services/data-catalog.service';
 import { FormService } from '../../../services/form.services';
 import {
   filterCompatibleEntityFields,
+  findFieldUsingEntityPath,
   formatEntityMappingPath,
 } from '../../../utils/entity-field-compat';
+import { getAllFields } from '../../../utils/template-readiness';
 
 @Component({
   selector: 'app-entity-field-mapper',
@@ -39,6 +41,7 @@ export class EntityFieldMapper {
   enabled = signal(false);
   selectedCatalogId = signal('');
   selectedEntityFieldKey = signal('');
+  conflictMessage = signal<string | null>(null);
   private lastSyncedFieldId = '';
 
   firstDepartment = computed(
@@ -49,6 +52,8 @@ export class EntityFieldMapper {
     const id = this.selectedCatalogId();
     return id ? this.catalogService.getById(id) : undefined;
   });
+
+  allFields = computed(() => getAllFields(this.formService.rows()));
 
   compatibleFields = computed(() => {
     const catalog = this.selectedCatalog();
@@ -89,6 +94,7 @@ export class EntityFieldMapper {
         this.enabled.set(Boolean(mapping?.catalogId));
         this.selectedCatalogId.set(mapping?.catalogId ?? '');
         this.selectedEntityFieldKey.set(mapping?.entityFieldKey ?? '');
+        this.conflictMessage.set(null);
         return;
       }
 
@@ -102,8 +108,24 @@ export class EntityFieldMapper {
     });
   }
 
+  ownerOfEntityField(entityFieldKey: string): FormField | undefined {
+    const catalogId = this.selectedCatalogId();
+    if (!catalogId || !entityFieldKey) return undefined;
+    return findFieldUsingEntityPath(
+      this.allFields(),
+      catalogId,
+      entityFieldKey,
+      this.fieldId()
+    );
+  }
+
+  isEntityFieldTaken(entityFieldKey: string): boolean {
+    return Boolean(this.ownerOfEntityField(entityFieldKey));
+  }
+
   onModeChange(enabled: boolean) {
     this.enabled.set(enabled);
+    this.conflictMessage.set(null);
     if (!enabled) {
       this.selectedCatalogId.set('');
       this.selectedEntityFieldKey.set('');
@@ -114,13 +136,29 @@ export class EntityFieldMapper {
   onCatalogSelected(item: DataCatalogItem) {
     this.selectedCatalogId.set(item.id);
     this.selectedEntityFieldKey.set('');
+    this.conflictMessage.set(null);
     this.persistMapping({ catalogId: item.id, entityFieldKey: '' });
   }
 
   onEntityFieldChange(fieldKey: string) {
-    this.selectedEntityFieldKey.set(fieldKey);
     const catalogId = this.selectedCatalogId();
     if (!catalogId) return;
+
+    const owner = findFieldUsingEntityPath(
+      this.allFields(),
+      catalogId,
+      fieldKey,
+      this.fieldId()
+    );
+    if (owner) {
+      this.conflictMessage.set(
+        `Already mapped to "${owner.label}". Pick a different entity field.`
+      );
+      return;
+    }
+
+    this.conflictMessage.set(null);
+    this.selectedEntityFieldKey.set(fieldKey);
     this.persistMapping({ catalogId, entityFieldKey: fieldKey });
   }
 

@@ -9,21 +9,14 @@
         Static
       </mat-button-toggle>
       <mat-button-toggle value="field-catalog" class="flex-1" (click)="onModeChange('field-catalog')">
-        This field
-      </mat-button-toggle>
-      <mat-button-toggle value="shared-list" class="flex-1" (click)="onModeChange('shared-list')">
-        Shared list
+        Catalog
       </mat-button-toggle>
     </mat-button-toggle-group>
 
     @if (sourceMode() === 'static') {
       <p class="options-source-desc">Type options manually — only this field uses them.</p>
-    } @else if (sourceMode() === 'field-catalog') {
-      <p class="options-source-desc">Pick a catalog source — only this field uses it.</p>
     } @else {
-      <p class="options-source-desc">
-        Reuse a list from the Data section — updates sync across all linked fields.
-      </p>
+      <p class="options-source-desc">Pick a catalog source — only this field uses it.</p>
     }
   } @else {
     <p class="options-source-hint">{{ modeHint() }}</p>
@@ -47,53 +40,6 @@
         [options]="options()"
         (optionsChange)="onStaticOptionsChange($event)"
       />
-    }
-  } @else if (sourceMode() === 'shared-list') {
-    @if (sharedLists().length === 0) {
-      <div class="options-source-callout">
-        <p>No shared lists yet. Create one in the <strong>Data</strong> section first.</p>
-        <button mat-stroked-button type="button" (click)="openSharedListsPanel()">
-          Open shared lists
-        </button>
-      </div>
-    } @else {
-      <mat-form-field appearance="outline" class="w-full">
-        <mat-label>Shared option list</mat-label>
-        <mat-select
-          [value]="dataBindingId() ?? ''"
-          (valueChange)="onSharedListSelected($event)"
-        >
-          @for (binding of sharedLists(); track binding.id) {
-            <mat-option
-              [value]="binding.id"
-              [disabled]="
-                (isAlreadyAttached() && binding.id !== dataBindingId()) ||
-                isSharedListUnavailable(binding.id)
-              "
-            >
-              {{ getSharedListLabel(binding.id) }}
-              @if (binding.targetFieldIds.length) {
-                ({{ formService.getFieldLabel(binding.targetFieldIds[0]) }})
-              } @else {
-                (empty)
-              }
-            </mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-
-      @if (isAlreadyAttached() && activeSharedList(); as list) {
-        <p class="options-source-desc">
-          Already linked to this list. Switch to Static to unlink before attaching another.
-        </p>
-      } @else if (activeSharedList(); as list) {
-        <p class="options-source-desc">
-          Linked with:
-          @for (fieldId of list.targetFieldIds; track fieldId; let last = $last) {
-            {{ formService.getFieldLabel(fieldId) }}@if (!last) {, }
-          }
-        </p>
-      }
     }
   } @else {
     <app-data-catalog-picker

@@ -23,7 +23,7 @@ export interface ApiPayloadDataSourceRef {
 }
 
 export interface ApiFieldDataConnection {
-  kind: 'none' | 'entity-map' | 'catalog' | 'shared-list';
+  kind: 'none' | 'entity-map' | 'catalog';
   bindingMode: ReturnType<typeof getDataBindingMode>;
   optionsSource?: 'static' | 'api';
   catalogId?: string;
@@ -31,8 +31,6 @@ export interface ApiFieldDataConnection {
   entityFieldKey?: string;
   entityFieldLabel?: string;
   entityPath?: string;
-  dataBindingId?: string;
-  dataBindingName?: string;
   dataSource?: ApiPayloadDataSourceRef;
 }
 
@@ -55,7 +53,6 @@ export interface ApiPayloadField {
   visibilityRule?: FormField['visibilityRule'];
   entityMapping?: FormField['entityMapping'];
   dataCatalogId?: string;
-  dataBindingId?: string;
   managementFeePercent?: number;
   dataConnection: ApiFieldDataConnection;
   runtime: ApiPayloadFieldRuntime;
@@ -147,7 +144,6 @@ function resolveDisplayValue(field: FormField, value: unknown): string | undefin
 
 function buildFieldDataConnection(
   field: FormField,
-  dataBindings: DataBinding[],
   getCatalogItem: CatalogLookup
 ): ApiFieldDataConnection {
   const bindingMode = getDataBindingMode(field.type);
@@ -168,28 +164,6 @@ function buildFieldDataConnection(
       entityPath: field.entityMapping.entityFieldKey
         ? `${field.entityMapping.catalogId}.${field.entityMapping.entityFieldKey}`
         : undefined,
-    };
-  }
-
-  if (field.dataBindingId) {
-    const binding = dataBindings.find((item) => item.id === field.dataBindingId);
-    const catalog = binding?.dataCatalogId
-      ? getCatalogItem(binding.dataCatalogId)
-      : undefined;
-
-    return {
-      kind: 'shared-list',
-      bindingMode,
-      optionsSource: 'api',
-      dataBindingId: field.dataBindingId,
-      dataBindingName: binding?.name,
-      catalogId: binding?.dataCatalogId,
-      catalogName: catalog?.name ?? binding?.name,
-      dataSource: binding?.dataSource ? summarizeDataSource(binding.dataSource) : undefined,
-      entityPath:
-        binding?.dataCatalogId && binding.dataSource.valueKey
-          ? `${binding.dataCatalogId}.${binding.dataSource.valueKey}`
-          : undefined,
     };
   }
 
@@ -241,13 +215,11 @@ function serializeFieldDefinition(field: FormField): Omit<ApiPayloadField, 'data
     if (field.optionsSource) payload.optionsSource = field.optionsSource;
     if (field.options?.length) payload.options = field.options;
     if (field.dataCatalogId) payload.dataCatalogId = field.dataCatalogId;
-    if (field.dataBindingId) payload.dataBindingId = field.dataBindingId;
   }
 
   if ((bindingMode === 'line-items' || bindingMode === 'label') && usesApiDataSource(field)) {
     if (field.optionsSource) payload.optionsSource = field.optionsSource;
     if (field.dataCatalogId) payload.dataCatalogId = field.dataCatalogId;
-    if (field.dataBindingId) payload.dataBindingId = field.dataBindingId;
   }
 
   return payload;
@@ -269,7 +241,7 @@ function applyResolvedEntityValue(
     return;
   }
 
-  if (dataConnection.kind === 'catalog' || dataConnection.kind === 'shared-list') {
+  if (dataConnection.kind === 'catalog') {
     const catalogId = dataConnection.catalogId;
     const entityKey = dataConnection.dataSource?.valueKey ?? 'id';
     if (!catalogId) return;
@@ -281,14 +253,13 @@ function applyResolvedEntityValue(
 function buildPayloadField(
   field: FormField,
   jobData: Record<string, unknown>,
-  dataBindings: DataBinding[],
   workflowRules: WorkflowRule[],
   getCatalogItem: CatalogLookup,
   entities: Record<string, Record<string, unknown>>
 ): ApiPayloadField {
   const value = jobData[field.id];
   const visible = isFieldVisible(field, jobData, workflowRules);
-  const dataConnection = buildFieldDataConnection(field, dataBindings, getCatalogItem);
+  const dataConnection = buildFieldDataConnection(field, getCatalogItem);
 
   if (visible && field.type !== 'section-header' && field.type !== 'button') {
     applyResolvedEntityValue(field, value, dataConnection, entities);
@@ -305,42 +276,6 @@ function buildPayloadField(
   };
 }
 
-function buildPayloadDataBindings(
-  dataBindings: DataBinding[],
-  fields: FormField[],
-  getCatalogItem: CatalogLookup
-): ApiPayloadDataBinding[] {
-  const fieldIds = new Set(fields.map((field) => field.id));
-  const activeBindingIds = new Set(
-    fields
-      .map((field) => field.dataBindingId)
-      .filter((bindingId): bindingId is string => Boolean(bindingId))
-  );
-
-  return dataBindings
-    .filter((binding) => activeBindingIds.has(binding.id))
-    .map((binding) => ({
-      id: binding.id,
-      name: binding.name,
-      catalogId: binding.dataCatalogId,
-      catalogName: binding.dataCatalogId
-        ? getCatalogItem(binding.dataCatalogId)?.name
-        : binding.name,
-      dataSource: summarizeDataSource(binding.dataSource),
-      targetFields: binding.targetFieldIds
-        .filter((fieldId) => fieldIds.has(fieldId))
-        .map((fieldId) => {
-          const field = fields.find((item) => item.id === fieldId);
-          return {
-            id: fieldId,
-            label: field?.label ?? fieldId,
-            type: field?.type ?? 'unknown',
-          };
-        }),
-    }))
-    .filter((binding) => binding.targetFields.length > 0);
-}
-
 function filterJobDataForFields(
   fields: FormField[],
   jobData: Record<string, unknown>
@@ -354,7 +289,7 @@ function filterJobDataForFields(
 export function buildApiSubmissionPayload(
   template: TaskTemplate,
   rows: FormRow[],
-  dataBindings: DataBinding[],
+  _dataBindings: DataBinding[],
   workflowRules: WorkflowRule[],
   jobData: Record<string, unknown>,
   getCatalogItem: CatalogLookup
@@ -369,15 +304,12 @@ export function buildApiSubmissionPayload(
       buildPayloadField(
         field,
         scopedJobData,
-        dataBindings,
         workflowRules,
         getCatalogItem,
         entities
       )
     ),
   }));
-
-  const payloadBindings = buildPayloadDataBindings(dataBindings, allFields, getCatalogItem);
 
   const connectedFieldCount = layout
     .flatMap((row) => row.fields)
@@ -401,7 +333,7 @@ export function buildApiSubmissionPayload(
       departments: template.departments ?? [],
       status: template.status,
     },
-    dataBindings: payloadBindings,
+    dataBindings: [],
     workflowRules,
     events,
     layout,
@@ -409,7 +341,7 @@ export function buildApiSubmissionPayload(
     meta: {
       rowCount: layout.length,
       fieldCount: allFields.length,
-      dataBindingCount: payloadBindings.length,
+      dataBindingCount: 0,
       connectedFieldCount,
       visibleFieldCount,
       workflowRuleCount: workflowRules.length,

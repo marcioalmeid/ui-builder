@@ -30,7 +30,7 @@
     </div>
 
     <div class="flex gap-4 flex-wrap">
-      @for (field of row.fields; track field.id + ':' + (field.dataCatalogId ?? '') + ':' + (field.dataBindingId ?? '') + ':' + (field.entityMapping?.catalogId ?? '') + ':' + (field.entityMapping?.entityFieldKey ?? '') + ':' + (field.optionsSource ?? '')) {
+      @for (field of row.fields; track field.id + ':' + (field.dataCatalogId ?? '') + ':' + (field.entityMapping?.catalogId ?? '') + ':' + (field.entityMapping?.entityFieldKey ?? '') + ':' + (field.optionsSource ?? '')) {
       <app-form-field
         [field]="field"
         [readonly]="formService.isReadonly()"

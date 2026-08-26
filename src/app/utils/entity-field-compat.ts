@@ -34,3 +34,35 @@ export function formatEntityMappingPath(
   if (!entityField) return catalogName;
   return `${catalogName}.${entityField.label}`;
 }
+
+/** True when both sides point at the same catalog property. */
+export function isSameEntityMappingPath(
+  a: { catalogId?: string; entityFieldKey?: string } | undefined,
+  catalogId: string,
+  entityFieldKey: string
+): boolean {
+  return Boolean(
+    catalogId &&
+      entityFieldKey &&
+      a?.catalogId === catalogId &&
+      a?.entityFieldKey === entityFieldKey
+  );
+}
+
+/** First form field already mapped to this entity path, if any. */
+export function findFieldUsingEntityPath(
+  fields: Iterable<FormField>,
+  catalogId: string,
+  entityFieldKey: string,
+  exceptFieldId?: string
+): FormField | undefined {
+  if (!catalogId || !entityFieldKey) return undefined;
+
+  for (const field of fields) {
+    if (exceptFieldId && field.id === exceptFieldId) continue;
+    if (isSameEntityMappingPath(field.entityMapping, catalogId, entityFieldKey)) {
+      return field;
+    }
+  }
+  return undefined;
+}

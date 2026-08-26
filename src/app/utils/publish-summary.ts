@@ -11,7 +11,10 @@ import {
 } from './field-data-binding';
 import { getFieldIssues } from './field-issues';
 import { DataCatalogService } from '../services/data-catalog.service';
-import { formatEntityMappingPath } from './entity-field-compat';
+import {
+  findFieldUsingEntityPath,
+  formatEntityMappingPath,
+} from './entity-field-compat';
 
 export interface DataChecklistItem {
   field: FormField;
@@ -24,18 +27,30 @@ export function buildDataChecklist(
   catalogService: Pick<DataCatalogService, 'getById' | 'getDisplayName'>
 ): DataChecklistItem[] {
   const items: DataChecklistItem[] = [];
+  const allFields = getAllFields(rows);
 
-  for (const field of getAllFields(rows)) {
+  for (const field of allFields) {
     if (!supportsDataBinding(field)) continue;
 
     if (hasEntityMapping(field)) {
       const catalogId = field.entityMapping!.catalogId;
+      const entityFieldKey = field.entityMapping!.entityFieldKey;
       const catalog = catalogService.getById(catalogId);
       const entityField = catalog?.entityFields.find(
-        (item) => item.key === field.entityMapping!.entityFieldKey
+        (item) => item.key === entityFieldKey
       );
 
-      if (isFieldDataConfigured(field)) {
+      const duplicateOwner = entityFieldKey
+        ? findFieldUsingEntityPath(allFields, catalogId, entityFieldKey, field.id)
+        : undefined;
+
+      if (duplicateOwner) {
+        items.push({
+          field,
+          status: 'error',
+          message: `Duplicate mapping — already used by "${duplicateOwner.label}"`,
+        });
+      } else if (isFieldDataConfigured(field)) {
         items.push({
           field,
           status: 'ok',
@@ -53,9 +68,7 @@ export function buildDataChecklist(
 
     if (usesApiDataSource(field)) {
       if (isFieldDataConfigured(field)) {
-        const via = field.dataBindingId
-          ? `Shared list · ${catalogService.getDisplayName(field.dataCatalogId, 'Catalog')}`
-          : catalogService.getDisplayName(field.dataCatalogId, 'Catalog');
+        const via = catalogService.getDisplayName(field.dataCatalogId, 'Catalog');
         const mode = getDataBindingMode(field.type);
         const modeLabel =
           mode === 'options'

@@ -1,7 +1,6 @@
 import { Injectable, signal, computed, inject, Injector } from "@angular/core";
-import { Observable, of } from "rxjs";
 import { FormRow } from "../models/form";
-import { ApiDataSource, FormField, RadioOption } from "../models/field";
+import { FormField } from "../models/field";
 import { DataBinding } from "../models/data-binding";
 import { WorkflowRule, createDefaultWorkflowRule } from "../models/workflow-rule";
 import {
@@ -17,11 +16,12 @@ import {
   normalizeListView,
   resolveTitleFieldId,
 } from "../utils/layout-contract";
-import { DataSourceService, FetchOptionsResult } from "./data-source.service";
 import { DepartmentService } from "./department.service";
 import { RetroactivityService } from "./retroactivity.service";
 import { normalizeTemplate } from "../utils/retroactivity";
-import { mergeFieldDataSourceUpdate, mergeFieldUpdate } from "../utils/field-data-source";
+import { mergeFieldUpdate } from "../utils/field-data-source";
+import { findFieldUsingEntityPath } from "../utils/entity-field-compat";
+import { migrateSharedListsToFieldCatalog } from "../utils/migrate-shared-lists";
 import { migrateLegacyVisibilityRules } from "../utils/workflow-migration";
 import { generateAngularFormCode } from "../utils/code-generator";
 import {
@@ -33,9 +33,6 @@ import {
 import { JobService } from "./job.service";
 
 export type BuilderSidebarSection = "template" | "fields" | "data" | "rules" | "list";
-
-/** A shared list can be linked to at most one field. */
-export const MAX_SHARED_LIST_FIELDS = 1;
 
 const STORAGE_KEY = "ui-builder-templates-v1";
 const LEGACY_STORAGE_KEY = "form-builder-state";
@@ -50,7 +47,6 @@ interface PersistedState {
   providedIn: "root",
 })
 export class FormService {
-  private dataSourceService = inject(DataSourceService);
   private departmentService = inject(DepartmentService);
   private retroactivity = inject(RetroactivityService);
   private injector = inject(Injector);
@@ -534,7 +530,6 @@ export class FormService {
     });
 
     this._rows.set(newRows);
-    this.removeFieldFromBindings(fieldId);
     if (this._selectedFieldId() === fieldId) {
       this.clearSelectedField();
     }
@@ -563,10 +558,6 @@ export class FormService {
     const rowToDelete = this._rows().find((row) => row.id === rowId);
     if (rowToDelete?.fields.some((f) => f.id === this._selectedFieldId())) {
       this.clearSelectedField();
-    }
-
-    for (const field of rowToDelete?.fields ?? []) {
-      this.removeFieldFromBindings(field.id);
     }
 
     this._rows.set(this._rows().filter((row) => row.id !== rowId));
@@ -610,6 +601,20 @@ export class FormService {
 
   updateField(fieldId: string, data: Partial<FormField>) {
     if (this.isReadonly()) return;
+
+    // Each entity property may map to only one form field (payload last-write-wins otherwise).
+    if (data.entityMapping?.catalogId && data.entityMapping.entityFieldKey) {
+      const owner = findFieldUsingEntityPath(
+        getAllFields(this._rows()),
+        data.entityMapping.catalogId,
+        data.entityMapping.entityFieldKey,
+        fieldId
+      );
+      if (owner) {
+        return;
+      }
+    }
+
     this.recordUndo();
 
     const rows = this._rows();
@@ -620,105 +625,6 @@ export class FormService {
       ),
     }));
     this._rows.set(newRows);
-    this.saveState();
-  }
-
-  /** Binding that currently owns this field, if any. */
-  getBindingOwningField(fieldId: string): DataBinding | undefined {
-    const byTargets = this._dataBindings().find((binding) =>
-      binding.targetFieldIds.includes(fieldId)
-    );
-    if (byTargets) return byTargets;
-
-    const field = this.fieldIndex().get(fieldId);
-    if (!field?.dataBindingId) return undefined;
-    return this._dataBindings().find((binding) => binding.id === field.dataBindingId);
-  }
-
-  /**
-   * Keep only fields not already attached to another shared list.
-   * Each shared list accepts at most one field.
-   * `exceptBindingId` allows the current binding to keep/replace its own target.
-   */
-  filterAvailableTargetFieldIds(
-    fieldIds: string[],
-    exceptBindingId?: string
-  ): { allowed: string[]; rejected: string[] } {
-    const allowed: string[] = [];
-    const rejected: string[] = [];
-
-    for (const fieldId of fieldIds) {
-      const owner = this.getBindingOwningField(fieldId);
-      if (owner && owner.id !== exceptBindingId) {
-        rejected.push(fieldId);
-        continue;
-      }
-      if (!allowed.includes(fieldId)) {
-        allowed.push(fieldId);
-      }
-    }
-
-    if (allowed.length > MAX_SHARED_LIST_FIELDS) {
-      rejected.push(...allowed.slice(MAX_SHARED_LIST_FIELDS));
-      return {
-        allowed: allowed.slice(0, MAX_SHARED_LIST_FIELDS),
-        rejected: [...new Set(rejected)],
-      };
-    }
-
-    return { allowed, rejected };
-  }
-
-  addDataBinding(binding: Omit<DataBinding, "id">): DataBinding {
-    this.assertEditable();
-    this.recordUndo();
-    const { allowed } = this.filterAvailableTargetFieldIds(binding.targetFieldIds);
-    const newBinding: DataBinding = {
-      id: crypto.randomUUID(),
-      ...binding,
-      targetFieldIds: allowed,
-    };
-    this._dataBindings.set([...this._dataBindings(), newBinding]);
-    this.syncFieldsToBinding(newBinding);
-    this.saveState();
-    return newBinding;
-  }
-
-  updateDataBinding(bindingId: string, data: Partial<Omit<DataBinding, "id">>) {
-    this.assertEditable();
-    this.recordUndo();
-    const previous = this._dataBindings().find((binding) => binding.id === bindingId);
-    const nextTargets =
-      data.targetFieldIds !== undefined
-        ? this.filterAvailableTargetFieldIds(data.targetFieldIds, bindingId).allowed
-        : undefined;
-
-    this._dataBindings.set(
-      this._dataBindings().map((binding) =>
-        binding.id === bindingId
-          ? {
-              ...binding,
-              ...data,
-              ...(nextTargets !== undefined ? { targetFieldIds: nextTargets } : {}),
-            }
-          : binding
-      )
-    );
-
-    const updated = this._dataBindings().find((binding) => binding.id === bindingId);
-    if (updated && previous) {
-      this.reconcileBindingFieldMembership(previous, updated);
-    }
-    this.saveState();
-  }
-
-  deleteDataBinding(bindingId: string) {
-    this.assertEditable();
-    this.recordUndo();
-    this._dataBindings.set(
-      this._dataBindings().filter((b) => b.id !== bindingId)
-    );
-    this.clearBindingFromFields(bindingId);
     this.saveState();
   }
 
@@ -757,217 +663,8 @@ export class FormService {
     this.saveState();
   }
 
-  linkFieldToSharedList(
-    fieldId: string,
-    bindingId: string
-  ): Observable<FetchOptionsResult> {
-    this.assertEditable();
-    const binding = this._dataBindings().find((item) => item.id === bindingId);
-    if (!binding) {
-      return of({ options: [], error: "Shared list not found." });
-    }
-
-    const owner = this.getBindingOwningField(fieldId);
-    if (owner && owner.id !== bindingId) {
-      return of({
-        options: [],
-        error: `Field is already linked to shared list "${owner.name}". Unlink it first.`,
-      });
-    }
-
-    const occupiedByOther = binding.targetFieldIds.find((id) => id !== fieldId);
-    if (occupiedByOther) {
-      return of({
-        options: [],
-        error: `Shared list already linked to "${this.getFieldLabel(occupiedByOther)}". Unlink that field first.`,
-      });
-    }
-
-    if (!binding.targetFieldIds.includes(fieldId)) {
-      this.updateDataBinding(bindingId, {
-        targetFieldIds: [fieldId],
-      });
-    }
-
-    return this.refreshDataBinding(bindingId, true);
-  }
-
-  unlinkFieldFromSharedList(fieldId: string) {
-    const field = this.fieldIndex().get(fieldId);
-
-    if (!field?.dataBindingId) return;
-
-    this.assertEditable();
-    this.recordUndo();
-
-    const bindingId = field.dataBindingId;
-    this._dataBindings.set(
-      this._dataBindings().map((binding) =>
-        binding.id === bindingId
-          ? {
-              ...binding,
-              targetFieldIds: binding.targetFieldIds.filter((id) => id !== fieldId),
-            }
-          : binding
-      )
-    );
-
-    const rows = this._rows();
-    this._rows.set(
-      rows.map((row) => ({
-        ...row,
-        fields: row.fields.map((item) =>
-          item.id === fieldId
-            ? mergeFieldDataSourceUpdate(item, {
-                dataBindingId: undefined,
-                optionsSource: "static",
-              })
-            : item
-        ),
-      }))
-    );
-    this.saveState();
-  }
-
-  getSharedListForField(fieldId: string): DataBinding | undefined {
-    const field = this.fieldIndex().get(fieldId);
-    if (!field?.dataBindingId) return undefined;
-    return this._dataBindings().find((binding) => binding.id === field.dataBindingId);
-  }
-
   getFieldLabel(fieldId: string): string {
     return this.fieldIndex().get(fieldId)?.label ?? fieldId;
-  }
-
-  refreshDataBinding(
-    bindingId: string,
-    bypassCache = false
-  ): Observable<FetchOptionsResult> {
-    const binding = this._dataBindings().find((item) => item.id === bindingId);
-    if (!binding) {
-      return of({ options: [], error: "Binding not found." });
-    }
-
-    return new Observable((subscriber) => {
-      this.dataSourceService
-        .fetchOptions(binding.dataSource, bypassCache)
-        .subscribe({
-          next: (result) => {
-            if (!result.error) {
-              // Re-read binding so targetFieldIds stay current after concurrent edits.
-              const latest =
-                this._dataBindings().find((item) => item.id === bindingId) ?? binding;
-              this.applyBindingOptions(latest, result.options);
-            }
-            subscriber.next(result);
-            subscriber.complete();
-          },
-          error: (err) => {
-            subscriber.next({
-              options: [],
-              error: err?.message ?? "Failed to refresh binding.",
-            });
-            subscriber.complete();
-          },
-        });
-    });
-  }
-
-  /** Attach all current target fields to this shared list (membership + catalog meta). */
-  private syncFieldsToBinding(binding: DataBinding, options?: RadioOption[]) {
-    const targetIds = new Set(binding.targetFieldIds);
-    this._rows.set(
-      this._rows().map((row) => ({
-        ...row,
-        fields: row.fields.map((field) => {
-          if (!targetIds.has(field.id)) return field;
-          return mergeFieldDataSourceUpdate(field, {
-            optionsSource: "api",
-            dataSource: binding.dataSource,
-            dataCatalogId: binding.dataCatalogId,
-            dataBindingId: binding.id,
-            ...(options ? { options } : {}),
-          });
-        }),
-      }))
-    );
-  }
-
-  /** Keep field.dataBindingId in sync when a binding's target list changes. */
-  private reconcileBindingFieldMembership(
-    previous: DataBinding,
-    next: DataBinding
-  ) {
-    const prevTargets = new Set(previous.targetFieldIds);
-    const nextTargets = new Set(next.targetFieldIds);
-
-    const removed = previous.targetFieldIds.filter((id) => !nextTargets.has(id));
-    const addedOrKept = next.targetFieldIds;
-
-    this._rows.set(
-      this._rows().map((row) => ({
-        ...row,
-        fields: row.fields.map((field) => {
-          if (removed.includes(field.id) && field.dataBindingId === previous.id) {
-            return mergeFieldDataSourceUpdate(field, {
-              dataBindingId: undefined,
-              optionsSource: "static",
-            });
-          }
-          if (addedOrKept.includes(field.id)) {
-            return mergeFieldDataSourceUpdate(field, {
-              optionsSource: "api",
-              dataSource: next.dataSource,
-              dataCatalogId: next.dataCatalogId,
-              dataBindingId: next.id,
-            });
-          }
-          // Stale membership: field points at this binding but is no longer a target.
-          if (field.dataBindingId === next.id && !nextTargets.has(field.id)) {
-            return mergeFieldDataSourceUpdate(field, {
-              dataBindingId: undefined,
-              optionsSource: "static",
-            });
-          }
-          if (prevTargets.has(field.id) && !nextTargets.has(field.id)) {
-            return field;
-          }
-          return field;
-        }),
-      }))
-    );
-  }
-
-  private applyBindingOptions(binding: DataBinding, options: RadioOption[]) {
-    this.syncFieldsToBinding(binding, options);
-    this.saveState();
-  }
-
-  private removeFieldFromBindings(fieldId: string) {
-    const updatedBindings = this._dataBindings()
-      .map((binding) => ({
-        ...binding,
-        targetFieldIds: binding.targetFieldIds.filter((id) => id !== fieldId),
-      }))
-      .filter((binding) => binding.targetFieldIds.length > 0);
-
-    this._dataBindings.set(updatedBindings);
-  }
-
-  private clearBindingFromFields(bindingId: string) {
-    const rows = this._rows();
-    const newRows = rows.map((row) => ({
-      ...row,
-      fields: row.fields.map((field) =>
-        field.dataBindingId === bindingId
-          ? mergeFieldDataSourceUpdate(field, {
-              dataBindingId: undefined,
-              optionsSource: "static",
-            })
-          : field
-      ),
-    }));
-    this._rows.set(newRows);
   }
 
   setSelectedField(fieldId: string) {
@@ -1019,7 +716,7 @@ export class FormService {
               ...t,
               layout: {
                 rows: this._rows(),
-                dataBindings: this._dataBindings(),
+                dataBindings: [],
                 workflowRules: this._workflowRules(),
                 listView: this._listView(),
               },
@@ -1071,39 +768,28 @@ export class FormService {
       structuredClone(template.layout.workflowRules ?? [])
     );
 
-    this._rows.set(migrated.rows);
-    this._dataBindings.set(structuredClone(template.layout.dataBindings));
+    const legacyBindings = structuredClone(template.layout.dataBindings ?? []);
+    const { rows, changed: sharedMigrated } = migrateSharedListsToFieldCatalog(
+      migrated.rows,
+      legacyBindings
+    );
+
+    this._rows.set(rows);
+    this._dataBindings.set([]);
     this._workflowRules.set(migrated.rules);
-    const fields = getAllFields(migrated.rows);
+    const fields = getAllFields(rows);
     this._listView.set(ensureListView(template.layout.listView, fields));
     this._selectedWorkflowRuleId.set(null);
     this._focusedWorkflowNodeId.set(null);
-    this.pruneOrphanedDataBindings();
 
-    if (migrated.changed) {
+    if (migrated.changed || sharedMigrated) {
       this.syncActiveTemplateLayout();
       this.saveState();
     }
   }
 
-  private pruneOrphanedDataBindings() {
-    const fieldIds = new Set(
-      this._rows().flatMap((row) => row.fields.map((field) => field.id))
-    );
-
-    this._dataBindings.set(
-      this._dataBindings()
-        .map((binding) => ({
-          ...binding,
-          targetFieldIds: binding.targetFieldIds.filter((id) => fieldIds.has(id)),
-        }))
-        .filter((binding) => binding.targetFieldIds.length > 0)
-    );
-  }
-
   private saveState() {
     try {
-      this.pruneOrphanedDataBindings();
       this.syncActiveTemplateLayout();
       const state: PersistedState = {
         templates: this._templates(),

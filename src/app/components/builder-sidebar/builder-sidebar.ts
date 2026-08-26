@@ -1,7 +1,6 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { FormElementsMenu } from '../form-elements-menu/form-elements-menu';
-import { DataBindingsPanel } from '../data-bindings-panel/data-bindings-panel';
 import { DataChecklist } from '../data-checklist/data-checklist';
 import { WorkflowRulesPanel } from '../workflow-rules-panel/workflow-rules-panel';
 import { ListViewPanel } from '../list-view-panel/list-view-panel';
@@ -30,7 +29,6 @@ interface SidebarSectionView {
   imports: [
     MatIconModule,
     FormElementsMenu,
-    DataBindingsPanel,
     DataChecklist,
     WorkflowRulesPanel,
     ListViewPanel,

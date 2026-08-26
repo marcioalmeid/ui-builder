@@ -59,13 +59,11 @@ export function isFieldBindingConfigured(field: FormField): boolean {
   }
   if (mode === 'options') {
     if (usesApiDataSource(field)) {
-      if (field.dataBindingId) return true;
       return Boolean(field.dataSource?.url?.trim());
     }
     return (field.options?.length ?? 0) > 0;
   }
   if (mode === 'line-items') {
-    if (field.dataBindingId) return true;
     return Boolean(field.dataCatalogId && field.dataSource?.url?.trim());
   }
   return true;
@@ -85,7 +83,7 @@ export function getFieldDataConnectionError(field: FormField): string | null {
   }
   if (mode === 'options') {
     if (usesApiDataSource(field)) {
-      return `"${field.label}" is set to Catalog but has no data source. Pick a catalog item or use Shared data bindings.`;
+      return `"${field.label}" is set to Catalog but has no data source. Pick a catalog item.`;
     }
     return `"${field.label}" has no options. Add static options or connect a catalog source.`;
   }
@@ -123,16 +121,6 @@ export function getFieldConnectionBadge(
       complete,
       icon: complete ? 'link' : 'link_off',
       label,
-    };
-  }
-
-  if (field.dataBindingId) {
-    return {
-      complete: isFieldBindingConfigured(field),
-      icon: 'hub',
-      label: catalogName
-        ? `Shared list · ${catalogName}`
-        : 'Shared option list',
     };
   }
 

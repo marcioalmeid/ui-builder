@@ -1,11 +1,8 @@
 import { FormField } from '../models/field';
 
-export type FieldDataSourceKind = 'static' | 'catalog' | 'binding';
+export type FieldDataSourceKind = 'static' | 'catalog';
 
 export function resolveFieldDataSourceKind(field: FormField): FieldDataSourceKind {
-  if (field.dataBindingId) {
-    return 'binding';
-  }
   if (field.optionsSource === 'api' && field.dataCatalogId) {
     return 'catalog';
   }
@@ -36,16 +33,6 @@ export function mergeFieldDataSourceUpdate(
     updated.dataCatalogId = undefined;
     updated.dataSource = undefined;
     updated.dataBindingId = undefined;
-    return updated;
-  }
-
-  if (data.dataBindingId) {
-    updated.optionsSource = 'api';
-    updated.entityMapping = undefined;
-    // Keep catalog metadata when the shared list provides it.
-    if (!('dataCatalogId' in data)) {
-      updated.dataCatalogId = undefined;
-    }
     return updated;
   }
 

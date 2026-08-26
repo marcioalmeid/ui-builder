@@ -9,11 +9,10 @@ import { DataCatalogItem } from '../../../catalog/data-catalog.items';
 import { DataSourceService } from '../../../services/data-source.service';
 import { DataCatalogPicker } from '../../data-catalog-picker/data-catalog-picker';
 import { FormService } from '../../../services/form.services';
-import { DataCatalogService } from '../../../services/data-catalog.service';
 import { OptionsListEditor } from '../options-list-editor/options-list-editor';
 import { getDataBindingMode } from '../../../utils/field-data-binding';
 
-type OptionsSourceMode = 'static' | 'field-catalog' | 'shared-list';
+type OptionsSourceMode = 'static' | 'field-catalog';
 
 @Component({
   selector: 'app-data-source-editor',
@@ -37,13 +36,11 @@ export class DataSourceEditor {
   optionsSource = input<OptionsSource>('static');
   dataSource = input<ApiDataSource>();
   dataCatalogId = input<string>();
-  dataBindingId = input<string>();
 
   fieldUpdate = output<Partial<FormField>>();
 
   private dataSourceService = inject(DataSourceService);
   formService = inject(FormService);
-  private catalogService = inject(DataCatalogService);
 
   bindingMode = computed(() => getDataBindingMode(this.fieldType()));
   showStaticOptions = computed(() => this.bindingMode() === 'options');
@@ -60,34 +57,8 @@ export class DataSourceEditor {
   });
 
   sourceMode = computed((): OptionsSourceMode => {
-    if (!this.showStaticOptions()) {
-      return this.optionsSource() === 'api' ? 'field-catalog' : 'static';
-    }
-    if (this.dataBindingId()) return 'shared-list';
-    if (this.optionsSource() === 'api') return 'field-catalog';
-    return 'static';
+    return this.optionsSource() === 'api' ? 'field-catalog' : 'static';
   });
-
-  sharedLists = computed(() => this.formService.dataBindings());
-
-  activeSharedList = computed(() => {
-    const bindingId = this.dataBindingId();
-    if (!bindingId) return undefined;
-    return this.sharedLists().find((binding) => binding.id === bindingId);
-  });
-
-  /** True when this field is already owned by a shared list. */
-  isAlreadyAttached = computed(() =>
-    Boolean(this.formService.getBindingOwningField(this.fieldId()))
-  );
-
-  isSharedListUnavailable(bindingId: string): boolean {
-    const binding = this.sharedLists().find((item) => item.id === bindingId);
-    if (!binding) return true;
-    if (binding.id === this.dataBindingId()) return false;
-    // List already has another field — cannot attach this one.
-    return binding.targetFieldIds.some((id) => id !== this.fieldId());
-  }
 
   firstDepartment = computed(
     () => this.formService.activeTemplate()?.departments?.[0] ?? ''
@@ -116,10 +87,6 @@ export class DataSourceEditor {
     this.statusError.set(false);
 
     if (mode === 'static') {
-      if (this.dataBindingId()) {
-        this.formService.unlinkFieldFromSharedList(this.fieldId());
-      }
-
       const update: Partial<FormField> = {
         optionsSource: 'static',
         dataCatalogId: undefined,
@@ -137,20 +104,7 @@ export class DataSourceEditor {
       return;
     }
 
-    if (mode === 'field-catalog') {
-      if (this.dataBindingId()) {
-        this.formService.unlinkFieldFromSharedList(this.fieldId());
-      }
-      this.fieldUpdate.emit({ optionsSource: 'api', dataBindingId: undefined });
-      return;
-    }
-
-    if (mode === 'shared-list' && this.sharedLists().length === 1) {
-      const only = this.sharedLists()[0];
-      if (!this.isSharedListUnavailable(only.id)) {
-        this.onSharedListSelected(only.id);
-      }
-    }
+    this.fieldUpdate.emit({ optionsSource: 'api', dataBindingId: undefined });
   }
 
   onStaticOptionsChange(options: RadioOption[]) {
@@ -191,52 +145,5 @@ export class DataSourceEditor {
         this.fieldUpdate.emit({ options });
       },
     });
-  }
-
-  onSharedListSelected(bindingId: string) {
-    if (!bindingId) return;
-
-    const owner = this.formService.getBindingOwningField(this.fieldId());
-    if (owner && owner.id !== bindingId) {
-      this.statusMessage.set(
-        `Already linked to "${this.catalogService.getDisplayName(owner.dataCatalogId, owner.name)}". Switch to Static or unlink first.`
-      );
-      this.statusError.set(true);
-      return;
-    }
-
-    this.loading.set(true);
-    this.statusMessage.set(null);
-    this.statusError.set(false);
-
-    this.formService.linkFieldToSharedList(this.fieldId(), bindingId).subscribe({
-      next: ({ options, error }) => {
-        this.loading.set(false);
-
-        if (error) {
-          this.statusMessage.set(error);
-          this.statusError.set(true);
-          return;
-        }
-
-        const binding = this.formService.dataBindings().find((item) => item.id === bindingId);
-        const name = binding
-          ? this.catalogService.getDisplayName(binding.dataCatalogId, binding.name)
-          : 'Shared list';
-
-        this.statusMessage.set(`Linked to shared list "${name}" (${options.length} options).`);
-        this.statusError.set(false);
-      },
-    });
-  }
-
-  openSharedListsPanel() {
-    this.formService.focusSidebarSection('data');
-  }
-
-  getSharedListLabel(bindingId: string): string {
-    const binding = this.sharedLists().find((item) => item.id === bindingId);
-    if (!binding) return bindingId;
-    return this.catalogService.getDisplayName(binding.dataCatalogId, binding.name);
   }
 }

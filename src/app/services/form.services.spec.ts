@@ -115,107 +115,29 @@ describe('FormService', () => {
     expect(service.rows()[0].fields).toHaveLength(1);
   });
 
-  it('links exactly one field to a shared list and syncs dataBindingId', () => {
+  it('rejects duplicate entity field mappings', () => {
     expect(service.createTemplate('My Form', ['general']).success).toBe(true);
     const rowId = service.rows()[0].id;
-    const fieldA = makeTextField(crypto.randomUUID(), 'Dropdown A');
-    fieldA.type = 'dropdown';
-    const fieldB = makeTextField(crypto.randomUUID(), 'Dropdown B');
-    fieldB.type = 'dropdown';
-    service.addField(fieldA, rowId);
-    service.addField(fieldB, rowId);
+    const name = makeTextField(crypto.randomUUID(), 'Name');
+    const company = makeTextField(crypto.randomUUID(), 'Company');
+    service.addField(name, rowId);
+    service.addField(company, rowId);
 
-    const binding = service.addDataBinding({
-      name: 'Shared Users',
-      dataCatalogId: 'users',
-      dataSource: {
-        url: '/api/users',
-        labelKey: 'name',
-        valueKey: 'id',
-      },
-      targetFieldIds: [fieldA.id, fieldB.id],
+    service.updateField(name.id, {
+      entityMapping: { catalogId: 'task-types', entityFieldKey: 'description' },
     });
-
-    expect(binding.targetFieldIds).toEqual([fieldA.id]);
+    service.updateField(company.id, {
+      entityMapping: { catalogId: 'task-types', entityFieldKey: 'description' },
+    });
 
     const rows = service.rows();
-    const linkedA = rows[0].fields.find((field) => field.id === fieldA.id);
-    const linkedB = rows[0].fields.find((field) => field.id === fieldB.id);
-    expect(linkedA?.dataBindingId).toBe(binding.id);
-    expect(linkedB?.dataBindingId).toBeUndefined();
-    expect(linkedA?.optionsSource).toBe('api');
-  });
-
-  it('rejects a second field on an occupied shared list', () => {
-    expect(service.createTemplate('My Form', ['general']).success).toBe(true);
-    const rowId = service.rows()[0].id;
-    const fieldA = makeTextField(crypto.randomUUID(), 'Dropdown A');
-    fieldA.type = 'dropdown';
-    const fieldB = makeTextField(crypto.randomUUID(), 'Dropdown B');
-    fieldB.type = 'dropdown';
-    service.addField(fieldA, rowId);
-    service.addField(fieldB, rowId);
-
-    const binding = service.addDataBinding({
-      name: 'List A',
-      dataCatalogId: 'users',
-      dataSource: {
-        url: '/api/users',
-        labelKey: 'name',
-        valueKey: 'id',
-      },
-      targetFieldIds: [fieldA.id],
+    const mappedName = rows[0].fields.find((field) => field.id === name.id);
+    const mappedCompany = rows[0].fields.find((field) => field.id === company.id);
+    expect(mappedName?.entityMapping).toEqual({
+      catalogId: 'task-types',
+      entityFieldKey: 'description',
     });
-
-    let linkError: string | undefined;
-    service.linkFieldToSharedList(fieldB.id, binding.id).subscribe((result) => {
-      linkError = result.error;
-    });
-    expect(linkError).toMatch(/already linked/i);
-    expect(service.getBindingOwningField(fieldA.id)?.id).toBe(binding.id);
-    expect(service.getBindingOwningField(fieldB.id)).toBeUndefined();
-  });
-
-  it('rejects linking a field already attached to another shared list', () => {
-    expect(service.createTemplate('My Form', ['general']).success).toBe(true);
-    const rowId = service.rows()[0].id;
-    const fieldA = makeTextField(crypto.randomUUID(), 'Dropdown A');
-    fieldA.type = 'dropdown';
-    const fieldB = makeTextField(crypto.randomUUID(), 'Dropdown B');
-    fieldB.type = 'dropdown';
-    service.addField(fieldA, rowId);
-    service.addField(fieldB, rowId);
-
-    const first = service.addDataBinding({
-      name: 'List A',
-      dataCatalogId: 'users',
-      dataSource: {
-        url: '/api/users',
-        labelKey: 'name',
-        valueKey: 'id',
-      },
-      targetFieldIds: [fieldA.id],
-    });
-
-    const second = service.addDataBinding({
-      name: 'List B',
-      dataCatalogId: 'platforms',
-      dataSource: {
-        url: '/api/platforms',
-        labelKey: 'name',
-        valueKey: 'id',
-      },
-      targetFieldIds: [fieldA.id, fieldB.id],
-    });
-
-    expect(second.targetFieldIds).toEqual([fieldB.id]);
-    expect(service.getBindingOwningField(fieldA.id)?.id).toBe(first.id);
-
-    let linkError: string | undefined;
-    service.linkFieldToSharedList(fieldA.id, second.id).subscribe((result) => {
-      linkError = result.error;
-    });
-    expect(linkError).toMatch(/already linked/i);
+    expect(mappedCompany?.entityMapping).toBeUndefined();
   });
 
   it('generateForm delegates to the extracted code generator', () => {
