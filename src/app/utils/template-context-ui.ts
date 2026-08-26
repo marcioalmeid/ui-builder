@@ -5,7 +5,7 @@ const SECTION_DEPARTMENTS: Record<BuilderSidebarSection, string[] | null> = {
   template: null,
   fields: null,
   data: ['Accounts', 'A/V', 'Design', 'Digital Ads', 'Media', 'Organic Social', 'SEO'],
-  rules: ['Digital Ads', 'Design'],
+  rules: null,
   list: null,
 };
 
@@ -13,7 +13,7 @@ const DEFAULT_EXPANDED: Record<BuilderSidebarSection, boolean | ((dept: string) 
   template: false,
   fields: true,
   data: (dept) => dept !== '',
-  rules: (dept) => dept === 'Digital Ads' || dept === 'Design',
+  rules: true,
   list: false,
 };
 
