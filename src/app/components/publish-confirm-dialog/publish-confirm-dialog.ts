@@ -56,7 +56,10 @@ export class PublishConfirmDialog {
   data = inject<PublishConfirmData>(MAT_DIALOG_DATA);
   private dialogRef = inject(MatDialogRef<PublishConfirmDialog, PublishConfirmResult | undefined>);
 
-  policy = signal<RiskPolicy>(this.data.riskPolicy);
+  /** First-class UI choices: safe auto-apply vs freeze until Migrate. */
+  policy = signal<RiskPolicy>(
+    this.data.riskPolicy === 'NONE' ? 'NONE' : 'ADDITIVE'
+  );
   step = signal<DialogStep>('review');
   migrateNow = signal(true);
 

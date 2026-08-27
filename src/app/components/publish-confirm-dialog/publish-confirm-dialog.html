@@ -85,7 +85,7 @@
     </section>
 
     <section class="publish-dialog__section" aria-label="Existing jobs policy">
-      <h3 class="publish-dialog__section-title">On publish, update existing jobs with</h3>
+      <h3 class="publish-dialog__section-title">How should open jobs update on publish?</h3>
       <mat-radio-group
         class="publish-dialog__policy-options"
         [ngModel]="policy()"
@@ -93,32 +93,22 @@
       >
         <mat-radio-button class="publish-dialog__policy-option" value="ADDITIVE">
           <span class="publish-dialog__policy-option-text">
-            <strong>Text + new optional fields</strong>
+            <strong>Update open jobs with safe changes</strong>
             <span class="publish-dialog__policy-option-hint">
-              Rename fields (labels &amp; hints) now, and new optional fields appear empty on old jobs.
-            </span>
-          </span>
-        </mat-radio-button>
-        <mat-radio-button class="publish-dialog__policy-option" value="COSMETIC">
-          <span class="publish-dialog__policy-option-text">
-            <strong>Text only — labels &amp; hints</strong>
-            <span class="publish-dialog__policy-option-hint">
-              Rename fields now. New fields stay hidden until Migrate.
+              Labels, hints, and new optional fields apply now (new fields appear empty).
+              Show/hide rules still wait for Migrate.
             </span>
           </span>
         </mat-radio-button>
         <mat-radio-button class="publish-dialog__policy-option" value="NONE">
           <span class="publish-dialog__policy-option-text">
-            <strong>Nothing (keep old form text)</strong>
+            <strong>Leave open jobs as they are</strong>
             <span class="publish-dialog__policy-option-hint">
-              Jobs keep current labels, hints, and fields. Everything waits for Migrate.
+              Jobs keep current labels, hints, and fields until Migrate.
             </span>
           </span>
         </mat-radio-button>
       </mat-radio-group>
-      <p class="publish-dialog__policy-footnote">
-        Rule changes (show/hide) never auto-apply here — use the Migrate step.
-      </p>
     </section>
 
     @if (hasDryRun()) {

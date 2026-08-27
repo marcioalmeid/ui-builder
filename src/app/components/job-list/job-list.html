@@ -7,9 +7,24 @@
           List, table, or board — search, filters, and layout contract columns per template.
         </p>
       </div>
-      <button mat-flat-button color="primary" type="button" (click)="createTask()">
-        <mat-icon>add</mat-icon> New task
-      </button>
+      <div class="flex flex-wrap gap-2">
+        <button mat-stroked-button type="button" (click)="exportTasks()">
+          <mat-icon>download</mat-icon> Export
+        </button>
+        <button mat-stroked-button type="button" (click)="importInput.click()">
+          <mat-icon>upload</mat-icon> Import
+        </button>
+        <input
+          #importInput
+          type="file"
+          accept="application/json,.json"
+          hidden
+          (change)="onImportFile($event)"
+        />
+        <button mat-flat-button color="primary" type="button" (click)="createTask()">
+          <mat-icon>add</mat-icon> New task
+        </button>
+      </div>
     </div>
 
     <div class="flex flex-wrap gap-3 mb-3">

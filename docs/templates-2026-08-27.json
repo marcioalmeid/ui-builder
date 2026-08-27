@@ -1,0 +1,1625 @@
+{
+  "format": "ui-builder-templates",
+  "version": 1,
+  "exportedAt": 1787794780154,
+  "activeTemplateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+  "templates": [
+    {
+      "id": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+      "name": "New Task (Advertising)",
+      "departments": [
+        "Digital Ads"
+      ],
+      "version": 2,
+      "status": "published",
+      "versions": [
+        {
+          "version": 1,
+          "layout": {
+            "rows": [
+              {
+                "id": "fd74bf41-9d1b-4d53-9a3f-77dbe5074938",
+                "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+                "fields": [
+                  {
+                    "id": "e3c9fcad-fdfe-47b1-8b64-c80836451f3a",
+                    "type": "text",
+                    "label": "Title",
+                    "icon": "text_fields",
+                    "placeholder": "Confirm next month's Honda budget",
+                    "required": true,
+                    "border": {
+                      "style": "none",
+                      "width": "1px",
+                      "color": "#ccc"
+                    },
+                    "entityMapping": {
+                      "catalogId": "task-types",
+                      "entityFieldKey": "name"
+                    },
+                    "optionsSource": "static"
+                  }
+                ]
+              },
+              {
+                "id": "58eb597b-126a-486e-bc27-6c87b94b29f0",
+                "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+                "fields": [
+                  {
+                    "id": "4809feb5-1e0a-4717-aba3-a1e7d023724e",
+                    "type": "textarea",
+                    "label": "Description",
+                    "icon": "notes",
+                    "placeholder": "Add context for the operator...",
+                    "required": false,
+                    "border": {
+                      "style": "none",
+                      "width": "1px",
+                      "color": "#ccc"
+                    },
+                    "entityMapping": {
+                      "catalogId": "task-types",
+                      "entityFieldKey": "description"
+                    },
+                    "optionsSource": "static"
+                  }
+                ]
+              },
+              {
+                "id": "00d48fda-4edb-440f-9bd9-59c3e14d5fc6",
+                "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+                "fields": [
+                  {
+                    "id": "20095cd6-3073-41f5-909f-be80886fe40b",
+                    "type": "dropdown",
+                    "label": "Task type",
+                    "icon": "arrow_drop_down_circle",
+                    "required": true,
+                    "placeholder": "Select task type",
+                    "optionsSource": "api",
+                    "dataCatalogId": "task-types",
+                    "dataSource": {
+                      "url": "/api/task-types",
+                      "method": "GET",
+                      "labelKey": "name",
+                      "valueKey": "id"
+                    },
+                    "options": [
+                      {
+                        "label": "Digital Advertising",
+                        "value": "digital-advertising"
+                      },
+                      {
+                        "label": "Print Media",
+                        "value": "print"
+                      }
+                    ],
+                    "border": {
+                      "style": "none",
+                      "width": "1px",
+                      "color": "#ccc"
+                    }
+                  },
+                  {
+                    "id": "9ae1d745-f84e-4acd-b905-666cb0067175",
+                    "type": "datepicker",
+                    "label": "Due date",
+                    "icon": "calendar_month",
+                    "placeholder": "mm/dd/yyyy",
+                    "required": false,
+                    "border": {
+                      "style": "none",
+                      "width": "1px",
+                      "color": "#ccc"
+                    },
+                    "entityMapping": {
+                      "catalogId": "task-types",
+                      "entityFieldKey": "due_date"
+                    },
+                    "optionsSource": "static"
+                  }
+                ]
+              },
+              {
+                "id": "634cd15f-6a70-4f72-9e6f-65a9d8279f01",
+                "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+                "fields": [
+                  {
+                    "id": "f64bda86-da63-4e1b-b4bb-159cb31a10d8",
+                    "type": "dropdown",
+                    "label": "Assign to",
+                    "icon": "arrow_drop_down_circle",
+                    "required": false,
+                    "placeholder": "Unassigned",
+                    "optionsSource": "api",
+                    "dataCatalogId": "users",
+                    "dataSource": {
+                      "url": "/api/users",
+                      "method": "GET",
+                      "labelKey": "name",
+                      "valueKey": "id"
+                    },
+                    "options": [
+                      {
+                        "label": "Alice Johnson",
+                        "value": "1"
+                      },
+                      {
+                        "label": "Bob Smith",
+                        "value": "2"
+                      },
+                      {
+                        "label": "Carla Mendes",
+                        "value": "3"
+                      }
+                    ],
+                    "border": {
+                      "style": "none",
+                      "width": "1px",
+                      "color": "#ccc"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "8b002f4c-2f48-46b7-a5cd-956c249bf6f1",
+                "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+                "fields": [
+                  {
+                    "id": "6281f7b1-a93e-47db-b205-740319cfc0df",
+                    "type": "section-header",
+                    "label": "Digital Advertising Details",
+                    "icon": "view_agenda",
+                    "hint": "Shown when Task type is Digital Advertising",
+                    "required": false,
+                    "optionsSource": "static"
+                  }
+                ]
+              },
+              {
+                "id": "77bf8a0a-49e5-431b-a24f-63e8ab79666c",
+                "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+                "fields": [
+                  {
+                    "id": "03135e61-3553-4d0f-ada9-fff719f766e2",
+                    "type": "dropdown",
+                    "label": "Platform",
+                    "icon": "arrow_drop_down_circle",
+                    "required": true,
+                    "placeholder": "Select...",
+                    "hint": "Where the campaign runs.",
+                    "optionsSource": "api",
+                    "dataCatalogId": "platforms",
+                    "dataSource": {
+                      "url": "/api/platforms",
+                      "method": "GET",
+                      "labelKey": "name",
+                      "valueKey": "id"
+                    },
+                    "options": [
+                      {
+                        "label": "Google Ads",
+                        "value": "google-ads"
+                      },
+                      {
+                        "label": "Meta Ads",
+                        "value": "meta-ads"
+                      },
+                      {
+                        "label": "LinkedIn Ads",
+                        "value": "linkedin-ads"
+                      }
+                    ],
+                    "border": {
+                      "style": "none",
+                      "width": "1px",
+                      "color": "#ccc"
+                    }
+                  },
+                  {
+                    "id": "129bc116-38c5-4e8b-a69a-b68b168ab872",
+                    "type": "dropdown",
+                    "label": "Request type",
+                    "icon": "arrow_drop_down_circle",
+                    "required": true,
+                    "placeholder": "Select...",
+                    "hint": "What needs to happen.",
+                    "optionsSource": "api",
+                    "dataCatalogId": "request-types",
+                    "dataSource": {
+                      "url": "/api/request-types",
+                      "method": "GET",
+                      "labelKey": "name",
+                      "valueKey": "id"
+                    },
+                    "options": [
+                      {
+                        "label": "New campaign",
+                        "value": "new-campaign"
+                      },
+                      {
+                        "label": "Budget change",
+                        "value": "budget-change"
+                      }
+                    ],
+                    "border": {
+                      "style": "none",
+                      "width": "1px",
+                      "color": "#ccc"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "5303df19-0382-468e-9aaf-5b7245a36778",
+                "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+                "fields": [
+                  {
+                    "id": "50cd587f-f65f-47af-9c7a-99f6b28177a5",
+                    "type": "dropdown",
+                    "label": "Vendor",
+                    "icon": "arrow_drop_down_circle",
+                    "required": false,
+                    "placeholder": "Select a vendor...",
+                    "hint": "Only for vendor-run external buys.",
+                    "optionsSource": "api",
+                    "dataCatalogId": "vendors",
+                    "dataSource": {
+                      "url": "/api/vendors",
+                      "method": "GET",
+                      "labelKey": "name",
+                      "valueKey": "id"
+                    },
+                    "options": [
+                      {
+                        "label": "Horizon Media",
+                        "value": "vendor-a"
+                      },
+                      {
+                        "label": "Spark Digital",
+                        "value": "vendor-b"
+                      }
+                    ],
+                    "border": {
+                      "style": "none",
+                      "width": "1px",
+                      "color": "#ccc"
+                    }
+                  },
+                  {
+                    "id": "43a1f21f-dac7-4b12-9a7e-36110e4381cc",
+                    "type": "dropdown",
+                    "label": "Budget",
+                    "icon": "arrow_drop_down_circle",
+                    "required": false,
+                    "placeholder": "Select a budget line item...",
+                    "hint": "Tie spend to a budget line item when applicable.",
+                    "optionsSource": "api",
+                    "dataCatalogId": "budget-line-items",
+                    "dataSource": {
+                      "url": "/api/budget-line-items",
+                      "method": "GET",
+                      "labelKey": "name",
+                      "valueKey": "id"
+                    },
+                    "options": [
+                      {
+                        "label": "Honda Q3 Brand Campaign",
+                        "value": "honda-q3"
+                      },
+                      {
+                        "label": "Always-on Search",
+                        "value": "always-on-search"
+                      }
+                    ],
+                    "border": {
+                      "style": "none",
+                      "width": "1px",
+                      "color": "#ccc"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "679b69d9-d7f9-449f-b6ca-d281e295c3a2",
+                "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+                "fields": [
+                  {
+                    "id": "9aff86fd-7bae-4f63-a7eb-04855ea73770",
+                    "type": "cost-breakdown",
+                    "label": "Cost breakdown",
+                    "icon": "calculate",
+                    "required": false,
+                    "hint": "Gross budget less data/flat fees and management fee = net ad spend.",
+                    "managementFeePercent": 15,
+                    "optionsSource": "api",
+                    "dataCatalogId": "budget-line-items",
+                    "dataSource": {
+                      "url": "/api/budget-line-items",
+                      "method": "GET",
+                      "labelKey": "name",
+                      "valueKey": "id"
+                    },
+                    "options": [
+                      {
+                        "label": "Honda Q3 Brand Campaign",
+                        "value": "honda-q3"
+                      },
+                      {
+                        "label": "Always-on Search",
+                        "value": "always-on-search"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "dataBindings": [],
+            "workflowRules": [
+              {
+                "id": "df6f5d4e-7bf2-4c69-acf0-1325be7b7e02",
+                "name": "Show advertising section when Task type is Digital Advertising",
+                "enabled": true,
+                "nodes": [
+                  {
+                    "id": "efcdd56d-e4c5-4f17-9e46-a140d326465d",
+                    "type": "trigger",
+                    "position": {
+                      "x": 0,
+                      "y": 0
+                    },
+                    "data": {
+                      "fieldId": "20095cd6-3073-41f5-909f-be80886fe40b"
+                    }
+                  },
+                  {
+                    "id": "a5bd80ab-ac55-4703-9664-eb8485da2325",
+                    "type": "condition",
+                    "position": {
+                      "x": 220,
+                      "y": 0
+                    },
+                    "data": {
+                      "operator": "equals",
+                      "value": "digital-advertising"
+                    }
+                  },
+                  {
+                    "id": "05ba0746-0636-459a-9294-2afa3db74a2b",
+                    "type": "action-show",
+                    "position": {
+                      "x": 440,
+                      "y": 0
+                    },
+                    "data": {
+                      "targetFieldId": "6281f7b1-a93e-47db-b205-740319cfc0df"
+                    }
+                  },
+                  {
+                    "id": "51eb2bb2-1eab-4651-afb9-f646f19ac99f",
+                    "type": "action-show",
+                    "position": {
+                      "x": 660,
+                      "y": 0
+                    },
+                    "data": {
+                      "targetFieldId": "03135e61-3553-4d0f-ada9-fff719f766e2"
+                    }
+                  },
+                  {
+                    "id": "81da46f5-9165-4759-a928-4b92350327ba",
+                    "type": "action-show",
+                    "position": {
+                      "x": 880,
+                      "y": 0
+                    },
+                    "data": {
+                      "targetFieldId": "129bc116-38c5-4e8b-a69a-b68b168ab872"
+                    }
+                  },
+                  {
+                    "id": "f1b0fd2f-edbf-4a1f-8b57-93fc71ab4f2f",
+                    "type": "action-show",
+                    "position": {
+                      "x": 1100,
+                      "y": 0
+                    },
+                    "data": {
+                      "targetFieldId": "50cd587f-f65f-47af-9c7a-99f6b28177a5"
+                    }
+                  },
+                  {
+                    "id": "7c53982c-b7f0-47ec-a92f-4a363b555f0f",
+                    "type": "action-show",
+                    "position": {
+                      "x": 1320,
+                      "y": 0
+                    },
+                    "data": {
+                      "targetFieldId": "43a1f21f-dac7-4b12-9a7e-36110e4381cc"
+                    }
+                  },
+                  {
+                    "id": "f28762eb-2900-4dc9-b99a-1511e4c5df3a",
+                    "type": "action-show",
+                    "position": {
+                      "x": 1540,
+                      "y": 0
+                    },
+                    "data": {
+                      "targetFieldId": "9aff86fd-7bae-4f63-a7eb-04855ea73770"
+                    }
+                  },
+                  {
+                    "id": "dd01d492-29d1-4173-8761-15cec686d5cd",
+                    "type": "action-event",
+                    "position": {
+                      "x": 1760,
+                      "y": 0
+                    },
+                    "data": {
+                      "eventCatalogId": "campaign.type.selected",
+                      "eventName": "Campaign type selected"
+                    }
+                  }
+                ],
+                "edges": [
+                  {
+                    "id": "1be7446d-2c43-4ddb-9a0d-42707e6ae047",
+                    "source": "efcdd56d-e4c5-4f17-9e46-a140d326465d",
+                    "target": "a5bd80ab-ac55-4703-9664-eb8485da2325"
+                  },
+                  {
+                    "id": "303c3340-a5d6-4679-8631-307fffba4d37",
+                    "source": "a5bd80ab-ac55-4703-9664-eb8485da2325",
+                    "target": "05ba0746-0636-459a-9294-2afa3db74a2b"
+                  },
+                  {
+                    "id": "9554d0ff-1381-41c3-baa0-e7e6b23513db",
+                    "source": "05ba0746-0636-459a-9294-2afa3db74a2b",
+                    "target": "51eb2bb2-1eab-4651-afb9-f646f19ac99f"
+                  },
+                  {
+                    "id": "cd136ef7-f4bd-43d0-b8d3-a35e3580613c",
+                    "source": "51eb2bb2-1eab-4651-afb9-f646f19ac99f",
+                    "target": "81da46f5-9165-4759-a928-4b92350327ba"
+                  },
+                  {
+                    "id": "f3234886-15ff-4fc9-91e8-0daa9558f602",
+                    "source": "81da46f5-9165-4759-a928-4b92350327ba",
+                    "target": "f1b0fd2f-edbf-4a1f-8b57-93fc71ab4f2f"
+                  },
+                  {
+                    "id": "351dfb5f-6191-4c39-bb61-b5dcc20c12f0",
+                    "source": "f1b0fd2f-edbf-4a1f-8b57-93fc71ab4f2f",
+                    "target": "7c53982c-b7f0-47ec-a92f-4a363b555f0f"
+                  },
+                  {
+                    "id": "53e6b39f-ccc3-4239-960d-eaf7430f9cc3",
+                    "source": "7c53982c-b7f0-47ec-a92f-4a363b555f0f",
+                    "target": "f28762eb-2900-4dc9-b99a-1511e4c5df3a"
+                  },
+                  {
+                    "id": "5d229e26-58be-4001-8dc0-f3d52a587a1a",
+                    "source": "f28762eb-2900-4dc9-b99a-1511e4c5df3a",
+                    "target": "dd01d492-29d1-4173-8761-15cec686d5cd"
+                  }
+                ]
+              }
+            ],
+            "listView": {
+              "titleFieldId": "e3c9fcad-fdfe-47b1-8b64-c80836451f3a",
+              "columns": [
+                {
+                  "fieldId": "20095cd6-3073-41f5-909f-be80886fe40b",
+                  "width": "medium",
+                  "filterable": true
+                },
+                {
+                  "fieldId": "f64bda86-da63-4e1b-b4bb-159cb31a10d8",
+                  "width": "medium",
+                  "filterable": true
+                },
+                {
+                  "fieldId": "9ae1d745-f84e-4acd-b905-666cb0067175",
+                  "width": "medium",
+                  "filterable": true
+                },
+                {
+                  "fieldId": "03135e61-3553-4d0f-ada9-fff719f766e2",
+                  "width": "medium",
+                  "filterable": true
+                },
+                {
+                  "fieldId": "50cd587f-f65f-47af-9c7a-99f6b28177a5",
+                  "width": "medium",
+                  "filterable": true
+                }
+              ],
+              "searchableFieldIds": [
+                "e3c9fcad-fdfe-47b1-8b64-c80836451f3a",
+                "4809feb5-1e0a-4717-aba3-a1e7d023724e",
+                "20095cd6-3073-41f5-909f-be80886fe40b",
+                "f64bda86-da63-4e1b-b4bb-159cb31a10d8",
+                "03135e61-3553-4d0f-ada9-fff719f766e2",
+                "50cd587f-f65f-47af-9c7a-99f6b28177a5",
+                "9ae1d745-f84e-4acd-b905-666cb0067175"
+              ]
+            }
+          }
+        },
+        {
+          "version": 2,
+          "layout": {
+            "rows": [
+              {
+                "id": "fd74bf41-9d1b-4d53-9a3f-77dbe5074938",
+                "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+                "fields": [
+                  {
+                    "id": "e3c9fcad-fdfe-47b1-8b64-c80836451f3a",
+                    "type": "text",
+                    "label": "Title",
+                    "icon": "text_fields",
+                    "placeholder": "Confirm next month's Honda budget",
+                    "required": true,
+                    "border": {
+                      "style": "none",
+                      "width": "1px",
+                      "color": "#ccc"
+                    },
+                    "entityMapping": {
+                      "catalogId": "task-types",
+                      "entityFieldKey": "name"
+                    },
+                    "optionsSource": "static"
+                  }
+                ]
+              },
+              {
+                "id": "58eb597b-126a-486e-bc27-6c87b94b29f0",
+                "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+                "fields": [
+                  {
+                    "id": "4809feb5-1e0a-4717-aba3-a1e7d023724e",
+                    "type": "textarea",
+                    "label": "Description",
+                    "icon": "notes",
+                    "placeholder": "Add context for the operator...",
+                    "required": false,
+                    "border": {
+                      "style": "none",
+                      "width": "1px",
+                      "color": "#ccc"
+                    },
+                    "entityMapping": {
+                      "catalogId": "task-types",
+                      "entityFieldKey": "description"
+                    },
+                    "optionsSource": "static"
+                  }
+                ]
+              },
+              {
+                "id": "00d48fda-4edb-440f-9bd9-59c3e14d5fc6",
+                "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+                "fields": [
+                  {
+                    "id": "20095cd6-3073-41f5-909f-be80886fe40b",
+                    "type": "dropdown",
+                    "label": "Task type",
+                    "icon": "arrow_drop_down_circle",
+                    "required": true,
+                    "placeholder": "Select task type",
+                    "optionsSource": "api",
+                    "dataCatalogId": "task-types",
+                    "dataSource": {
+                      "url": "/api/task-types",
+                      "method": "GET",
+                      "labelKey": "name",
+                      "valueKey": "id"
+                    },
+                    "options": [
+                      {
+                        "label": "Digital Advertising",
+                        "value": "digital-advertising"
+                      },
+                      {
+                        "label": "Print Media",
+                        "value": "print"
+                      }
+                    ],
+                    "border": {
+                      "style": "none",
+                      "width": "1px",
+                      "color": "#ccc"
+                    }
+                  },
+                  {
+                    "id": "9ae1d745-f84e-4acd-b905-666cb0067175",
+                    "type": "datepicker",
+                    "label": "Due date",
+                    "icon": "calendar_month",
+                    "placeholder": "mm/dd/yyyy",
+                    "required": false,
+                    "border": {
+                      "style": "none",
+                      "width": "1px",
+                      "color": "#ccc"
+                    },
+                    "entityMapping": {
+                      "catalogId": "task-types",
+                      "entityFieldKey": "due_date"
+                    },
+                    "optionsSource": "static"
+                  }
+                ]
+              },
+              {
+                "id": "634cd15f-6a70-4f72-9e6f-65a9d8279f01",
+                "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+                "fields": [
+                  {
+                    "id": "f64bda86-da63-4e1b-b4bb-159cb31a10d8",
+                    "type": "dropdown",
+                    "label": "Assign to",
+                    "icon": "arrow_drop_down_circle",
+                    "required": false,
+                    "placeholder": "Unassigned",
+                    "optionsSource": "api",
+                    "dataCatalogId": "users",
+                    "dataSource": {
+                      "url": "/api/users",
+                      "method": "GET",
+                      "labelKey": "name",
+                      "valueKey": "id"
+                    },
+                    "options": [
+                      {
+                        "label": "Alice Johnson",
+                        "value": "1"
+                      },
+                      {
+                        "label": "Bob Smith",
+                        "value": "2"
+                      },
+                      {
+                        "label": "Carla Mendes",
+                        "value": "3"
+                      }
+                    ],
+                    "border": {
+                      "style": "none",
+                      "width": "1px",
+                      "color": "#ccc"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "8b002f4c-2f48-46b7-a5cd-956c249bf6f1",
+                "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+                "fields": [
+                  {
+                    "id": "6281f7b1-a93e-47db-b205-740319cfc0df",
+                    "type": "section-header",
+                    "label": "Digital Advertising Details",
+                    "icon": "view_agenda",
+                    "hint": "Shown when Task type is Digital Advertising",
+                    "required": false,
+                    "optionsSource": "static"
+                  }
+                ]
+              },
+              {
+                "id": "77bf8a0a-49e5-431b-a24f-63e8ab79666c",
+                "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+                "fields": [
+                  {
+                    "id": "03135e61-3553-4d0f-ada9-fff719f766e2",
+                    "type": "dropdown",
+                    "label": "Platform",
+                    "icon": "arrow_drop_down_circle",
+                    "required": true,
+                    "placeholder": "Select...",
+                    "hint": "Where the campaign runs.",
+                    "optionsSource": "api",
+                    "dataCatalogId": "platforms",
+                    "dataSource": {
+                      "url": "/api/platforms",
+                      "method": "GET",
+                      "labelKey": "name",
+                      "valueKey": "id"
+                    },
+                    "options": [
+                      {
+                        "label": "Google Ads",
+                        "value": "google-ads"
+                      },
+                      {
+                        "label": "Meta Ads",
+                        "value": "meta-ads"
+                      },
+                      {
+                        "label": "LinkedIn Ads",
+                        "value": "linkedin-ads"
+                      }
+                    ],
+                    "border": {
+                      "style": "none",
+                      "width": "1px",
+                      "color": "#ccc"
+                    }
+                  },
+                  {
+                    "id": "129bc116-38c5-4e8b-a69a-b68b168ab872",
+                    "type": "dropdown",
+                    "label": "Request type",
+                    "icon": "arrow_drop_down_circle",
+                    "required": true,
+                    "placeholder": "Select...",
+                    "hint": "What needs to happen.",
+                    "optionsSource": "api",
+                    "dataCatalogId": "request-types",
+                    "dataSource": {
+                      "url": "/api/request-types",
+                      "method": "GET",
+                      "labelKey": "name",
+                      "valueKey": "id"
+                    },
+                    "options": [
+                      {
+                        "label": "New campaign",
+                        "value": "new-campaign"
+                      },
+                      {
+                        "label": "Budget change",
+                        "value": "budget-change"
+                      }
+                    ],
+                    "border": {
+                      "style": "none",
+                      "width": "1px",
+                      "color": "#ccc"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "5303df19-0382-468e-9aaf-5b7245a36778",
+                "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+                "fields": [
+                  {
+                    "id": "50cd587f-f65f-47af-9c7a-99f6b28177a5",
+                    "type": "dropdown",
+                    "label": "Vendor",
+                    "icon": "arrow_drop_down_circle",
+                    "required": false,
+                    "placeholder": "Select a vendor...",
+                    "hint": "Only for vendor-run external buys.",
+                    "optionsSource": "api",
+                    "dataCatalogId": "vendors",
+                    "dataSource": {
+                      "url": "/api/vendors",
+                      "method": "GET",
+                      "labelKey": "name",
+                      "valueKey": "id"
+                    },
+                    "options": [
+                      {
+                        "label": "Horizon Media",
+                        "value": "vendor-a"
+                      },
+                      {
+                        "label": "Spark Digital",
+                        "value": "vendor-b"
+                      }
+                    ],
+                    "border": {
+                      "style": "none",
+                      "width": "1px",
+                      "color": "#ccc"
+                    }
+                  },
+                  {
+                    "id": "43a1f21f-dac7-4b12-9a7e-36110e4381cc",
+                    "type": "dropdown",
+                    "label": "Budget",
+                    "icon": "arrow_drop_down_circle",
+                    "required": false,
+                    "placeholder": "Select a budget line item...",
+                    "hint": "Tie spend to a budget line item when applicable.",
+                    "optionsSource": "api",
+                    "dataCatalogId": "budget-line-items",
+                    "dataSource": {
+                      "url": "/api/budget-line-items",
+                      "method": "GET",
+                      "labelKey": "name",
+                      "valueKey": "id"
+                    },
+                    "options": [
+                      {
+                        "label": "Honda Q3 Brand Campaign",
+                        "value": "honda-q3"
+                      },
+                      {
+                        "label": "Always-on Search",
+                        "value": "always-on-search"
+                      }
+                    ],
+                    "border": {
+                      "style": "none",
+                      "width": "1px",
+                      "color": "#ccc"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "679b69d9-d7f9-449f-b6ca-d281e295c3a2",
+                "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+                "fields": [
+                  {
+                    "id": "9aff86fd-7bae-4f63-a7eb-04855ea73770",
+                    "type": "cost-breakdown",
+                    "label": "Cost breakdown",
+                    "icon": "calculate",
+                    "required": false,
+                    "hint": "Gross budget less data/flat fees and management fee = net ad spend.",
+                    "managementFeePercent": 15,
+                    "optionsSource": "api",
+                    "dataCatalogId": "budget-line-items",
+                    "dataSource": {
+                      "url": "/api/budget-line-items",
+                      "method": "GET",
+                      "labelKey": "name",
+                      "valueKey": "id"
+                    },
+                    "options": [
+                      {
+                        "label": "Honda Q3 Brand Campaign",
+                        "value": "honda-q3"
+                      },
+                      {
+                        "label": "Always-on Search",
+                        "value": "always-on-search"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "dataBindings": [],
+            "workflowRules": [
+              {
+                "id": "df6f5d4e-7bf2-4c69-acf0-1325be7b7e02",
+                "name": "Show advertising section when Task type is Digital Advertising",
+                "enabled": true,
+                "nodes": [
+                  {
+                    "id": "efcdd56d-e4c5-4f17-9e46-a140d326465d",
+                    "type": "trigger",
+                    "position": {
+                      "x": 0,
+                      "y": 0
+                    },
+                    "data": {
+                      "fieldId": "20095cd6-3073-41f5-909f-be80886fe40b"
+                    }
+                  },
+                  {
+                    "id": "a5bd80ab-ac55-4703-9664-eb8485da2325",
+                    "type": "condition",
+                    "position": {
+                      "x": 220,
+                      "y": 0
+                    },
+                    "data": {
+                      "operator": "equals",
+                      "value": "digital-advertising"
+                    }
+                  },
+                  {
+                    "id": "05ba0746-0636-459a-9294-2afa3db74a2b",
+                    "type": "action-show",
+                    "position": {
+                      "x": 440,
+                      "y": 0
+                    },
+                    "data": {
+                      "targetFieldId": "6281f7b1-a93e-47db-b205-740319cfc0df"
+                    }
+                  },
+                  {
+                    "id": "51eb2bb2-1eab-4651-afb9-f646f19ac99f",
+                    "type": "action-show",
+                    "position": {
+                      "x": 660,
+                      "y": 0
+                    },
+                    "data": {
+                      "targetFieldId": "03135e61-3553-4d0f-ada9-fff719f766e2"
+                    }
+                  },
+                  {
+                    "id": "81da46f5-9165-4759-a928-4b92350327ba",
+                    "type": "action-show",
+                    "position": {
+                      "x": 880,
+                      "y": 0
+                    },
+                    "data": {
+                      "targetFieldId": "129bc116-38c5-4e8b-a69a-b68b168ab872"
+                    }
+                  },
+                  {
+                    "id": "f1b0fd2f-edbf-4a1f-8b57-93fc71ab4f2f",
+                    "type": "action-show",
+                    "position": {
+                      "x": 1100,
+                      "y": 0
+                    },
+                    "data": {
+                      "targetFieldId": "50cd587f-f65f-47af-9c7a-99f6b28177a5"
+                    }
+                  },
+                  {
+                    "id": "7c53982c-b7f0-47ec-a92f-4a363b555f0f",
+                    "type": "action-show",
+                    "position": {
+                      "x": 1320,
+                      "y": 0
+                    },
+                    "data": {
+                      "targetFieldId": "43a1f21f-dac7-4b12-9a7e-36110e4381cc"
+                    }
+                  },
+                  {
+                    "id": "f28762eb-2900-4dc9-b99a-1511e4c5df3a",
+                    "type": "action-show",
+                    "position": {
+                      "x": 1540,
+                      "y": 0
+                    },
+                    "data": {
+                      "targetFieldId": "9aff86fd-7bae-4f63-a7eb-04855ea73770"
+                    }
+                  },
+                  {
+                    "id": "dd01d492-29d1-4173-8761-15cec686d5cd",
+                    "type": "action-event",
+                    "position": {
+                      "x": 1760,
+                      "y": 0
+                    },
+                    "data": {
+                      "eventCatalogId": "campaign.type.selected",
+                      "eventName": "Campaign type selected"
+                    }
+                  }
+                ],
+                "edges": [
+                  {
+                    "id": "1be7446d-2c43-4ddb-9a0d-42707e6ae047",
+                    "source": "efcdd56d-e4c5-4f17-9e46-a140d326465d",
+                    "target": "a5bd80ab-ac55-4703-9664-eb8485da2325"
+                  },
+                  {
+                    "id": "303c3340-a5d6-4679-8631-307fffba4d37",
+                    "source": "a5bd80ab-ac55-4703-9664-eb8485da2325",
+                    "target": "05ba0746-0636-459a-9294-2afa3db74a2b"
+                  },
+                  {
+                    "id": "9554d0ff-1381-41c3-baa0-e7e6b23513db",
+                    "source": "05ba0746-0636-459a-9294-2afa3db74a2b",
+                    "target": "51eb2bb2-1eab-4651-afb9-f646f19ac99f"
+                  },
+                  {
+                    "id": "cd136ef7-f4bd-43d0-b8d3-a35e3580613c",
+                    "source": "51eb2bb2-1eab-4651-afb9-f646f19ac99f",
+                    "target": "81da46f5-9165-4759-a928-4b92350327ba"
+                  },
+                  {
+                    "id": "f3234886-15ff-4fc9-91e8-0daa9558f602",
+                    "source": "81da46f5-9165-4759-a928-4b92350327ba",
+                    "target": "f1b0fd2f-edbf-4a1f-8b57-93fc71ab4f2f"
+                  },
+                  {
+                    "id": "351dfb5f-6191-4c39-bb61-b5dcc20c12f0",
+                    "source": "f1b0fd2f-edbf-4a1f-8b57-93fc71ab4f2f",
+                    "target": "7c53982c-b7f0-47ec-a92f-4a363b555f0f"
+                  },
+                  {
+                    "id": "53e6b39f-ccc3-4239-960d-eaf7430f9cc3",
+                    "source": "7c53982c-b7f0-47ec-a92f-4a363b555f0f",
+                    "target": "f28762eb-2900-4dc9-b99a-1511e4c5df3a"
+                  },
+                  {
+                    "id": "5d229e26-58be-4001-8dc0-f3d52a587a1a",
+                    "source": "f28762eb-2900-4dc9-b99a-1511e4c5df3a",
+                    "target": "dd01d492-29d1-4173-8761-15cec686d5cd"
+                  }
+                ]
+              }
+            ],
+            "listView": {
+              "titleFieldId": "e3c9fcad-fdfe-47b1-8b64-c80836451f3a",
+              "columns": [
+                {
+                  "fieldId": "20095cd6-3073-41f5-909f-be80886fe40b",
+                  "width": "medium",
+                  "filterable": true
+                },
+                {
+                  "fieldId": "f64bda86-da63-4e1b-b4bb-159cb31a10d8",
+                  "width": "medium",
+                  "filterable": true
+                },
+                {
+                  "fieldId": "9ae1d745-f84e-4acd-b905-666cb0067175",
+                  "width": "medium",
+                  "filterable": true
+                },
+                {
+                  "fieldId": "03135e61-3553-4d0f-ada9-fff719f766e2",
+                  "width": "medium",
+                  "filterable": true
+                },
+                {
+                  "fieldId": "50cd587f-f65f-47af-9c7a-99f6b28177a5",
+                  "width": "medium",
+                  "filterable": true
+                }
+              ],
+              "searchableFieldIds": [
+                "e3c9fcad-fdfe-47b1-8b64-c80836451f3a",
+                "4809feb5-1e0a-4717-aba3-a1e7d023724e",
+                "20095cd6-3073-41f5-909f-be80886fe40b",
+                "f64bda86-da63-4e1b-b4bb-159cb31a10d8",
+                "03135e61-3553-4d0f-ada9-fff719f766e2",
+                "50cd587f-f65f-47af-9c7a-99f6b28177a5",
+                "9ae1d745-f84e-4acd-b905-666cb0067175"
+              ]
+            }
+          }
+        }
+      ],
+      "retiredFieldIds": [],
+      "riskPolicy": "NONE",
+      "updatedAt": 1787794780154,
+      "layout": {
+        "rows": [
+          {
+            "id": "fd74bf41-9d1b-4d53-9a3f-77dbe5074938",
+            "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+            "fields": [
+              {
+                "id": "e3c9fcad-fdfe-47b1-8b64-c80836451f3a",
+                "type": "text",
+                "label": "Title",
+                "icon": "text_fields",
+                "placeholder": "Confirm next month's Honda budget",
+                "required": true,
+                "border": {
+                  "style": "none",
+                  "width": "1px",
+                  "color": "#ccc"
+                },
+                "entityMapping": {
+                  "catalogId": "task-types",
+                  "entityFieldKey": "name"
+                },
+                "optionsSource": "static"
+              }
+            ]
+          },
+          {
+            "id": "58eb597b-126a-486e-bc27-6c87b94b29f0",
+            "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+            "fields": [
+              {
+                "id": "4809feb5-1e0a-4717-aba3-a1e7d023724e",
+                "type": "textarea",
+                "label": "Description",
+                "icon": "notes",
+                "placeholder": "Add context for the operator...",
+                "required": false,
+                "border": {
+                  "style": "none",
+                  "width": "1px",
+                  "color": "#ccc"
+                },
+                "entityMapping": {
+                  "catalogId": "task-types",
+                  "entityFieldKey": "description"
+                },
+                "optionsSource": "static"
+              }
+            ]
+          },
+          {
+            "id": "00d48fda-4edb-440f-9bd9-59c3e14d5fc6",
+            "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+            "fields": [
+              {
+                "id": "20095cd6-3073-41f5-909f-be80886fe40b",
+                "type": "dropdown",
+                "label": "Task type",
+                "icon": "arrow_drop_down_circle",
+                "required": true,
+                "placeholder": "Select task type",
+                "optionsSource": "api",
+                "dataCatalogId": "task-types",
+                "dataSource": {
+                  "url": "/api/task-types",
+                  "method": "GET",
+                  "labelKey": "name",
+                  "valueKey": "id"
+                },
+                "options": [
+                  {
+                    "label": "Digital Advertising",
+                    "value": "digital-advertising"
+                  },
+                  {
+                    "label": "Print Media",
+                    "value": "print"
+                  }
+                ],
+                "border": {
+                  "style": "none",
+                  "width": "1px",
+                  "color": "#ccc"
+                }
+              },
+              {
+                "id": "9ae1d745-f84e-4acd-b905-666cb0067175",
+                "type": "datepicker",
+                "label": "Due date",
+                "icon": "calendar_month",
+                "placeholder": "mm/dd/yyyy",
+                "required": false,
+                "border": {
+                  "style": "none",
+                  "width": "1px",
+                  "color": "#ccc"
+                },
+                "entityMapping": {
+                  "catalogId": "task-types",
+                  "entityFieldKey": "due_date"
+                },
+                "optionsSource": "static"
+              }
+            ]
+          },
+          {
+            "id": "634cd15f-6a70-4f72-9e6f-65a9d8279f01",
+            "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+            "fields": [
+              {
+                "id": "f64bda86-da63-4e1b-b4bb-159cb31a10d8",
+                "type": "dropdown",
+                "label": "Assign to",
+                "icon": "arrow_drop_down_circle",
+                "required": false,
+                "placeholder": "Unassigned",
+                "optionsSource": "api",
+                "dataCatalogId": "users",
+                "dataSource": {
+                  "url": "/api/users",
+                  "method": "GET",
+                  "labelKey": "name",
+                  "valueKey": "id"
+                },
+                "options": [
+                  {
+                    "label": "Alice Johnson",
+                    "value": "1"
+                  },
+                  {
+                    "label": "Bob Smith",
+                    "value": "2"
+                  },
+                  {
+                    "label": "Carla Mendes",
+                    "value": "3"
+                  }
+                ],
+                "border": {
+                  "style": "none",
+                  "width": "1px",
+                  "color": "#ccc"
+                }
+              }
+            ]
+          },
+          {
+            "id": "8b002f4c-2f48-46b7-a5cd-956c249bf6f1",
+            "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+            "fields": [
+              {
+                "id": "6281f7b1-a93e-47db-b205-740319cfc0df",
+                "type": "section-header",
+                "label": "Digital Advertising Details",
+                "icon": "view_agenda",
+                "hint": "Shown when Task type is Digital Advertising",
+                "required": false,
+                "optionsSource": "static"
+              }
+            ]
+          },
+          {
+            "id": "77bf8a0a-49e5-431b-a24f-63e8ab79666c",
+            "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+            "fields": [
+              {
+                "id": "03135e61-3553-4d0f-ada9-fff719f766e2",
+                "type": "dropdown",
+                "label": "Platform",
+                "icon": "arrow_drop_down_circle",
+                "required": true,
+                "placeholder": "Select...",
+                "hint": "Where the campaign runs.",
+                "optionsSource": "api",
+                "dataCatalogId": "platforms",
+                "dataSource": {
+                  "url": "/api/platforms",
+                  "method": "GET",
+                  "labelKey": "name",
+                  "valueKey": "id"
+                },
+                "options": [
+                  {
+                    "label": "Google Ads",
+                    "value": "google-ads"
+                  },
+                  {
+                    "label": "Meta Ads",
+                    "value": "meta-ads"
+                  },
+                  {
+                    "label": "LinkedIn Ads",
+                    "value": "linkedin-ads"
+                  }
+                ],
+                "border": {
+                  "style": "none",
+                  "width": "1px",
+                  "color": "#ccc"
+                }
+              },
+              {
+                "id": "129bc116-38c5-4e8b-a69a-b68b168ab872",
+                "type": "dropdown",
+                "label": "Request type",
+                "icon": "arrow_drop_down_circle",
+                "required": true,
+                "placeholder": "Select...",
+                "hint": "What needs to happen.",
+                "optionsSource": "api",
+                "dataCatalogId": "request-types",
+                "dataSource": {
+                  "url": "/api/request-types",
+                  "method": "GET",
+                  "labelKey": "name",
+                  "valueKey": "id"
+                },
+                "options": [
+                  {
+                    "label": "New campaign",
+                    "value": "new-campaign"
+                  },
+                  {
+                    "label": "Budget change",
+                    "value": "budget-change"
+                  }
+                ],
+                "border": {
+                  "style": "none",
+                  "width": "1px",
+                  "color": "#ccc"
+                }
+              }
+            ]
+          },
+          {
+            "id": "5303df19-0382-468e-9aaf-5b7245a36778",
+            "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+            "fields": [
+              {
+                "id": "50cd587f-f65f-47af-9c7a-99f6b28177a5",
+                "type": "dropdown",
+                "label": "Vendor",
+                "icon": "arrow_drop_down_circle",
+                "required": false,
+                "placeholder": "Select a vendor...",
+                "hint": "Only for vendor-run external buys.",
+                "optionsSource": "api",
+                "dataCatalogId": "vendors",
+                "dataSource": {
+                  "url": "/api/vendors",
+                  "method": "GET",
+                  "labelKey": "name",
+                  "valueKey": "id"
+                },
+                "options": [
+                  {
+                    "label": "Horizon Media",
+                    "value": "vendor-a"
+                  },
+                  {
+                    "label": "Spark Digital",
+                    "value": "vendor-b"
+                  }
+                ],
+                "border": {
+                  "style": "none",
+                  "width": "1px",
+                  "color": "#ccc"
+                }
+              },
+              {
+                "id": "43a1f21f-dac7-4b12-9a7e-36110e4381cc",
+                "type": "dropdown",
+                "label": "Budget",
+                "icon": "arrow_drop_down_circle",
+                "required": false,
+                "placeholder": "Select a budget line item...",
+                "hint": "Tie spend to a budget line item when applicable.",
+                "optionsSource": "api",
+                "dataCatalogId": "budget-line-items",
+                "dataSource": {
+                  "url": "/api/budget-line-items",
+                  "method": "GET",
+                  "labelKey": "name",
+                  "valueKey": "id"
+                },
+                "options": [
+                  {
+                    "label": "Honda Q3 Brand Campaign",
+                    "value": "honda-q3"
+                  },
+                  {
+                    "label": "Always-on Search",
+                    "value": "always-on-search"
+                  }
+                ],
+                "border": {
+                  "style": "none",
+                  "width": "1px",
+                  "color": "#ccc"
+                }
+              }
+            ]
+          },
+          {
+            "id": "679b69d9-d7f9-449f-b6ca-d281e295c3a2",
+            "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+            "fields": [
+              {
+                "id": "9aff86fd-7bae-4f63-a7eb-04855ea73770",
+                "type": "cost-breakdown",
+                "label": "Cost breakdown",
+                "icon": "calculate",
+                "required": false,
+                "hint": "Gross budget less data/flat fees and management fee = net ad spend.",
+                "managementFeePercent": 15,
+                "optionsSource": "api",
+                "dataCatalogId": "budget-line-items",
+                "dataSource": {
+                  "url": "/api/budget-line-items",
+                  "method": "GET",
+                  "labelKey": "name",
+                  "valueKey": "id"
+                },
+                "options": [
+                  {
+                    "label": "Honda Q3 Brand Campaign",
+                    "value": "honda-q3"
+                  },
+                  {
+                    "label": "Always-on Search",
+                    "value": "always-on-search"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "dataBindings": [],
+        "workflowRules": [
+          {
+            "id": "df6f5d4e-7bf2-4c69-acf0-1325be7b7e02",
+            "name": "Show advertising section when Task type is Digital Advertising",
+            "enabled": true,
+            "nodes": [
+              {
+                "id": "efcdd56d-e4c5-4f17-9e46-a140d326465d",
+                "type": "trigger",
+                "position": {
+                  "x": 0,
+                  "y": 0
+                },
+                "data": {
+                  "fieldId": "20095cd6-3073-41f5-909f-be80886fe40b"
+                }
+              },
+              {
+                "id": "a5bd80ab-ac55-4703-9664-eb8485da2325",
+                "type": "condition",
+                "position": {
+                  "x": 220,
+                  "y": 0
+                },
+                "data": {
+                  "operator": "equals",
+                  "value": "digital-advertising"
+                }
+              },
+              {
+                "id": "05ba0746-0636-459a-9294-2afa3db74a2b",
+                "type": "action-show",
+                "position": {
+                  "x": 440,
+                  "y": 0
+                },
+                "data": {
+                  "targetFieldId": "6281f7b1-a93e-47db-b205-740319cfc0df"
+                }
+              },
+              {
+                "id": "51eb2bb2-1eab-4651-afb9-f646f19ac99f",
+                "type": "action-show",
+                "position": {
+                  "x": 660,
+                  "y": 0
+                },
+                "data": {
+                  "targetFieldId": "03135e61-3553-4d0f-ada9-fff719f766e2"
+                }
+              },
+              {
+                "id": "81da46f5-9165-4759-a928-4b92350327ba",
+                "type": "action-show",
+                "position": {
+                  "x": 880,
+                  "y": 0
+                },
+                "data": {
+                  "targetFieldId": "129bc116-38c5-4e8b-a69a-b68b168ab872"
+                }
+              },
+              {
+                "id": "f1b0fd2f-edbf-4a1f-8b57-93fc71ab4f2f",
+                "type": "action-show",
+                "position": {
+                  "x": 1100,
+                  "y": 0
+                },
+                "data": {
+                  "targetFieldId": "50cd587f-f65f-47af-9c7a-99f6b28177a5"
+                }
+              },
+              {
+                "id": "7c53982c-b7f0-47ec-a92f-4a363b555f0f",
+                "type": "action-show",
+                "position": {
+                  "x": 1320,
+                  "y": 0
+                },
+                "data": {
+                  "targetFieldId": "43a1f21f-dac7-4b12-9a7e-36110e4381cc"
+                }
+              },
+              {
+                "id": "f28762eb-2900-4dc9-b99a-1511e4c5df3a",
+                "type": "action-show",
+                "position": {
+                  "x": 1540,
+                  "y": 0
+                },
+                "data": {
+                  "targetFieldId": "9aff86fd-7bae-4f63-a7eb-04855ea73770"
+                }
+              },
+              {
+                "id": "dd01d492-29d1-4173-8761-15cec686d5cd",
+                "type": "action-event",
+                "position": {
+                  "x": 1760,
+                  "y": 0
+                },
+                "data": {
+                  "eventCatalogId": "campaign.type.selected",
+                  "eventName": "Campaign type selected"
+                }
+              }
+            ],
+            "edges": [
+              {
+                "id": "1be7446d-2c43-4ddb-9a0d-42707e6ae047",
+                "source": "efcdd56d-e4c5-4f17-9e46-a140d326465d",
+                "target": "a5bd80ab-ac55-4703-9664-eb8485da2325"
+              },
+              {
+                "id": "303c3340-a5d6-4679-8631-307fffba4d37",
+                "source": "a5bd80ab-ac55-4703-9664-eb8485da2325",
+                "target": "05ba0746-0636-459a-9294-2afa3db74a2b"
+              },
+              {
+                "id": "9554d0ff-1381-41c3-baa0-e7e6b23513db",
+                "source": "05ba0746-0636-459a-9294-2afa3db74a2b",
+                "target": "51eb2bb2-1eab-4651-afb9-f646f19ac99f"
+              },
+              {
+                "id": "cd136ef7-f4bd-43d0-b8d3-a35e3580613c",
+                "source": "51eb2bb2-1eab-4651-afb9-f646f19ac99f",
+                "target": "81da46f5-9165-4759-a928-4b92350327ba"
+              },
+              {
+                "id": "f3234886-15ff-4fc9-91e8-0daa9558f602",
+                "source": "81da46f5-9165-4759-a928-4b92350327ba",
+                "target": "f1b0fd2f-edbf-4a1f-8b57-93fc71ab4f2f"
+              },
+              {
+                "id": "351dfb5f-6191-4c39-bb61-b5dcc20c12f0",
+                "source": "f1b0fd2f-edbf-4a1f-8b57-93fc71ab4f2f",
+                "target": "7c53982c-b7f0-47ec-a92f-4a363b555f0f"
+              },
+              {
+                "id": "53e6b39f-ccc3-4239-960d-eaf7430f9cc3",
+                "source": "7c53982c-b7f0-47ec-a92f-4a363b555f0f",
+                "target": "f28762eb-2900-4dc9-b99a-1511e4c5df3a"
+              },
+              {
+                "id": "5d229e26-58be-4001-8dc0-f3d52a587a1a",
+                "source": "f28762eb-2900-4dc9-b99a-1511e4c5df3a",
+                "target": "dd01d492-29d1-4173-8761-15cec686d5cd"
+              }
+            ]
+          }
+        ],
+        "listView": {
+          "titleFieldId": "e3c9fcad-fdfe-47b1-8b64-c80836451f3a",
+          "columns": [
+            {
+              "fieldId": "20095cd6-3073-41f5-909f-be80886fe40b",
+              "width": "medium",
+              "filterable": true
+            },
+            {
+              "fieldId": "f64bda86-da63-4e1b-b4bb-159cb31a10d8",
+              "width": "medium",
+              "filterable": true
+            },
+            {
+              "fieldId": "9ae1d745-f84e-4acd-b905-666cb0067175",
+              "width": "medium",
+              "filterable": true
+            },
+            {
+              "fieldId": "03135e61-3553-4d0f-ada9-fff719f766e2",
+              "width": "medium",
+              "filterable": true
+            },
+            {
+              "fieldId": "50cd587f-f65f-47af-9c7a-99f6b28177a5",
+              "width": "medium",
+              "filterable": true
+            }
+          ],
+          "searchableFieldIds": [
+            "e3c9fcad-fdfe-47b1-8b64-c80836451f3a",
+            "4809feb5-1e0a-4717-aba3-a1e7d023724e",
+            "20095cd6-3073-41f5-909f-be80886fe40b",
+            "f64bda86-da63-4e1b-b4bb-159cb31a10d8",
+            "03135e61-3553-4d0f-ada9-fff719f766e2",
+            "50cd587f-f65f-47af-9c7a-99f6b28177a5",
+            "9ae1d745-f84e-4acd-b905-666cb0067175"
+          ]
+        }
+      },
+      "context": "advertising"
+    }
+  ]
+}

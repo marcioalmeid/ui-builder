@@ -22,6 +22,7 @@ import {
 import { JobService } from '../../services/job.service';
 import { FormService } from '../../services/form.services';
 import { RetroactivityService } from '../../services/retroactivity.service';
+import { confirmDialog, alertDialog } from '../../utils/confirmation';
 import {
   ResolvedListColumn,
   TaskListContext,
@@ -226,6 +227,51 @@ export class JobList {
       return;
     }
     void this.router.navigate(['/tasks/new']);
+  }
+
+  exportTasks() {
+    this.jobService.exportTasks();
+  }
+
+  async onImportFile(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file) return;
+
+    const count = this.tasks().length;
+    const confirmed = confirmDialog(
+      [
+        `Import "${file.name}"?`,
+        '',
+        `This replaces all ${count} current task(s) with the file contents.`,
+        '',
+        'Continue?',
+      ].join('\n')
+    );
+    if (!confirmed) return;
+
+    try {
+      const text = await file.text();
+      const result = this.jobService.importTasks(text);
+      if (!result.success) {
+        alertDialog(result.error ?? 'Could not import tasks.');
+        return;
+      }
+
+      const missing = result.missingTemplateCount ?? 0;
+      const lines = [`Imported ${result.count ?? 0} task(s).`];
+      if (missing > 0) {
+        lines.push(
+          '',
+          `${missing} task(s) reference a template that is not loaded locally.`,
+          'Import the matching templates if those tasks look broken.'
+        );
+      }
+      alertDialog(lines.join('\n'));
+    } catch {
+      alertDialog('Could not read the selected file.');
+    }
   }
 
   taskTitle(task: JobSubmission): string {

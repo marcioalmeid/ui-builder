@@ -12,6 +12,11 @@ import {
   lastPublishedLayout,
   lastPublishedVersion,
 } from '../utils/retroactivity';
+import {
+  buildTaskBundle,
+  parseTaskBundle,
+  serializeTaskBundle,
+} from '../utils/task-bundle';
 
 @Injectable({
   providedIn: 'root',
@@ -214,5 +219,49 @@ export class JobService {
       this.repository.replaceAll(kept);
     }
     return removed;
+  }
+
+  /** Download all tasks as a JSON backup. */
+  exportTasks(): void {
+    const bundle = buildTaskBundle(this.repository.list());
+    const blob = new Blob([serializeTaskBundle(bundle)], {
+      type: 'application/json',
+    });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    const stamp = new Date().toISOString().slice(0, 10);
+    link.download = `tasks-${stamp}.json`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+  }
+
+  /**
+   * Replace all local tasks from an exported JSON bundle.
+   * Tasks whose template no longer exists are kept (they show as orphans until pruned).
+   */
+  importTasks(raw: string): {
+    success: boolean;
+    error?: string;
+    count?: number;
+    missingTemplateCount?: number;
+  } {
+    const parsed = parseTaskBundle(raw);
+    if (!parsed.success) {
+      return { success: false, error: parsed.error };
+    }
+
+    const tasks = parsed.bundle.tasks;
+    this.repository.replaceAll(tasks);
+
+    const missingTemplateCount = tasks.filter(
+      (task) => !this.formService.getTemplate(task.templateId)
+    ).length;
+
+    return {
+      success: true,
+      count: tasks.length,
+      missingTemplateCount,
+    };
   }
 }

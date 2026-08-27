@@ -1,0 +1,985 @@
+{
+  "format": "ui-builder-tasks",
+  "version": 1,
+  "exportedAt": 1787794527165,
+  "tasks": [
+    {
+      "id": "a373dd0f-736e-4785-81c3-3b9e0baa1952-1787839200000",
+      "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+      "templateVersion": 2,
+      "templateName": "New Task (Advertising)",
+      "friendlyId": "TASK-001",
+      "data": {
+        "e3c9fcad-fdfe-47b1-8b64-c80836451f3a": "Confirm Honda Q3 brand search budget",
+        "4809feb5-1e0a-4717-aba3-a1e7d023724e": "Finance approved a mid-flight increase for branded search. Align with media buyer before Friday.",
+        "20095cd6-3073-41f5-909f-be80886fe40b": "digital-advertising",
+        "9ae1d745-f84e-4acd-b905-666cb0067175": "2026-08-29",
+        "f64bda86-da63-4e1b-b4bb-159cb31a10d8": "1",
+        "03135e61-3553-4d0f-ada9-fff719f766e2": "google-ads",
+        "129bc116-38c5-4e8b-a69a-b68b168ab872": "budget-change",
+        "50cd587f-f65f-47af-9c7a-99f6b28177a5": "vendor-a",
+        "43a1f21f-dac7-4b12-9a7e-36110e4381cc": "honda-q3",
+        "9aff86fd-7bae-4f63-a7eb-04855ea73770": {
+          "grossBudget": 250000,
+          "managementFeePercent": 15,
+          "additionalFees": [
+            {
+              "id": "d0058442-3d01-4fbd-9b4d-73aaaec6b186",
+              "label": "Platform fee",
+              "amount": 1200
+            },
+            {
+              "id": "a0515f60-53f2-4d3f-a179-4a345c4d21d6",
+              "label": "Tracking",
+              "amount": 350
+            }
+          ]
+        }
+      },
+      "events": [
+        {
+          "eventName": "campaign.type.selected",
+          "kind": "signal",
+          "ruleId": "df6f5d4e-7bf2-4c69-acf0-1325be7b7e02",
+          "ruleName": "Show advertising section when Task type is Digital Advertising",
+          "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+          "templateVersion": 2,
+          "trigger": {
+            "fieldId": "20095cd6-3073-41f5-909f-be80886fe40b",
+            "label": "Task type",
+            "value": "digital-advertising"
+          },
+          "condition": {
+            "operator": "equals",
+            "value": "digital-advertising"
+          },
+          "payload": {
+            "kind": "signal"
+          },
+          "timestamp": "2026-08-27T14:00:00Z"
+        }
+      ],
+      "submittedAt": 1787839200000,
+      "status": "in_progress",
+      "appliedFieldEventIds": [],
+      "appliedRuleEventIds": []
+    },
+    {
+      "id": "a373dd0f-736e-4785-81c3-3b9e0baa1952-1787827980000",
+      "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+      "templateVersion": 2,
+      "templateName": "New Task (Advertising)",
+      "friendlyId": "TASK-002",
+      "data": {
+        "e3c9fcad-fdfe-47b1-8b64-c80836451f3a": "Launch Acura dealer co-op display",
+        "4809feb5-1e0a-4717-aba3-a1e7d023724e": "Spin up programmatic display for regional dealers using the co-op creative kit.",
+        "20095cd6-3073-41f5-909f-be80886fe40b": "digital-advertising",
+        "9ae1d745-f84e-4acd-b905-666cb0067175": "2026-09-02",
+        "f64bda86-da63-4e1b-b4bb-159cb31a10d8": "2",
+        "03135e61-3553-4d0f-ada9-fff719f766e2": "programmatic",
+        "129bc116-38c5-4e8b-a69a-b68b168ab872": "new-campaign",
+        "50cd587f-f65f-47af-9c7a-99f6b28177a5": "vendor-c",
+        "43a1f21f-dac7-4b12-9a7e-36110e4381cc": "dealer-co-op",
+        "9aff86fd-7bae-4f63-a7eb-04855ea73770": {
+          "grossBudget": 80000,
+          "managementFeePercent": 12,
+          "additionalFees": [
+            {
+              "id": "d8526854-8f3b-494d-95b7-b34c4d173a10",
+              "label": "Ad serving",
+              "amount": 900
+            }
+          ]
+        }
+      },
+      "events": [
+        {
+          "eventName": "campaign.type.selected",
+          "kind": "signal",
+          "ruleId": "df6f5d4e-7bf2-4c69-acf0-1325be7b7e02",
+          "ruleName": "Show advertising section when Task type is Digital Advertising",
+          "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+          "templateVersion": 2,
+          "trigger": {
+            "fieldId": "20095cd6-3073-41f5-909f-be80886fe40b",
+            "label": "Task type",
+            "value": "digital-advertising"
+          },
+          "condition": {
+            "operator": "equals",
+            "value": "digital-advertising"
+          },
+          "payload": {
+            "kind": "signal"
+          },
+          "timestamp": "2026-08-27T10:53:00Z"
+        }
+      ],
+      "submittedAt": 1787827980000,
+      "status": "todo",
+      "appliedFieldEventIds": [],
+      "appliedRuleEventIds": []
+    },
+    {
+      "id": "a373dd0f-736e-4785-81c3-3b9e0baa1952-1787816760000",
+      "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+      "templateVersion": 2,
+      "templateName": "New Task (Advertising)",
+      "friendlyId": "TASK-003",
+      "data": {
+        "e3c9fcad-fdfe-47b1-8b64-c80836451f3a": "Meta ads creative refresh \u2014 fall lineup",
+        "4809feb5-1e0a-4717-aba3-a1e7d023724e": "Swap hero assets for the September lineup. Keep audiences and bids unchanged.",
+        "20095cd6-3073-41f5-909f-be80886fe40b": "digital-advertising",
+        "9ae1d745-f84e-4acd-b905-666cb0067175": "2026-08-28",
+        "f64bda86-da63-4e1b-b4bb-159cb31a10d8": "3",
+        "03135e61-3553-4d0f-ada9-fff719f766e2": "meta-ads",
+        "129bc116-38c5-4e8b-a69a-b68b168ab872": "creative-update",
+        "50cd587f-f65f-47af-9c7a-99f6b28177a5": "vendor-b",
+        "43a1f21f-dac7-4b12-9a7e-36110e4381cc": "always-on-search",
+        "9aff86fd-7bae-4f63-a7eb-04855ea73770": {
+          "grossBudget": 45000,
+          "managementFeePercent": 15,
+          "additionalFees": [
+            {
+              "id": "b288036e-cf70-43af-bf6e-4d34c663c289",
+              "label": "Creative production",
+              "amount": 2500
+            }
+          ]
+        }
+      },
+      "events": [
+        {
+          "eventName": "campaign.type.selected",
+          "kind": "signal",
+          "ruleId": "df6f5d4e-7bf2-4c69-acf0-1325be7b7e02",
+          "ruleName": "Show advertising section when Task type is Digital Advertising",
+          "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+          "templateVersion": 2,
+          "trigger": {
+            "fieldId": "20095cd6-3073-41f5-909f-be80886fe40b",
+            "label": "Task type",
+            "value": "digital-advertising"
+          },
+          "condition": {
+            "operator": "equals",
+            "value": "digital-advertising"
+          },
+          "payload": {
+            "kind": "signal"
+          },
+          "timestamp": "2026-08-27T07:46:00Z"
+        }
+      ],
+      "submittedAt": 1787816760000,
+      "status": "in_progress",
+      "appliedFieldEventIds": [],
+      "appliedRuleEventIds": []
+    },
+    {
+      "id": "a373dd0f-736e-4785-81c3-3b9e0baa1952-1787805540000",
+      "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+      "templateVersion": 2,
+      "templateName": "New Task (Advertising)",
+      "friendlyId": "TASK-004",
+      "data": {
+        "e3c9fcad-fdfe-47b1-8b64-c80836451f3a": "Weekly performance report \u2014 Always-on Search",
+        "4809feb5-1e0a-4717-aba3-a1e7d023724e": "Pull last 7 days CPA/ROAS and flag any keyword waste over $200.",
+        "20095cd6-3073-41f5-909f-be80886fe40b": "digital-advertising",
+        "9ae1d745-f84e-4acd-b905-666cb0067175": "2026-08-27",
+        "f64bda86-da63-4e1b-b4bb-159cb31a10d8": "1",
+        "03135e61-3553-4d0f-ada9-fff719f766e2": "google-ads",
+        "129bc116-38c5-4e8b-a69a-b68b168ab872": "reporting",
+        "50cd587f-f65f-47af-9c7a-99f6b28177a5": "vendor-d",
+        "43a1f21f-dac7-4b12-9a7e-36110e4381cc": "always-on-search",
+        "9aff86fd-7bae-4f63-a7eb-04855ea73770": {
+          "grossBudget": 45000,
+          "managementFeePercent": 10,
+          "additionalFees": []
+        }
+      },
+      "events": [
+        {
+          "eventName": "campaign.type.selected",
+          "kind": "signal",
+          "ruleId": "df6f5d4e-7bf2-4c69-acf0-1325be7b7e02",
+          "ruleName": "Show advertising section when Task type is Digital Advertising",
+          "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+          "templateVersion": 2,
+          "trigger": {
+            "fieldId": "20095cd6-3073-41f5-909f-be80886fe40b",
+            "label": "Task type",
+            "value": "digital-advertising"
+          },
+          "condition": {
+            "operator": "equals",
+            "value": "digital-advertising"
+          },
+          "payload": {
+            "kind": "signal"
+          },
+          "timestamp": "2026-08-27T04:39:00Z"
+        }
+      ],
+      "submittedAt": 1787805540000,
+      "status": "todo",
+      "appliedFieldEventIds": [],
+      "appliedRuleEventIds": []
+    },
+    {
+      "id": "a373dd0f-736e-4785-81c3-3b9e0baa1952-1787794320000",
+      "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+      "templateVersion": 2,
+      "templateName": "New Task (Advertising)",
+      "friendlyId": "TASK-005",
+      "data": {
+        "e3c9fcad-fdfe-47b1-8b64-c80836451f3a": "LinkedIn thought-leadership campaign kickoff",
+        "4809feb5-1e0a-4717-aba3-a1e7d023724e": "B2B lead gen for fleet decision-makers. Need form + UTM before go-live.",
+        "20095cd6-3073-41f5-909f-be80886fe40b": "digital-advertising",
+        "9ae1d745-f84e-4acd-b905-666cb0067175": "2026-09-05",
+        "f64bda86-da63-4e1b-b4bb-159cb31a10d8": "2",
+        "03135e61-3553-4d0f-ada9-fff719f766e2": "linkedin-ads",
+        "129bc116-38c5-4e8b-a69a-b68b168ab872": "new-campaign",
+        "50cd587f-f65f-47af-9c7a-99f6b28177a5": "vendor-a",
+        "43a1f21f-dac7-4b12-9a7e-36110e4381cc": "acura-launch",
+        "9aff86fd-7bae-4f63-a7eb-04855ea73770": {
+          "grossBudget": 120000,
+          "managementFeePercent": 18,
+          "additionalFees": [
+            {
+              "id": "5c5103c4-915d-4332-8e47-0edba98525f6",
+              "label": "LinkedIn fee",
+              "amount": 1800
+            }
+          ]
+        }
+      },
+      "events": [
+        {
+          "eventName": "campaign.type.selected",
+          "kind": "signal",
+          "ruleId": "df6f5d4e-7bf2-4c69-acf0-1325be7b7e02",
+          "ruleName": "Show advertising section when Task type is Digital Advertising",
+          "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+          "templateVersion": 2,
+          "trigger": {
+            "fieldId": "20095cd6-3073-41f5-909f-be80886fe40b",
+            "label": "Task type",
+            "value": "digital-advertising"
+          },
+          "condition": {
+            "operator": "equals",
+            "value": "digital-advertising"
+          },
+          "payload": {
+            "kind": "signal"
+          },
+          "timestamp": "2026-08-27T01:32:00Z"
+        }
+      ],
+      "submittedAt": 1787794320000,
+      "status": "todo",
+      "appliedFieldEventIds": [],
+      "appliedRuleEventIds": []
+    },
+    {
+      "id": "a373dd0f-736e-4785-81c3-3b9e0baa1952-1787783100000",
+      "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+      "templateVersion": 2,
+      "templateName": "New Task (Advertising)",
+      "friendlyId": "TASK-006",
+      "data": {
+        "e3c9fcad-fdfe-47b1-8b64-c80836451f3a": "Increase Meta prospecting spend +20%",
+        "4809feb5-1e0a-4717-aba3-a1e7d023724e": "Scale winning ad sets after creative QA. Cap daily at $4.5k until CPA holds.",
+        "20095cd6-3073-41f5-909f-be80886fe40b": "digital-advertising",
+        "9ae1d745-f84e-4acd-b905-666cb0067175": "2026-08-30",
+        "f64bda86-da63-4e1b-b4bb-159cb31a10d8": "3",
+        "03135e61-3553-4d0f-ada9-fff719f766e2": "meta-ads",
+        "129bc116-38c5-4e8b-a69a-b68b168ab872": "budget-change",
+        "50cd587f-f65f-47af-9c7a-99f6b28177a5": "vendor-b",
+        "43a1f21f-dac7-4b12-9a7e-36110e4381cc": "honda-q3",
+        "9aff86fd-7bae-4f63-a7eb-04855ea73770": {
+          "grossBudget": 250000,
+          "managementFeePercent": 15,
+          "additionalFees": [
+            {
+              "id": "96f7769a-e38c-4c33-9f74-95fd7c454034",
+              "label": "Meta ads tax",
+              "amount": 750
+            }
+          ]
+        }
+      },
+      "events": [
+        {
+          "eventName": "campaign.type.selected",
+          "kind": "signal",
+          "ruleId": "df6f5d4e-7bf2-4c69-acf0-1325be7b7e02",
+          "ruleName": "Show advertising section when Task type is Digital Advertising",
+          "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+          "templateVersion": 2,
+          "trigger": {
+            "fieldId": "20095cd6-3073-41f5-909f-be80886fe40b",
+            "label": "Task type",
+            "value": "digital-advertising"
+          },
+          "condition": {
+            "operator": "equals",
+            "value": "digital-advertising"
+          },
+          "payload": {
+            "kind": "signal"
+          },
+          "timestamp": "2026-08-26T22:25:00Z"
+        }
+      ],
+      "submittedAt": 1787783100000,
+      "status": "todo",
+      "appliedFieldEventIds": [],
+      "appliedRuleEventIds": []
+    },
+    {
+      "id": "a373dd0f-736e-4785-81c3-3b9e0baa1952-1787771880000",
+      "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+      "templateVersion": 2,
+      "templateName": "New Task (Advertising)",
+      "friendlyId": "TASK-007",
+      "data": {
+        "e3c9fcad-fdfe-47b1-8b64-c80836451f3a": "Pause underperforming display placements",
+        "4809feb5-1e0a-4717-aba3-a1e7d023724e": "Clear Channel report shows high viewability but weak CTR on 3 sites \u2014 pause and reallocate.",
+        "20095cd6-3073-41f5-909f-be80886fe40b": "digital-advertising",
+        "9ae1d745-f84e-4acd-b905-666cb0067175": "2026-08-28",
+        "f64bda86-da63-4e1b-b4bb-159cb31a10d8": "1",
+        "03135e61-3553-4d0f-ada9-fff719f766e2": "programmatic",
+        "129bc116-38c5-4e8b-a69a-b68b168ab872": "creative-update",
+        "50cd587f-f65f-47af-9c7a-99f6b28177a5": "vendor-c",
+        "43a1f21f-dac7-4b12-9a7e-36110e4381cc": "dealer-co-op",
+        "9aff86fd-7bae-4f63-a7eb-04855ea73770": {
+          "grossBudget": 80000,
+          "managementFeePercent": 12,
+          "additionalFees": []
+        }
+      },
+      "events": [
+        {
+          "eventName": "campaign.type.selected",
+          "kind": "signal",
+          "ruleId": "df6f5d4e-7bf2-4c69-acf0-1325be7b7e02",
+          "ruleName": "Show advertising section when Task type is Digital Advertising",
+          "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+          "templateVersion": 2,
+          "trigger": {
+            "fieldId": "20095cd6-3073-41f5-909f-be80886fe40b",
+            "label": "Task type",
+            "value": "digital-advertising"
+          },
+          "condition": {
+            "operator": "equals",
+            "value": "digital-advertising"
+          },
+          "payload": {
+            "kind": "signal"
+          },
+          "timestamp": "2026-08-26T19:18:00Z"
+        }
+      ],
+      "submittedAt": 1787771880000,
+      "status": "done",
+      "appliedFieldEventIds": [],
+      "appliedRuleEventIds": []
+    },
+    {
+      "id": "a373dd0f-736e-4785-81c3-3b9e0baa1952-1787760660000",
+      "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+      "templateVersion": 2,
+      "templateName": "New Task (Advertising)",
+      "friendlyId": "TASK-008",
+      "data": {
+        "e3c9fcad-fdfe-47b1-8b64-c80836451f3a": "Acura launch \u2014 retargeting setup",
+        "4809feb5-1e0a-4717-aba3-a1e7d023724e": "Build site visitors + video viewers pools for week-2 retargeting.",
+        "20095cd6-3073-41f5-909f-be80886fe40b": "digital-advertising",
+        "9ae1d745-f84e-4acd-b905-666cb0067175": "2026-09-01",
+        "f64bda86-da63-4e1b-b4bb-159cb31a10d8": "2",
+        "03135e61-3553-4d0f-ada9-fff719f766e2": "meta-ads",
+        "129bc116-38c5-4e8b-a69a-b68b168ab872": "new-campaign",
+        "50cd587f-f65f-47af-9c7a-99f6b28177a5": "vendor-b",
+        "43a1f21f-dac7-4b12-9a7e-36110e4381cc": "acura-launch",
+        "9aff86fd-7bae-4f63-a7eb-04855ea73770": {
+          "grossBudget": 120000,
+          "managementFeePercent": 15,
+          "additionalFees": [
+            {
+              "id": "62763939-a5d3-4b26-9aca-fccade86eb24",
+              "label": "Pixel QA",
+              "amount": 400
+            }
+          ]
+        }
+      },
+      "events": [
+        {
+          "eventName": "campaign.type.selected",
+          "kind": "signal",
+          "ruleId": "df6f5d4e-7bf2-4c69-acf0-1325be7b7e02",
+          "ruleName": "Show advertising section when Task type is Digital Advertising",
+          "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+          "templateVersion": 2,
+          "trigger": {
+            "fieldId": "20095cd6-3073-41f5-909f-be80886fe40b",
+            "label": "Task type",
+            "value": "digital-advertising"
+          },
+          "condition": {
+            "operator": "equals",
+            "value": "digital-advertising"
+          },
+          "payload": {
+            "kind": "signal"
+          },
+          "timestamp": "2026-08-26T16:11:00Z"
+        }
+      ],
+      "submittedAt": 1787760660000,
+      "status": "in_progress",
+      "appliedFieldEventIds": [],
+      "appliedRuleEventIds": []
+    },
+    {
+      "id": "a373dd0f-736e-4785-81c3-3b9e0baa1952-1787749440000",
+      "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+      "templateVersion": 2,
+      "templateName": "New Task (Advertising)",
+      "friendlyId": "TASK-009",
+      "data": {
+        "e3c9fcad-fdfe-47b1-8b64-c80836451f3a": "Google Ads negative keyword cleanup",
+        "4809feb5-1e0a-4717-aba3-a1e7d023724e": "Remove brand-hijack and irrelevant queries from Always-on Search.",
+        "20095cd6-3073-41f5-909f-be80886fe40b": "digital-advertising",
+        "9ae1d745-f84e-4acd-b905-666cb0067175": "2026-08-27",
+        "f64bda86-da63-4e1b-b4bb-159cb31a10d8": "1",
+        "03135e61-3553-4d0f-ada9-fff719f766e2": "google-ads",
+        "129bc116-38c5-4e8b-a69a-b68b168ab872": "creative-update",
+        "50cd587f-f65f-47af-9c7a-99f6b28177a5": "vendor-d",
+        "43a1f21f-dac7-4b12-9a7e-36110e4381cc": "always-on-search",
+        "9aff86fd-7bae-4f63-a7eb-04855ea73770": {
+          "grossBudget": 45000,
+          "managementFeePercent": 10,
+          "additionalFees": []
+        }
+      },
+      "events": [
+        {
+          "eventName": "campaign.type.selected",
+          "kind": "signal",
+          "ruleId": "df6f5d4e-7bf2-4c69-acf0-1325be7b7e02",
+          "ruleName": "Show advertising section when Task type is Digital Advertising",
+          "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+          "templateVersion": 2,
+          "trigger": {
+            "fieldId": "20095cd6-3073-41f5-909f-be80886fe40b",
+            "label": "Task type",
+            "value": "digital-advertising"
+          },
+          "condition": {
+            "operator": "equals",
+            "value": "digital-advertising"
+          },
+          "payload": {
+            "kind": "signal"
+          },
+          "timestamp": "2026-08-26T13:04:00Z"
+        }
+      ],
+      "submittedAt": 1787749440000,
+      "status": "done",
+      "appliedFieldEventIds": [],
+      "appliedRuleEventIds": []
+    },
+    {
+      "id": "a373dd0f-736e-4785-81c3-3b9e0baa1952-1787738220000",
+      "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+      "templateVersion": 2,
+      "templateName": "New Task (Advertising)",
+      "friendlyId": "TASK-010",
+      "data": {
+        "e3c9fcad-fdfe-47b1-8b64-c80836451f3a": "Q3 brand campaign \u2014 invoice reconciliation",
+        "4809feb5-1e0a-4717-aba3-a1e7d023724e": "Match Horizon Media invoice lines to Honda Q3 IO and flag variances >2%.",
+        "20095cd6-3073-41f5-909f-be80886fe40b": "digital-advertising",
+        "9ae1d745-f84e-4acd-b905-666cb0067175": "2026-09-04",
+        "f64bda86-da63-4e1b-b4bb-159cb31a10d8": "3",
+        "03135e61-3553-4d0f-ada9-fff719f766e2": "google-ads",
+        "129bc116-38c5-4e8b-a69a-b68b168ab872": "reporting",
+        "50cd587f-f65f-47af-9c7a-99f6b28177a5": "vendor-a",
+        "43a1f21f-dac7-4b12-9a7e-36110e4381cc": "honda-q3",
+        "9aff86fd-7bae-4f63-a7eb-04855ea73770": {
+          "grossBudget": 250000,
+          "managementFeePercent": 15,
+          "additionalFees": [
+            {
+              "id": "7b1f0277-47a7-4ef7-ac44-fc84a4abc9c3",
+              "label": "Audit support",
+              "amount": 600
+            }
+          ]
+        }
+      },
+      "events": [
+        {
+          "eventName": "campaign.type.selected",
+          "kind": "signal",
+          "ruleId": "df6f5d4e-7bf2-4c69-acf0-1325be7b7e02",
+          "ruleName": "Show advertising section when Task type is Digital Advertising",
+          "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+          "templateVersion": 2,
+          "trigger": {
+            "fieldId": "20095cd6-3073-41f5-909f-be80886fe40b",
+            "label": "Task type",
+            "value": "digital-advertising"
+          },
+          "condition": {
+            "operator": "equals",
+            "value": "digital-advertising"
+          },
+          "payload": {
+            "kind": "signal"
+          },
+          "timestamp": "2026-08-26T09:57:00Z"
+        }
+      ],
+      "submittedAt": 1787738220000,
+      "status": "todo",
+      "appliedFieldEventIds": [],
+      "appliedRuleEventIds": []
+    },
+    {
+      "id": "a373dd0f-736e-4785-81c3-3b9e0baa1952-1787727000000",
+      "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+      "templateVersion": 2,
+      "templateName": "New Task (Advertising)",
+      "friendlyId": "TASK-011",
+      "data": {
+        "e3c9fcad-fdfe-47b1-8b64-c80836451f3a": "Programmatic private marketplace proposal",
+        "4809feb5-1e0a-4717-aba3-a1e7d023724e": "Review Spark Digital PMP inventory for auto intenders; recommend buy/no-buy.",
+        "20095cd6-3073-41f5-909f-be80886fe40b": "digital-advertising",
+        "9ae1d745-f84e-4acd-b905-666cb0067175": "2026-09-08",
+        "f64bda86-da63-4e1b-b4bb-159cb31a10d8": "2",
+        "03135e61-3553-4d0f-ada9-fff719f766e2": "programmatic",
+        "129bc116-38c5-4e8b-a69a-b68b168ab872": "new-campaign",
+        "50cd587f-f65f-47af-9c7a-99f6b28177a5": "vendor-b",
+        "43a1f21f-dac7-4b12-9a7e-36110e4381cc": "honda-q3",
+        "9aff86fd-7bae-4f63-a7eb-04855ea73770": {
+          "grossBudget": 250000,
+          "managementFeePercent": 14,
+          "additionalFees": [
+            {
+              "id": "718b7bed-fdfa-4a84-83b6-ef91092c6cda",
+              "label": "Data fee",
+              "amount": 1100
+            }
+          ]
+        }
+      },
+      "events": [
+        {
+          "eventName": "campaign.type.selected",
+          "kind": "signal",
+          "ruleId": "df6f5d4e-7bf2-4c69-acf0-1325be7b7e02",
+          "ruleName": "Show advertising section when Task type is Digital Advertising",
+          "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+          "templateVersion": 2,
+          "trigger": {
+            "fieldId": "20095cd6-3073-41f5-909f-be80886fe40b",
+            "label": "Task type",
+            "value": "digital-advertising"
+          },
+          "condition": {
+            "operator": "equals",
+            "value": "digital-advertising"
+          },
+          "payload": {
+            "kind": "signal"
+          },
+          "timestamp": "2026-08-26T06:50:00Z"
+        }
+      ],
+      "submittedAt": 1787727000000,
+      "status": "todo",
+      "appliedFieldEventIds": [],
+      "appliedRuleEventIds": []
+    },
+    {
+      "id": "a373dd0f-736e-4785-81c3-3b9e0baa1952-1787715780000",
+      "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+      "templateVersion": 2,
+      "templateName": "New Task (Advertising)",
+      "friendlyId": "TASK-012",
+      "data": {
+        "e3c9fcad-fdfe-47b1-8b64-c80836451f3a": "Shift budget from display to search",
+        "4809feb5-1e0a-4717-aba3-a1e7d023724e": "Move $15k from dealer co-op display into branded search for Labor Day weekend.",
+        "20095cd6-3073-41f5-909f-be80886fe40b": "digital-advertising",
+        "9ae1d745-f84e-4acd-b905-666cb0067175": "2026-08-31",
+        "f64bda86-da63-4e1b-b4bb-159cb31a10d8": "1",
+        "03135e61-3553-4d0f-ada9-fff719f766e2": "google-ads",
+        "129bc116-38c5-4e8b-a69a-b68b168ab872": "budget-change",
+        "50cd587f-f65f-47af-9c7a-99f6b28177a5": "vendor-d",
+        "43a1f21f-dac7-4b12-9a7e-36110e4381cc": "dealer-co-op",
+        "9aff86fd-7bae-4f63-a7eb-04855ea73770": {
+          "grossBudget": 80000,
+          "managementFeePercent": 12,
+          "additionalFees": []
+        }
+      },
+      "events": [
+        {
+          "eventName": "campaign.type.selected",
+          "kind": "signal",
+          "ruleId": "df6f5d4e-7bf2-4c69-acf0-1325be7b7e02",
+          "ruleName": "Show advertising section when Task type is Digital Advertising",
+          "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+          "templateVersion": 2,
+          "trigger": {
+            "fieldId": "20095cd6-3073-41f5-909f-be80886fe40b",
+            "label": "Task type",
+            "value": "digital-advertising"
+          },
+          "condition": {
+            "operator": "equals",
+            "value": "digital-advertising"
+          },
+          "payload": {
+            "kind": "signal"
+          },
+          "timestamp": "2026-08-26T03:43:00Z"
+        }
+      ],
+      "submittedAt": 1787715780000,
+      "status": "in_progress",
+      "appliedFieldEventIds": [],
+      "appliedRuleEventIds": []
+    },
+    {
+      "id": "a373dd0f-736e-4785-81c3-3b9e0baa1952-1787704560000",
+      "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+      "templateVersion": 2,
+      "templateName": "New Task (Advertising)",
+      "friendlyId": "TASK-013",
+      "data": {
+        "e3c9fcad-fdfe-47b1-8b64-c80836451f3a": "Creative A/B test \u2014 carousel vs single image",
+        "4809feb5-1e0a-4717-aba3-a1e7d023724e": "Run 7-day Meta test on Acura launch creative. Document winner in Notion.",
+        "20095cd6-3073-41f5-909f-be80886fe40b": "digital-advertising",
+        "9ae1d745-f84e-4acd-b905-666cb0067175": "2026-09-03",
+        "f64bda86-da63-4e1b-b4bb-159cb31a10d8": "3",
+        "03135e61-3553-4d0f-ada9-fff719f766e2": "meta-ads",
+        "129bc116-38c5-4e8b-a69a-b68b168ab872": "creative-update",
+        "50cd587f-f65f-47af-9c7a-99f6b28177a5": "vendor-b",
+        "43a1f21f-dac7-4b12-9a7e-36110e4381cc": "acura-launch",
+        "9aff86fd-7bae-4f63-a7eb-04855ea73770": {
+          "grossBudget": 120000,
+          "managementFeePercent": 15,
+          "additionalFees": [
+            {
+              "id": "58be6e9e-a924-41fe-9018-af3069fe1e6b",
+              "label": "Testing uplift",
+              "amount": 500
+            }
+          ]
+        }
+      },
+      "events": [
+        {
+          "eventName": "campaign.type.selected",
+          "kind": "signal",
+          "ruleId": "df6f5d4e-7bf2-4c69-acf0-1325be7b7e02",
+          "ruleName": "Show advertising section when Task type is Digital Advertising",
+          "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+          "templateVersion": 2,
+          "trigger": {
+            "fieldId": "20095cd6-3073-41f5-909f-be80886fe40b",
+            "label": "Task type",
+            "value": "digital-advertising"
+          },
+          "condition": {
+            "operator": "equals",
+            "value": "digital-advertising"
+          },
+          "payload": {
+            "kind": "signal"
+          },
+          "timestamp": "2026-08-26T00:36:00Z"
+        }
+      ],
+      "submittedAt": 1787704560000,
+      "status": "todo",
+      "appliedFieldEventIds": [],
+      "appliedRuleEventIds": []
+    },
+    {
+      "id": "a373dd0f-736e-4785-81c3-3b9e0baa1952-1787693340000",
+      "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+      "templateVersion": 2,
+      "templateName": "New Task (Advertising)",
+      "friendlyId": "TASK-014",
+      "data": {
+        "e3c9fcad-fdfe-47b1-8b64-c80836451f3a": "Monthly client deck \u2014 Digital Ads summary",
+        "4809feb5-1e0a-4717-aba3-a1e7d023724e": "Compile August KPIs, learnings, and September recommendations for the client call.",
+        "20095cd6-3073-41f5-909f-be80886fe40b": "digital-advertising",
+        "9ae1d745-f84e-4acd-b905-666cb0067175": "2026-09-06",
+        "f64bda86-da63-4e1b-b4bb-159cb31a10d8": "2",
+        "03135e61-3553-4d0f-ada9-fff719f766e2": "google-ads",
+        "129bc116-38c5-4e8b-a69a-b68b168ab872": "reporting",
+        "50cd587f-f65f-47af-9c7a-99f6b28177a5": "vendor-a",
+        "43a1f21f-dac7-4b12-9a7e-36110e4381cc": "honda-q3",
+        "9aff86fd-7bae-4f63-a7eb-04855ea73770": {
+          "grossBudget": 250000,
+          "managementFeePercent": 15,
+          "additionalFees": []
+        }
+      },
+      "events": [
+        {
+          "eventName": "campaign.type.selected",
+          "kind": "signal",
+          "ruleId": "df6f5d4e-7bf2-4c69-acf0-1325be7b7e02",
+          "ruleName": "Show advertising section when Task type is Digital Advertising",
+          "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+          "templateVersion": 2,
+          "trigger": {
+            "fieldId": "20095cd6-3073-41f5-909f-be80886fe40b",
+            "label": "Task type",
+            "value": "digital-advertising"
+          },
+          "condition": {
+            "operator": "equals",
+            "value": "digital-advertising"
+          },
+          "payload": {
+            "kind": "signal"
+          },
+          "timestamp": "2026-08-25T21:29:00Z"
+        }
+      ],
+      "submittedAt": 1787693340000,
+      "status": "todo",
+      "appliedFieldEventIds": [],
+      "appliedRuleEventIds": []
+    },
+    {
+      "id": "a373dd0f-736e-4785-81c3-3b9e0baa1952-1787682120000",
+      "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+      "templateVersion": 2,
+      "templateName": "New Task (Advertising)",
+      "friendlyId": "TASK-015",
+      "data": {
+        "e3c9fcad-fdfe-47b1-8b64-c80836451f3a": "Print insert for weekend circular",
+        "4809feb5-1e0a-4717-aba3-a1e7d023724e": "Coordinate dealer print insert specs and ship date with the print vendor.",
+        "20095cd6-3073-41f5-909f-be80886fe40b": "print",
+        "9ae1d745-f84e-4acd-b905-666cb0067175": "2026-09-02",
+        "f64bda86-da63-4e1b-b4bb-159cb31a10d8": "3"
+      },
+      "events": [],
+      "submittedAt": 1787682120000,
+      "status": "todo",
+      "appliedFieldEventIds": [],
+      "appliedRuleEventIds": []
+    },
+    {
+      "id": "a373dd0f-736e-4785-81c3-3b9e0baa1952-1787670900000",
+      "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+      "templateVersion": 2,
+      "templateName": "New Task (Advertising)",
+      "friendlyId": "TASK-016",
+      "data": {
+        "e3c9fcad-fdfe-47b1-8b64-c80836451f3a": "Social organic posts for Labor Day sale",
+        "4809feb5-1e0a-4717-aba3-a1e7d023724e": "Draft 5 organic posts (IG + FB) aligned with paid creative; legal review needed.",
+        "20095cd6-3073-41f5-909f-be80886fe40b": "social",
+        "9ae1d745-f84e-4acd-b905-666cb0067175": "2026-08-29",
+        "f64bda86-da63-4e1b-b4bb-159cb31a10d8": "1"
+      },
+      "events": [],
+      "submittedAt": 1787670900000,
+      "status": "in_progress",
+      "appliedFieldEventIds": [],
+      "appliedRuleEventIds": []
+    },
+    {
+      "id": "a373dd0f-736e-4785-81c3-3b9e0baa1952-1787659680000",
+      "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+      "templateVersion": 2,
+      "templateName": "New Task (Advertising)",
+      "friendlyId": "TASK-017",
+      "data": {
+        "e3c9fcad-fdfe-47b1-8b64-c80836451f3a": "Update media calendar for September",
+        "4809feb5-1e0a-4717-aba3-a1e7d023724e": "Roll Q3 flights into September planner and mark blackout dates.",
+        "20095cd6-3073-41f5-909f-be80886fe40b": "general",
+        "9ae1d745-f84e-4acd-b905-666cb0067175": "2026-08-28",
+        "f64bda86-da63-4e1b-b4bb-159cb31a10d8": "2"
+      },
+      "events": [],
+      "submittedAt": 1787659680000,
+      "status": "done",
+      "appliedFieldEventIds": [],
+      "appliedRuleEventIds": []
+    },
+    {
+      "id": "a373dd0f-736e-4785-81c3-3b9e0baa1952-1787648460000",
+      "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+      "templateVersion": 2,
+      "templateName": "New Task (Advertising)",
+      "friendlyId": "TASK-018",
+      "data": {
+        "e3c9fcad-fdfe-47b1-8b64-c80836451f3a": "LinkedIn lead-gen form QA",
+        "4809feb5-1e0a-4717-aba3-a1e7d023724e": "Verify CRM mapping and thank-you page before campaign spend unlocks.",
+        "20095cd6-3073-41f5-909f-be80886fe40b": "digital-advertising",
+        "9ae1d745-f84e-4acd-b905-666cb0067175": "2026-09-01",
+        "f64bda86-da63-4e1b-b4bb-159cb31a10d8": "3",
+        "03135e61-3553-4d0f-ada9-fff719f766e2": "linkedin-ads",
+        "129bc116-38c5-4e8b-a69a-b68b168ab872": "creative-update",
+        "50cd587f-f65f-47af-9c7a-99f6b28177a5": "vendor-a",
+        "43a1f21f-dac7-4b12-9a7e-36110e4381cc": "acura-launch",
+        "9aff86fd-7bae-4f63-a7eb-04855ea73770": {
+          "grossBudget": 120000,
+          "managementFeePercent": 18,
+          "additionalFees": []
+        }
+      },
+      "events": [
+        {
+          "eventName": "campaign.type.selected",
+          "kind": "signal",
+          "ruleId": "df6f5d4e-7bf2-4c69-acf0-1325be7b7e02",
+          "ruleName": "Show advertising section when Task type is Digital Advertising",
+          "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+          "templateVersion": 2,
+          "trigger": {
+            "fieldId": "20095cd6-3073-41f5-909f-be80886fe40b",
+            "label": "Task type",
+            "value": "digital-advertising"
+          },
+          "condition": {
+            "operator": "equals",
+            "value": "digital-advertising"
+          },
+          "payload": {
+            "kind": "signal"
+          },
+          "timestamp": "2026-08-25T09:01:00Z"
+        }
+      ],
+      "submittedAt": 1787648460000,
+      "status": "todo",
+      "appliedFieldEventIds": [],
+      "appliedRuleEventIds": []
+    },
+    {
+      "id": "a373dd0f-736e-4785-81c3-3b9e0baa1952-1787637240000",
+      "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+      "templateVersion": 2,
+      "templateName": "New Task (Advertising)",
+      "friendlyId": "TASK-019",
+      "data": {
+        "e3c9fcad-fdfe-47b1-8b64-c80836451f3a": "Emergency spend cap \u2014 brand safety alert",
+        "4809feb5-1e0a-4717-aba3-a1e7d023724e": "Temporarily reduce programmatic spend after brand-safety flag until whitelist updated.",
+        "20095cd6-3073-41f5-909f-be80886fe40b": "digital-advertising",
+        "9ae1d745-f84e-4acd-b905-666cb0067175": "2026-08-27",
+        "f64bda86-da63-4e1b-b4bb-159cb31a10d8": "1",
+        "03135e61-3553-4d0f-ada9-fff719f766e2": "programmatic",
+        "129bc116-38c5-4e8b-a69a-b68b168ab872": "budget-change",
+        "50cd587f-f65f-47af-9c7a-99f6b28177a5": "vendor-c",
+        "43a1f21f-dac7-4b12-9a7e-36110e4381cc": "honda-q3",
+        "9aff86fd-7bae-4f63-a7eb-04855ea73770": {
+          "grossBudget": 250000,
+          "managementFeePercent": 12,
+          "additionalFees": [
+            {
+              "id": "35d807fb-974d-4bb1-ada3-1fc34cbfbea3",
+              "label": "Brand safety tool",
+              "amount": 850
+            }
+          ]
+        }
+      },
+      "events": [
+        {
+          "eventName": "campaign.type.selected",
+          "kind": "signal",
+          "ruleId": "df6f5d4e-7bf2-4c69-acf0-1325be7b7e02",
+          "ruleName": "Show advertising section when Task type is Digital Advertising",
+          "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+          "templateVersion": 2,
+          "trigger": {
+            "fieldId": "20095cd6-3073-41f5-909f-be80886fe40b",
+            "label": "Task type",
+            "value": "digital-advertising"
+          },
+          "condition": {
+            "operator": "equals",
+            "value": "digital-advertising"
+          },
+          "payload": {
+            "kind": "signal"
+          },
+          "timestamp": "2026-08-25T05:54:00Z"
+        }
+      ],
+      "submittedAt": 1787637240000,
+      "status": "done",
+      "appliedFieldEventIds": [],
+      "appliedRuleEventIds": []
+    },
+    {
+      "id": "a373dd0f-736e-4785-81c3-3b9e0baa1952-1787626020000",
+      "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+      "templateVersion": 2,
+      "templateName": "New Task (Advertising)",
+      "friendlyId": "TASK-020",
+      "data": {
+        "e3c9fcad-fdfe-47b1-8b64-c80836451f3a": "Always-on Search \u2014 RSA asset refresh",
+        "4809feb5-1e0a-4717-aba3-a1e7d023724e": "Replace stale headlines/descriptions; keep pinning strategy from last test.",
+        "20095cd6-3073-41f5-909f-be80886fe40b": "digital-advertising",
+        "9ae1d745-f84e-4acd-b905-666cb0067175": "2026-09-07",
+        "f64bda86-da63-4e1b-b4bb-159cb31a10d8": "2",
+        "03135e61-3553-4d0f-ada9-fff719f766e2": "google-ads",
+        "129bc116-38c5-4e8b-a69a-b68b168ab872": "creative-update",
+        "50cd587f-f65f-47af-9c7a-99f6b28177a5": "vendor-d",
+        "43a1f21f-dac7-4b12-9a7e-36110e4381cc": "always-on-search",
+        "9aff86fd-7bae-4f63-a7eb-04855ea73770": {
+          "grossBudget": 45000,
+          "managementFeePercent": 10,
+          "additionalFees": [
+            {
+              "id": "5d4364e0-7b19-449c-9083-17e976a50633",
+              "label": "Copywriting",
+              "amount": 300
+            }
+          ]
+        }
+      },
+      "events": [
+        {
+          "eventName": "campaign.type.selected",
+          "kind": "signal",
+          "ruleId": "df6f5d4e-7bf2-4c69-acf0-1325be7b7e02",
+          "ruleName": "Show advertising section when Task type is Digital Advertising",
+          "templateId": "a373dd0f-736e-4785-81c3-3b9e0baa1952",
+          "templateVersion": 2,
+          "trigger": {
+            "fieldId": "20095cd6-3073-41f5-909f-be80886fe40b",
+            "label": "Task type",
+            "value": "digital-advertising"
+          },
+          "condition": {
+            "operator": "equals",
+            "value": "digital-advertising"
+          },
+          "payload": {
+            "kind": "signal"
+          },
+          "timestamp": "2026-08-25T02:47:00Z"
+        }
+      ],
+      "submittedAt": 1787626020000,
+      "status": "todo",
+      "appliedFieldEventIds": [],
+      "appliedRuleEventIds": []
+    }
+  ]
+}
